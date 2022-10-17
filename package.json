@@ -1,0 +1,26 @@
+{
+  "name": "stable_horde",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZeldaFan0225/Stable_Horde_Discord.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZeldaFan0225/Stable_Horde_Discord/issues"
+  },
+  "homepage": "https://github.com/ZeldaFan0225/Stable_Horde_Discord#readme",
+  "dependencies": {
+    "discord.js": "^14.6.0",
+    "pg": "^8.8.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.6.5"
+  }
+}
