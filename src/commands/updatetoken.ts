@@ -24,7 +24,7 @@ export default class extends Command {
             style: 1
         })
         return ctx.interaction.reply({
-            content: `Update your token by pressing the button below.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${commands?.find(c => c.name === "terms") ? `</terms:${commands?.find(c => c.name === "terms")!.id}>` : "/terms"}`,
+            content: `Update your token by pressing the button below.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${commands?.find(c => c.name === "terms") ? `</terms:${commands?.find(c => c.name === "terms")!.id}>` : "/terms"}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://stablehorde.net/register`,
             components: [{type: 1, components: [add_token_button.toJSON()]}],
             ephemeral: true
         })
