@@ -1,3 +1,31 @@
 {
-    
+    "allow_nsfw": false,
+    "trusted_workers": true,
+    "censor_nsfw": true,
+    "default_steps": 30,
+    "default_res": {
+        "width": 512,
+        "height": 512
+    },
+    "default_cfg": 7,
+    "default_sampler": "k_euler",
+    "default_token": "0000000000",
+    "dev": true,
+    "user_restrictions": {
+        "width": {
+            "min": 64,
+            "max": 1024
+        },
+        "height": {
+            "min": 64,
+            "max": 1024
+        },
+        "amount": {
+            "max": 4
+        },
+        "steps": {
+            "min": 1,
+            "max": 100
+        }
+    }
 }

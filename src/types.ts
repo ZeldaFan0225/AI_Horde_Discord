@@ -9,7 +9,9 @@ import {
     UserContextMenuCommandInteraction
 } from "discord.js";
 import { Pool } from "pg";
+import { APIManager } from "./classes/apiManager";
 import { SupportClient } from "./classes/client";
+import { ModelGenerationInputStableToggles } from "./stable_horde_types";
 
 export enum StoreTypes {
     COMMANDS,
@@ -40,7 +42,8 @@ export interface CustomIDInitOptions {
 export interface BaseContextInitOptions {
     interaction: Interaction,
     client: SupportClient,
-    database: Pool
+    database: Pool,
+    api_manager: APIManager
 }
 
 export interface CommandContextInitOptions extends BaseContextInitOptions {
@@ -73,9 +76,38 @@ export interface AutocompleteContextInitOptions extends BaseContextInitOptions {
 
 export interface Config {
     staff_roles?: string[],
-    questions?: {
-        pcvr: string[],
-        no_pcvr: string[]
+    allow_nsfw?: boolean,
+    trusted_workers?: boolean,
+    censor_nsfw?: boolean,
+    workers?: string[],
+    default_steps?: number,
+    default_res?: {
+        width?: number,
+        height?: number
     },
-    auto_edit_channel?: boolean
+    default_cfg?: number,
+    default_sampler?: ModelGenerationInputStableToggles,
+    default_token?: string,
+    dev?: boolean,
+    user_restrictions?: {
+        width?: {
+            min?: number,
+            max?: number
+        },
+        height?: {
+            min?: number,
+            max?: number
+        },
+        amount?: {
+            max?: number
+        },
+        steps?: {
+            min?: number,
+            max?: number
+        }
+    }
 }
+
+export const ICONS = Object.freeze({
+    "AMONG_US": "<a:AmongPartywo:843160353386135553>"
+} as const)

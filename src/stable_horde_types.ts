@@ -103,7 +103,15 @@ export interface ModelGenerationInputStable {
     n?: number
 }
 
-export type ModelGenerationInputStableToggles = "k_lms" |"k_heun" | "k_euler" | "k_dpm_2" | "k_dpm_2_a" | "DDIM" | "PLMS"
+export enum ModelGenerationInputStableToggles {
+    "k_lms" = "k_lms",
+    "k_heun" = "k_heun",
+    "k_euler" = "k_euler",
+    "k_dpm_2" = "k_dpm_2",
+    "k_dpm_2_a" = "k_dpm_2_a",
+    "DDIM" = "DDIM",
+    "PLMS" = "PLMS"
+} 
 
 export interface ModelPayloadRootStable {
     /** 
@@ -172,11 +180,11 @@ export interface RequestError {
     message: string
 }
 
-export interface RequestStatusCheck extends RequestStatusStable {
+export interface RequestStatusStable extends RequestStatusCheck {
     generations: GenerationStable[]
 }
 
-export interface RequestStatusStable {
+export interface RequestStatusCheck {
     /** The amount of finished images in this request */
     finished: number,
     /** The amount of still processing images in this request */
@@ -351,7 +359,7 @@ export interface GenerationSubmitted {
 }
 
 export interface UserDetailsStable extends UserDetails {
-    usage?: UserDetailsStable,
+    usage?: UsageDetailsStable,
     contributions?: ContributionsDetailsStable
 }
 
@@ -404,12 +412,12 @@ export interface MonthlyKudos {
     last_received?: string
 }
 
-export interface UserDetailsStable extends UserDetails {
+export interface UsageDetailsStable extends UsageDetails {
     /** How many megapixelsteps this user has requested */
     megapixelsteps?: number
 }
 
-export interface UserDetails {
+export interface UsageDetails {
     /** How many images this user has requested */
     requests?: number,
 }
@@ -421,7 +429,7 @@ export interface ContributionsDetailsStable extends ContributionsDetails {
 
 export interface ContributionsDetails {
     /** How many images this user has generated */
-    fullfillments?: number
+    fulfillments?: number
 }
 
 export interface ModifyUser {

@@ -9,8 +9,8 @@ export class CommandContext extends BaseContext {
         this.interaction = options.interaction
     }
 
-    async error(options: { content?: string, error_key?: string, ephemeral?: boolean, codeblock?: boolean, type?: "user" | "guild", args?: string[] }) {
-        const err_string = options.content ?? "Unknown Error"
+    async error(options: { error?: string, ephemeral?: boolean, codeblock?: boolean, type?: "user" | "guild", args?: string[] }) {
+        const err_string = options.error ?? "Unknown Error"
         const embed = new EmbedBuilder({
             color: Colors.Red,
             description: `❌ **Error** | ${(options.codeblock ?? true) ? `\`${err_string}\`` : err_string}`
