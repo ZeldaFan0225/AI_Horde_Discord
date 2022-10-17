@@ -244,7 +244,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`,
                         title: `Image ${i+1}`,
                         image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
                         color: Colors.Blue,
-                        description: g.seed
+                        description: `Seed: ${g.seed}`
                     })
                     return {attachment, embed}
                 })
