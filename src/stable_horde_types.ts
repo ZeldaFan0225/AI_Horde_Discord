@@ -204,6 +204,8 @@ export interface Generation {
     worker_id?: string,
     /** The name of the worker which generated this image */
     worker_name?: string,
+    /** The model which generated this image */
+    model?: string
 }
 
 export interface GenerationStable extends Generation {
@@ -510,11 +512,20 @@ export interface ModifyWorker {
     name?: string
 }
 
-export interface Model {
+export interface DeletedWorker {
     /** The ID of the deleted worker */
     deleted_id?: string,
     /** The Name of the deleted worker*/
     deleted_name?: string
+}
+
+export interface ActiveModel {
+    /** The name of a model available by workers in this horde. */
+    name?: string,
+    /** How many workers in this horde are running this model. */
+    count?: number,
+    /** The average speed of generation for this model */
+    performance?: number
 }
 
 export interface KudosTransferred {

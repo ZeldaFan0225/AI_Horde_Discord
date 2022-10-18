@@ -1,10 +1,10 @@
 import { ButtonInteraction, ComponentType, SelectMenuInteraction } from "discord.js";
 import { Pool } from "pg";
 import { APIManager } from "../classes/apiManager";
-import { SupportClient } from "../classes/client";
+import { StableHordeClient } from "../classes/client";
 import { ComponentContext } from "../classes/componentContext";
 
-export async function handleComponents(interaction: ButtonInteraction | SelectMenuInteraction, client: SupportClient, database: Pool, api_manager: APIManager) {
+export async function handleComponents(interaction: ButtonInteraction | SelectMenuInteraction, client: StableHordeClient, database: Pool, api_manager: APIManager) {
     const command = await client.components.getComponent(interaction).catch(() => null)
     if(!command) return;
     let context

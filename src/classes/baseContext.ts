@@ -4,11 +4,11 @@ import {
 import { Pool } from "pg";
 import {BaseContextInitOptions} from "../types";
 import { APIManager } from "./apiManager";
-import { SupportClient } from "./client";
+import { StableHordeClient } from "./client";
 
 export class BaseContext{
     interaction: Interaction
-    client: SupportClient
+    client: StableHordeClient
     database: Pool
     api_manager: APIManager
     constructor(options: BaseContextInitOptions) {

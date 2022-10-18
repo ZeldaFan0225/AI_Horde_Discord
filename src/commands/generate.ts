@@ -4,6 +4,7 @@ import { CommandContext } from "../classes/commandContext";
 import { GenerationInput, ModelGenerationInputStableToggles } from "../stable_horde_types";
 import { Config } from "../types";
 import {readFileSync} from "fs"
+import { AutocompleteContext } from "../classes/autocompleteContext";
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
@@ -99,6 +100,15 @@ const command_data = new SlashCommandBuilder()
         .setMinValue(1)
         .setMaxValue(config.user_restrictions?.amount?.max ?? 4)
     )
+    if(config.user_restrictions?.allow_models) {
+        command_data
+        .addStringOption(
+            new SlashCommandStringOption()
+            .setName("model")
+            .setDescription("The model to use for this generation")
+            .setAutocomplete(true)
+        )
+    }
 
 export default class extends Command {
     constructor() {
@@ -124,9 +134,12 @@ export default class extends Command {
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
         const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.default_steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
+        const model = ctx.interaction.options.getString("model")
 
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
+        if(model && ctx.client.config.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
+        if(model && model !== "YOLO" && !(await ctx.api_manager.getStatusModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
 
         const token = await ctx.api_manager.getUserToken(ctx.interaction.user.id) || ctx.client.config.default_token || "0000000000"
 
@@ -152,7 +165,8 @@ export default class extends Command {
             nsfw: ctx.client.config.allow_nsfw,
             censor_nsfw: ctx.client.config.censor_nsfw,
             trusted_workers: ctx.client.config.trusted_workers,
-            workers: ctx.client.config.workers
+            workers: ctx.client.config.workers,
+            models: !model ? undefined : model === "YOLO" ? [] : [model]
         }
 
         if(ctx.client.config.dev) {
@@ -182,6 +196,12 @@ export default class extends Command {
 ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`,
         })
 
+        const login_embed = new EmbedBuilder({
+            color: Colors.Red,
+            title: "You are not logged in",
+            description: `This will make your requests appear anonymous.\nThis can result in low generation speed due to low priority.\nLog in now with ${await ctx.client.getSlashCommandTag("login")}\n\nDon't know what the token is?\nCreate a stable horde account here: https://stablehorde.net/register`
+        })
+
         if(ctx.client.config.dev) embed.setFooter({text: generation_start.id})
 
         const btn = new ButtonBuilder({
@@ -193,7 +213,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`,
 
         ctx.interaction.editReply({
             content: "",
-            embeds: [embed.toJSON()],
+            embeds: token === (ctx.client.config.default_token ?? "0000000000") ? [embed.toJSON(), login_embed.toJSON()] : [embed.toJSON()],
             components
         })
 
@@ -244,7 +264,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`,
                         title: `Image ${i+1}`,
                         image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
                         color: Colors.Blue,
-                        description: `Seed: ${g.seed}`
+                        description: `Seed: ${g.seed}\nModel: ${g.model}`
                     })
                     return {attachment, embed}
                 })
@@ -264,7 +284,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+status.wait_time}:R>`
 
             if(ctx.client.config.dev) embed.setFooter({text: generation_start?.id ?? "Unknown ID"})
 
-            let embeds = [embed.toJSON()]
+            let embeds = token === (ctx.client.config.default_token ?? "0000000000") ? [embed.toJSON(), login_embed.toJSON()] : [embed.toJSON()]
 
             if(status.wait_time > 60 * 2) {
                 embeds.push(new EmbedBuilder({
@@ -279,6 +299,17 @@ ETA: <t:${Math.floor(Date.now()/1000)+status.wait_time}:R>`
                 embeds,
                 components
             })
-        }, 1000 * 10)
+        }, 1000 * (ctx.client.config?.update_generation_status_interval_seconds || 5))
+    }
+
+    override async autocomplete(context: AutocompleteContext): Promise<any> {
+        const option = context.interaction.options.getFocused(true)
+        switch(option.name) {
+            case "model": {
+                const models = await context.api_manager.getStatusModels()
+                if(context.client.config.dev) console.log(models)
+                context.interaction.respond([{name: "Any Model", value: "YOLO"}, ...models.sort((a, b) => b.performance!-a.performance!).map(m => ({name: `${m.name} | Workers: ${m.count} | Performance: ${m.performance}`, value: m.name!}))])
+            }
+        }
     }
 }

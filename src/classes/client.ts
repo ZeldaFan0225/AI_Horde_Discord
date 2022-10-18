@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import { Store } from "../stores/store";
 import { Config, StoreTypes } from "../types";
 
-export class SupportClient extends Client {
+export class StableHordeClient extends Client {
 	commands: Store<StoreTypes.COMMANDS>;
 	components: Store<StoreTypes.COMPONENTS>;
 	modals: Store<StoreTypes.MODALS>;
@@ -26,4 +26,11 @@ export class SupportClient extends Client {
         const config = JSON.parse(readFileSync("./config.json").toString())
         this.config = config as Config
     }
+
+	async getSlashCommandTag(name: string) {
+		const commands = await this.application?.commands.fetch()
+		if(!commands?.size) return `/${name}`
+		else if(commands?.find(c => c.name === "terms")?.id) return `</terms:${commands?.find(c => c.name === "terms")!.id}>`
+		else return `/${name}`
+	}
 }

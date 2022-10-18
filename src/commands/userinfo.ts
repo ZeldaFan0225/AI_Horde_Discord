@@ -23,7 +23,6 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
-        const commands = await ctx.interaction.guild?.commands.fetch()
         let token = await ctx.api_manager.getUserToken(ctx.interaction.options.getUser("user")?.id ?? ctx.interaction.user.id)
         if(!token && ctx.interaction.options.getUser("user")?.id) return ctx.error({error: "The user has not added their token"})
         const add_token_button = new ButtonBuilder({
@@ -32,7 +31,7 @@ export default class extends Command {
             style: 1
         })
         if(!token) return ctx.interaction.reply({
-            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${commands?.find(c => c.name === "terms") ? `</terms:${commands?.find(c => c.name === "terms")!.id}>` : "/terms"}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://stablehorde.net/register`,
+            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://stablehorde.net/register`,
             components: [{type: 1, components: [add_token_button.toJSON()]}],
             ephemeral: true
         })
@@ -57,6 +56,7 @@ Images Generated \`${user_data.contributions?.fulfillments}\` (\`${user_data.con
 Allowed Concurrency \`${user_data.concurrency}\`
 
 **Kudos**
+Total \`${Object.values(user_data.kudos_details ?? {}).reduce((a, b) => (a) + b)}\`
 Accumulated \`${user_data.kudos_details?.accumulated}\`
 Gifted \`${user_data.kudos_details?.gifted}\`
 Admin \`${user_data.kudos_details?.admin}\`

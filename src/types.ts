@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import { Pool } from "pg";
 import { APIManager } from "./classes/apiManager";
-import { SupportClient } from "./classes/client";
+import { StableHordeClient } from "./classes/client";
 import { ModelGenerationInputStableToggles } from "./stable_horde_types";
 
 export enum StoreTypes {
@@ -41,7 +41,7 @@ export interface CustomIDInitOptions {
 
 export interface BaseContextInitOptions {
     interaction: Interaction,
-    client: SupportClient,
+    client: StableHordeClient,
     database: Pool,
     api_manager: APIManager
 }
@@ -89,6 +89,8 @@ export interface Config {
     default_sampler?: ModelGenerationInputStableToggles,
     default_token?: string,
     dev?: boolean,
+    blacklisted_models?: string[]
+    update_generation_status_interval_seconds?: number,
     user_restrictions?: {
         width?: {
             min?: number,
@@ -104,7 +106,8 @@ export interface Config {
         steps?: {
             min?: number,
             max?: number
-        }
+        },
+        allow_models?: boolean
     }
 }
 

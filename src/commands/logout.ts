@@ -3,14 +3,14 @@ import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 
 const command_data = new SlashCommandBuilder()
-    .setName("deletetoken")
+    .setName("logout")
     .setDMPermission(false)
     .setDescription(`Deletes your token from the database`)
 
 export default class extends Command {
     constructor() {
         super({
-            name: "deletetoken",
+            name: "logout",
             command_data: command_data.toJSON(),
             staff_only: false,
         })

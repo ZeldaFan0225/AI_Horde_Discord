@@ -1,5 +1,6 @@
 import { ApplicationCommandData } from "discord.js"
 import {CommandInitOptions} from "../types";
+import { AutocompleteContext } from "./autocompleteContext";
 import {CommandContext} from "./commandContext";
 
 export class Command {
@@ -14,5 +15,9 @@ export class Command {
 
     async run(_context: CommandContext): Promise<any> {
         throw new Error("You need to override the base run method")
+    }
+
+    async autocomplete(context: AutocompleteContext): Promise<any> {
+        return context.interaction.respond([])
     }
 }

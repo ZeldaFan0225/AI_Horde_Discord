@@ -11,6 +11,8 @@
     "default_sampler": "k_euler",
     "default_token": "0000000000",
     "dev": true,
+    "blacklisted_models": [],
+    "update_generation_status_interval_seconds": 5,
     "user_restrictions": {
         "width": {
             "min": 64,
@@ -26,6 +28,7 @@
         "steps": {
             "min": 1,
             "max": 100
-        }
+        },
+        "allow_models": true
     }
 }

@@ -1,10 +1,10 @@
 import { ModalSubmitInteraction } from "discord.js";
 import { Pool } from "pg";
 import { APIManager } from "../classes/apiManager";
-import { SupportClient } from "../classes/client";
+import { StableHordeClient } from "../classes/client";
 import { ModalContext } from "../classes/modalContext";
 
-export async function handleModals(interaction: ModalSubmitInteraction, client: SupportClient, database: Pool, api_manager: APIManager) {
+export async function handleModals(interaction: ModalSubmitInteraction, client: StableHordeClient, database: Pool, api_manager: APIManager) {
     const command = await client.modals.getModal(interaction).catch(() => null)
     if(!command) return;
     let context = new ModalContext({interaction, client, database, api_manager})

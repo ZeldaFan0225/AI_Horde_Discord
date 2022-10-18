@@ -1,13 +1,20 @@
+import SuperMap from "@thunder04/supermap"
 import Centra from "centra"
 import { Pool } from "pg"
-import { GenerationInput, HordePerformanceStable, RequestAsync, RequestStatusCheck, RequestStatusStable, UserDetailsStable } from "../stable_horde_types"
+import { GenerationInput, HordePerformanceStable, ActiveModel, RequestAsync, RequestStatusCheck, RequestStatusStable, UserDetailsStable } from "../stable_horde_types"
 
 export class APIManager {
     base_route: string
     database: Pool
+
+    modelsCache: SuperMap<string, ActiveModel[]>
+    performanceCache: SuperMap<string, HordePerformanceStable>
     constructor(options: {base_route: string, database: Pool}) {
         this.base_route = options.base_route
         this.database = options.database
+
+        this.modelsCache = new SuperMap({intervalTime: 1000})
+        this.performanceCache = new SuperMap({intervalTime: 1000})
     }
 
     async getUserToken(user_id: string): Promise<string|undefined> {
@@ -68,10 +75,16 @@ export class APIManager {
         return await res.json() as RequestStatusStable
     }
 
-    async getStatusPerformance(): Promise<HordePerformanceStable> {
+    async getStatusPerformance(force?: boolean): Promise<HordePerformanceStable> {
+        if(!force) {
+            if(this.performanceCache.has("performance")) return this.performanceCache.get("performance")!
+        }
         const res = await Centra(`${this.base_route}/status/performance`, "GET")
         .send()
-        return await res.json() as HordePerformanceStable
+
+        const result = await res.json() as HordePerformanceStable
+        this.performanceCache.set("performance", result, 1000*10)
+        return result
     }
 
     async deleteGenerateStatus(id: string) {
@@ -82,4 +95,16 @@ export class APIManager {
 
         return await res.json() as RequestStatusStable
     }
+
+    async getStatusModels(force?: boolean): Promise<ActiveModel[]> {
+        if(!force) {
+            if(this.modelsCache.has("models")) return this.modelsCache.get("models")!
+        }
+        const res = await Centra(`${this.base_route}/status/models`, "GET")
+        .send()
+
+        const result = await res.json() as ActiveModel[]
+        this.modelsCache.set("models", result, 1000*10)
+        return result
+    } 
 }
