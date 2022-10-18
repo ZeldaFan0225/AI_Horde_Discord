@@ -167,7 +167,7 @@ export default class extends Command {
             censor_nsfw: ctx.client.config.censor_nsfw,
             trusted_workers: ctx.client.config.trusted_workers,
             workers: ctx.client.config.workers,
-            models: !model ? undefined : model === "YOLO" ? [] : [model]
+            models: !model ? (ctx.client.config.default_model ? [ctx.client.config.default_model] : undefined) : model === "YOLO" ? [] : [model]
         }
 
         if(ctx.client.config.dev) {
@@ -208,6 +208,11 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`,
         const btn = new ButtonBuilder({
             label: "Cancel",
             custom_id: `cancel_gen_${generation_start.id}`,
+            style: 4
+        })
+        const delete_btn = new ButtonBuilder({
+            label: "Delete this message",
+            custom_id: `delete_${ctx.interaction.user.id}`,
             style: 4
         })
         const components = [{type: 1,components: [btn.toJSON()]}]
@@ -270,7 +275,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`,
                     return {attachment, embed}
                 })
                 clearInterval(inter);
-                return message.edit({content: "Image generation finished", embeds: image_map.map(i => i.embed), files: image_map.map(i => i.attachment), components: []});
+                return message.edit({content: "Image generation finished", components: [{type: 1, components: [delete_btn.toJSON()]}], embeds: image_map.map(i => i.embed), files: image_map.map(i => i.attachment)});
             }
             
             const embed = new EmbedBuilder({

@@ -9,6 +9,7 @@
     },
     "default_cfg": 7,
     "default_sampler": "k_euler",
+    "default_model": "stable_diffusion",
     "default_token": "0000000000",
     "dev": true,
     "blacklisted_models": [],

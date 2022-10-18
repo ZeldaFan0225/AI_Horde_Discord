@@ -87,6 +87,7 @@ export interface Config {
     },
     default_cfg?: number,
     default_sampler?: ModelGenerationInputStableToggles,
+    default_model?: string,
     default_token?: string,
     dev?: boolean,
     blacklisted_words?: string[],

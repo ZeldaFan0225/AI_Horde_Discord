@@ -30,6 +30,11 @@ export default class extends Command {
             label: "Save Token",
             style: 1
         })
+        const delete_btn = new ButtonBuilder({
+            label: "Delete this message",
+            custom_id: `delete_${ctx.interaction.user.id}`,
+            style: 4
+        })
         if(!token) return ctx.interaction.reply({
             content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://stablehorde.net/register`,
             components: [{type: 1, components: [add_token_button.toJSON()]}],
@@ -69,7 +74,11 @@ Contributing \`${user_data.worker_count}\``,
         })
 
         ctx.interaction.reply({
-            embeds: [embed.toJSON()]
+            embeds: [embed.toJSON()],
+            components: [{
+                type: 1,
+                components: [delete_btn.toJSON()]
+            }]
         })
     }
 }
