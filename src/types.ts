@@ -89,6 +89,7 @@ export interface Config {
     default_sampler?: ModelGenerationInputStableToggles,
     default_token?: string,
     dev?: boolean,
+    blacklisted_words?: string[],
     blacklisted_models?: string[]
     update_generation_status_interval_seconds?: number,
     user_restrictions?: {

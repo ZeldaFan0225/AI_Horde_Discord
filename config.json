@@ -12,6 +12,7 @@
     "default_token": "0000000000",
     "dev": true,
     "blacklisted_models": [],
+    "blacklisted_words": ["gay porn"],
     "update_generation_status_interval_seconds": 5,
     "user_restrictions": {
         "width": {

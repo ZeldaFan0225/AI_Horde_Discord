@@ -136,6 +136,7 @@ export default class extends Command {
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         const model = ctx.interaction.options.getString("model")
 
+        if(ctx.client.config.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
         if(model && ctx.client.config.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
