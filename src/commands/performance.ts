@@ -1,4 +1,4 @@
-import { /*ButtonBuilder, */Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ButtonBuilder, Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 
@@ -18,11 +18,11 @@ export default class extends Command {
 
     override async run(ctx: CommandContext): Promise<any> {
         const performance = await ctx.api_manager.getStatusPerformance()
-        /*const btn = new ButtonBuilder({
+        const btn = new ButtonBuilder({
             label: "Refresh",
             style: 2,
             custom_id: "update_performance"
-        })*/
+        })
         const embed = new EmbedBuilder({
             color: Colors.Blue,
             title: "Stable Horde Performance",
@@ -33,10 +33,10 @@ Total Workers \`${performance.worker_count}\``
         })
         ctx.interaction.reply({
             embeds: [embed],
-            /*components: [{
+            components: [{
                 type: 1,
                 components: [btn.toJSON()]
-            }]*/
+            }]
         })
     }
 }

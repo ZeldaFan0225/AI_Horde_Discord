@@ -26,7 +26,7 @@ export interface GenerationInput {
     workers?: string[],
     /** Specify which models are allowed to be used for this request */
     models?: string[],
-    /** The Base64-encoded webp to use for img2img */
+    /** The Base64-encoded webp to use for img2img, max siue 3072 * 3072 */
     source_image?: string
 }
 
@@ -181,22 +181,22 @@ export interface RequestError {
 }
 
 export interface RequestStatusStable extends RequestStatusCheck {
-    generations: GenerationStable[]
+    generations?: GenerationStable[]
 }
 
 export interface RequestStatusCheck {
     /** The amount of finished images in this request */
-    finished: number,
+    finished?: number,
     /** The amount of still processing images in this request */
-    processing: number,
+    processing?: number,
     /** The amount of images waiting to be picked up by a worker */
-    waiting: number,
+    waiting?: number,
     /** True when all images in this request are done. Else False. */
-    done: boolean,
+    done?: boolean,
     /** The expected amount to wait (in seconds) to generate all images in this request */
-    wait_time: number,
+    wait_time?: number,
     /** The position in the requests queue. This position is determined by relative Kudos amounts. */
-    queue_position: number,
+    queue_position?: number,
 }
 
 export interface Generation {

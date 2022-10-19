@@ -76,7 +76,6 @@ export interface AutocompleteContextInitOptions extends BaseContextInitOptions {
 
 export interface Config {
     staff_roles?: string[],
-    allow_nsfw?: boolean,
     trusted_workers?: boolean,
     censor_nsfw?: boolean,
     workers?: string[],
@@ -109,7 +108,30 @@ export interface Config {
             min?: number,
             max?: number
         },
-        allow_models?: boolean
+        cfg?: {
+            min?: number,
+            max?: number
+        },
+        denoise?: {
+            min?: number,
+            max?: number
+        },
+        allow_sampler?: boolean,
+        allow_cfg?: boolean,
+        allow_seed?: boolean,
+        allow_height?: boolean,
+        allow_width?: boolean,
+        allow_upscale?: boolean,
+        allow_gfpgan?: boolean,
+        allow_real_esrgan?: boolean,
+        allow_ldsr?: boolean,
+        allow_seed_variation?: boolean,
+        allow_steps?: boolean,
+        allow_amount?: boolean,
+        allow_models?: boolean,
+        allow_nsfw?: boolean,
+        allow_img2img?: boolean,
+        allow_denoise?: boolean
     }
 }
 

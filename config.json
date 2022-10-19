@@ -1,5 +1,4 @@
 {
-    "allow_nsfw": false,
     "trusted_workers": true,
     "censor_nsfw": true,
     "default_steps": 30,
@@ -13,7 +12,7 @@
     "default_token": "0000000000",
     "dev": true,
     "blacklisted_models": [],
-    "blacklisted_words": ["gay porn"],
+    "blacklisted_words": ["gay porn", "69"],
     "update_generation_status_interval_seconds": 5,
     "user_restrictions": {
         "width": {
@@ -31,6 +30,29 @@
             "min": 1,
             "max": 100
         },
-        "allow_models": true
+        "cfg": {
+            "min": -40,
+            "max": 30
+        },
+        "denoise": {
+            "min": 0,
+            "max": 100
+        },
+        "allow_sampler": true,
+        "allow_cfg": true,
+        "allow_seed": true,
+        "allow_height": true,
+        "allow_width": true,
+        "allow_upscale": true,
+        "allow_gfpgan": true,
+        "allow_real_esrgan": true,
+        "allow_ldsr": true,
+        "allow_seed_variation": true,
+        "allow_steps": true,
+        "allow_amount": true,
+        "allow_models": true,
+        "allow_img2img": true,
+        "allow_denoise": true,
+        "allow_nsfw": false
     }
 }
