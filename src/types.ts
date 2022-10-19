@@ -88,6 +88,7 @@ export interface Config {
     default_sampler?: ModelGenerationInputStableToggles,
     default_model?: string,
     default_token?: string,
+    default_denoise?: number,
     dev?: boolean,
     blacklisted_words?: string[],
     blacklisted_models?: string[]

@@ -171,7 +171,7 @@ export default class extends Command {
         const prompt = ctx.interaction.options.getString("prompt", true)
         const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.default_sampler ?? ModelGenerationInputStableToggles.k_euler) as ModelGenerationInputStableToggles
         const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.default_cfg ?? 5
-        const denoise = (ctx.interaction.options.getInteger("denoise_percentage") ?? 0)/100
+        const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.default_denoise ?? 50)/100
         const seed = ctx.interaction.options.getString("seed")
         const height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.default_res?.height ?? 512
         const width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.default_res?.width ?? 512
@@ -204,7 +204,6 @@ export default class extends Command {
         const generation_data: GenerationInput = {
             prompt,
             params: {
-                toggles: [1, 4],
                 sampler_name: sampler,
                 cfg_scale: cfg,
                 seed: seed ?? undefined,
@@ -235,8 +234,13 @@ export default class extends Command {
             //ephemeral: true
         })
 
-        const generation_start = await ctx.api_manager.postAsyncGeneration(generation_data, token).catch((e) => ctx.client.config.dev ? console.error(e) : null)
-        if(!generation_start?.id) return ctx.error({error: "Unable to start generation"})
+        const generation_start = await ctx.api_manager.postAsyncGeneration(generation_data, token)
+        .catch((e) => {
+            if(ctx.client.config.dev) console.error(e)
+            ctx.error({error: `Unable to start generation: ${e.message}`})
+            return null;
+        })
+        if(!generation_start?.id) return;
         const start_status = await ctx.api_manager.getGenerateCheck(generation_start.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
         const start_horde_data = await ctx.api_manager.getStatusPerformance()
 

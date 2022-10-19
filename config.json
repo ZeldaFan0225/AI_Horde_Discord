@@ -10,6 +10,7 @@
     "default_sampler": "k_euler",
     "default_model": "stable_diffusion",
     "default_token": "0000000000",
+    "default_denoise": 50,
     "dev": true,
     "blacklisted_models": [],
     "blacklisted_words": ["gay porn", "69"],
