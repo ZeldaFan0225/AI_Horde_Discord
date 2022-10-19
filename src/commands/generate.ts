@@ -213,6 +213,9 @@ export default class extends Command {
             height = mod_height%64 <= 32 ? mod_height-(mod_height%64) : mod_height+(64-(mod_height%64))
             width = mod_width%64 <= 32 ? mod_width-(mod_width%64) : mod_width+(64-(mod_width%64))
         }
+
+        height = ctx.interaction.options.getInteger("height") ?? height
+        width = ctx.interaction.options.getInteger("width") ?? width
         
         if(ctx.client.config.dev) {
             console.log(img?.height)
