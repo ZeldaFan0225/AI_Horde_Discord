@@ -30,7 +30,7 @@ export class StableHordeClient extends Client {
 	async getSlashCommandTag(name: string) {
 		const commands = await this.application?.commands.fetch()
 		if(!commands?.size) return `/${name}`
-		else if(commands?.find(c => c.name === "terms")?.id) return `</terms:${commands?.find(c => c.name === "terms")!.id}>`
+		else if(commands?.find(c => c.name === name)?.id) return `</${name}:${commands?.find(c => c.name === name)!.id}>`
 		else return `/${name}`
 	}
 }
