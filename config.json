@@ -13,7 +13,7 @@
     "default_denoise": 50,
     "dev": true,
     "blacklisted_models": [],
-    "blacklisted_words": ["gay porn", "69"],
+    "blacklisted_words": [],
     "update_generation_status_interval_seconds": 5,
     "user_restrictions": {
         "width": {

@@ -6,6 +6,7 @@ import { Config } from "../types";
 import {readFileSync} from "fs"
 import { AutocompleteContext } from "../classes/autocompleteContext";
 import Centra from "centra";
+const {buffer2webpbuffer} = require("webp-converter")
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
@@ -25,6 +26,14 @@ const command_data = new SlashCommandBuilder()
             new SlashCommandAttachmentOption()
             .setName("img2img")
             .setDescription("The image to use for img2img (.webp); max: 3072px")
+        )
+    }
+    if(config.user_restrictions?.allow_img2img) {
+        command_data
+        .addBooleanOption(
+            new SlashCommandBooleanOption()
+            .setName("keep_original_ratio")
+            .setDescription("Whether to keep the aspect ratio and image size of the original image")
         )
     }
     if(config.user_restrictions?.allow_sampler) {
@@ -173,8 +182,8 @@ export default class extends Command {
         const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.default_cfg ?? 5
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.default_denoise ?? 50)/100
         const seed = ctx.interaction.options.getString("seed")
-        const height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.default_res?.height ?? 512
-        const width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.default_res?.width ?? 512
+        let height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.default_res?.height ?? 512
+        let width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.default_res?.width ?? 512
         const upscale = !!ctx.interaction.options.getBoolean("upscale")
         const gfpgan = !!ctx.interaction.options.getBoolean("gfpgan")
         const real_esrgan = !!ctx.interaction.options.getBoolean("real_esrgan")
@@ -182,23 +191,49 @@ export default class extends Command {
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
         const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.default_steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
-        const model = ctx.interaction.options.getString("model")
+        const model = ctx.interaction.options.getString("model") ?? ctx.client.config.default_model
+        const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? true
         const img = ctx.interaction.options.getAttachment("img2img")
+
 
         if(ctx.client.config.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
         if(model && ctx.client.config.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
         if(model && model !== "YOLO" && !(await ctx.api_manager.getStatusModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
-        if(img && img.contentType !== "image/webp") return ctx.error({error: "Image to Image input must be a webp file"})
+        if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Image to Image input must be a image"})
         if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Image to Image input too large (max. 3072 x 3072)"})
+        
+        if(keep_ratio && img?.width && img?.height) {
+            const ratio = img?.width/img?.height
+            const largest = ratio >= 1 ? img.width : img.height
+            const m = largest > 1024 ? 1024/largest : 1
+            const mod_height = Math.round(img.height*m)
+            const mod_width = Math.round(img.width*m)
+            height = mod_height%64 <= 32 ? mod_height-(mod_height%64) : mod_height+(64-(mod_height%64))
+            width = mod_width%64 <= 32 ? mod_width-(mod_width%64) : mod_width+(64-(mod_width%64))
+        }
+        
+        if(ctx.client.config.dev) {
+            console.log(img?.height)
+            console.log(img?.width)
+            console.log(height)
+            console.log(width)
+        }
+
+        await ctx.interaction.deferReply({})
 
         const token = await ctx.api_manager.getUserToken(ctx.interaction.user.id) || ctx.client.config.default_token || "0000000000"
-        let img_data
+        let img_data: Buffer | undefined
         if(img) {
-            img_data = await Centra(img.url, "GET")
+            let img_data_res = await Centra(img.url, "GET")
                 .send()
-                .then(res => res.body.toString("base64"))
+            
+            if(img.contentType === "image/webp") img_data = img_data_res.body
+            else {
+                img_data = await buffer2webpbuffer(img_data_res.body, img.contentType?.replace("image/",""),"-q 80")
+                //return ctx.error({error: "Image must be webp"})
+            }
         }
 
         const generation_data: GenerationInput = {
@@ -222,17 +257,14 @@ export default class extends Command {
             censor_nsfw: ctx.client.config.censor_nsfw,
             trusted_workers: ctx.client.config.trusted_workers,
             workers: ctx.client.config.workers,
-            models: !model ? (ctx.client.config.default_model ? [ctx.client.config.default_model] : undefined) : model === "YOLO" ? [] : [model],
-            source_image: img_data
+            models: !model ? undefined : model === "YOLO" ? [] : [model],
+            source_image: img_data?.toString("base64")
         }
 
         if(ctx.client.config.dev) {
             console.log(token)
             console.log(generation_data)
         }
-        await ctx.interaction.deferReply({
-            //ephemeral: true
-        })
 
         const generation_start = await ctx.api_manager.postAsyncGeneration(generation_data, token)
         .catch((e) => {
@@ -337,11 +369,13 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
                         color: Colors.Blue,
                         description: `**Seed:** ${g.seed}\n**Model:** ${g.model}${!i ? `\n**Prompt:** ${prompt}` : ""}`,
                     })
-                    if(img && img.url) embed.setThumbnail(img.url)
+                    if(img_data) embed.setThumbnail(`attachment://original.webp`)
                     return {attachment, embed}
-                })
+                }) || []
                 clearInterval(inter);
-                return message.edit({content: `Image generation finished`, components: [{type: 1, components: [delete_btn.toJSON()]}], embeds: image_map?.map(i => i.embed), files: image_map?.map(i => i.attachment)});
+                const files = image_map.map(i => i.attachment)
+                if(img_data) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
+                return message.edit({content: `Image generation finished`, components: [{type: 1, components: [delete_btn.toJSON()]}], embeds: image_map.map(i => i.embed), files});
             }
             
             const embed = new EmbedBuilder({

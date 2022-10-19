@@ -20,7 +20,8 @@
     "@thunder04/supermap": "^3.0.2",
     "centra": "^2.5.0",
     "discord.js": "^14.6.0",
-    "pg": "^8.8.0"
+    "pg": "^8.8.0",
+    "webp-converter": "^2.3.3"
   },
   "devDependencies": {
     "@types/centra": "^2.2.0",
