@@ -89,6 +89,7 @@ export interface Config {
     default_model?: string,
     default_token?: string,
     default_denoise?: number,
+    require_login?: boolean,
     dev?: boolean,
     blacklisted_words?: string[],
     blacklisted_models?: string[]

@@ -199,6 +199,7 @@ export default class extends Command {
         const user_token = await ctx.api_manager.getUserToken(ctx.interaction.user.id)
         const can_bypass = ctx.client.config.img2img?.whitelist?.bypass_checks && ctx.client.config.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
+        if(ctx.client.config.require_login && !user_token) return ctx.error({error: `You are required to ${ctx.client.getSlashCommandTag("login")} to use ${ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
         if(ctx.client.config.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
