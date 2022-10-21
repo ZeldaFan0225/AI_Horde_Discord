@@ -29,10 +29,10 @@
         "require_login": true,
         "require_stable_horde_account_oauth_connection": false,
         "allow_non_webp": true,
-        "require_nsfw_channel": true,
+        "require_nsfw_channel": false,
         "whitelist": {
             "only_allow_whitelist": false,
-            "user_ids": ["134295609287901184"],
+            "user_ids": ["683655307356143706"],
             "bypass_checks": true
         }
     },
