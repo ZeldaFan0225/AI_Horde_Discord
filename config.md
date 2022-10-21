@@ -86,9 +86,9 @@ Here you can see an explanation of what which option does
 }
 ```
 
-`*1` See API Documentation for reference (https://stablehorde.net/api)
-`*2` Available Samplers: k_lms, k_heun, k_euler, k_euler_a, k_dpm_2, k_dpm_2_a, DDIM, PLMS
-`*3` Not all models are available at all times *
-`*4` Developer mode will enable logging and will also show the generations ID in the embed in Discord
-`*5` This is currently not released but will be implemented soon
-`*6` This option changes how the /generate command is created. If set to false the user will not have the option to modify this value when generating.
+`*1` See API Documentation for reference (https://stablehorde.net/api)  
+`*2` Available Samplers: k_lms, k_heun, k_euler, k_euler_a, k_dpm_2, k_dpm_2_a, DDIM, PLMS  
+`*3` Not all models are available at all times *1  
+`*4` Developer mode will enable logging and will also show the generations ID in the embed in Discord  
+`*5` This is currently not released but will be implemented soon  
+`*6` This option changes how the /generate command is created. If set to false the user will not have the option to modify this value when generating.  
