@@ -15,6 +15,27 @@
     "blacklisted_models": [],
     "blacklisted_words": [],
     "update_generation_status_interval_seconds": 5,
+    "logs": {
+        "enabled": true,
+        "directory": "/logs",
+        "plain": true,
+        "csv": true,
+        "log_actions": {
+            "non_img2img": true,
+            "img2img": true
+        }
+    },
+    "img2img": {
+        "require_login": true,
+        "require_stable_horde_account_oauth_connection": false,
+        "allow_non_webp": true,
+        "require_nsfw_channel": true,
+        "whitelist": {
+            "only_allow_whitelist": false,
+            "user_ids": ["134295609287901184"],
+            "bypass_checks": true
+        }
+    },
     "user_restrictions": {
         "width": {
             "min": 64,

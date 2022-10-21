@@ -1,4 +1,4 @@
-import { AttachmentBuilder, ButtonBuilder, Colors, EmbedBuilder, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
+import { AttachmentBuilder, ButtonBuilder, ChannelType, Colors, EmbedBuilder, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 import { GenerationInput, ModelGenerationInputStableToggles } from "../stable_horde_types";
@@ -7,6 +7,7 @@ import {readFileSync} from "fs"
 import { AutocompleteContext } from "../classes/autocompleteContext";
 import Centra from "centra";
 const {buffer2webpbuffer} = require("webp-converter")
+import { appendFileSync } from "fs"
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
@@ -25,7 +26,7 @@ const command_data = new SlashCommandBuilder()
         .addAttachmentOption(
             new SlashCommandAttachmentOption()
             .setName("img2img")
-            .setDescription("The image to use for img2img (.webp); max: 3072px")
+            .setDescription("The image to use for img2img; max: 3072px")
         )
     }
     if(config.user_restrictions?.allow_img2img) {
@@ -193,17 +194,24 @@ export default class extends Command {
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         const model = ctx.interaction.options.getString("model") ?? ctx.client.config.default_model
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? true
-        const img = ctx.interaction.options.getAttachment("img2img")
+        let img = ctx.interaction.options.getAttachment("img2img")
 
+        const user_token = await ctx.api_manager.getUserToken(ctx.interaction.user.id)
+        const can_bypass = ctx.client.config.img2img?.whitelist?.bypass_checks && ctx.client.config.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
         if(ctx.client.config.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
         if(model && ctx.client.config.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
         if(model && model !== "YOLO" && !(await ctx.api_manager.getStatusModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
+        if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${ctx.client.getSlashCommandTag("login")} and agree to our ${ctx.client.getSlashCommandTag("terms")} first before being able to use img2img`, codeblock: false})
+        //if(img && ctx.client.config.img2img?.require_stable_horde_account_oauth_connection) // TODO: wait for api to add the field to check for it
+        if(img && !can_bypass && ctx.client.config.img2img?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use img2img"})
         if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Image to Image input must be a image"})
         if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Image to Image input too large (max. 3072 x 3072)"})
-        
+        if(img && !can_bypass && !ctx.client.config?.img2img?.allow_non_webp && img.contentType !== "image/webp") return ctx.error({error: "You can only upload webp for img2img"})
+        if(img && ctx.client.config.img2img?.whitelist?.only_allow_whitelist && !ctx.client.config.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)) return ctx.error({error: "You are not whitelisted to use img2img"})
+
         if(keep_ratio && img?.width && img?.height) {
             const ratio = img?.width/img?.height
             const largest = ratio >= 1 ? img.width : img.height
@@ -226,7 +234,7 @@ export default class extends Command {
 
         await ctx.interaction.deferReply({})
 
-        const token = await ctx.api_manager.getUserToken(ctx.interaction.user.id) || ctx.client.config.default_token || "0000000000"
+        const token = user_token || ctx.client.config.default_token || "0000000000"
         let img_data: Buffer | undefined
         if(img) {
             let img_data_res = await Centra(img.url, "GET")
@@ -275,7 +283,27 @@ export default class extends Command {
             ctx.error({error: `Unable to start generation: ${e.message}`})
             return null;
         })
-        if(!generation_start?.id) return;
+        if(!generation_start || !generation_start.id) return;
+
+
+        if (ctx.client.config.logs?.enabled) {
+            if (ctx.client.config.logs.log_actions?.img2img && img) {
+                if (ctx.client.config.logs.plain) logGeneration("txt");
+                if (ctx.client.config.logs.csv) logGeneration("csv");
+            } else if(ctx.client.config.logs.log_actions?.non_img2img && !img) {
+                if (ctx.client.config.logs.plain) logGeneration("txt");
+                if (ctx.client.config.logs.csv) logGeneration("csv");
+            }
+            function logGeneration(type: "txt" | "csv") {
+                ctx.client.initLogDir();
+                const log_dir = ctx.client.config.logs?.directory ?? "/logs";
+                const content = type === "csv" ? `\n${new Date().toISOString()},${ctx.interaction.user.id},${generation_start?.id},${!!img},${prompt}` : `\n${new Date().toISOString()} | ${ctx.interaction.user.id}${" ".repeat(20 - ctx.interaction.user.id.length)} | ${generation_start?.id} | ${!!img}${" ".repeat(img ? 10 : 9)} | ${prompt}`;
+                appendFileSync(`${process.cwd()}${log_dir}/logs_${new Date().getMonth() + 1}-${new Date().getFullYear()}.${type}`, content);
+            }
+        }
+
+        if(ctx.client.config.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " img2img":""} with prompt "${prompt}" (${generation_start?.id})`)
+
         const start_status = await ctx.api_manager.getGenerateCheck(generation_start.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
         const start_horde_data = await ctx.api_manager.getStatusPerformance()
 

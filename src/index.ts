@@ -32,6 +32,10 @@ const api_manager = new APIManager({base_route: "https://stablehorde.net/api/v2"
 
 client.login(process.env["DISCORD_TOKEN"])
 
+if(client.config.logs?.enabled) {
+    client.initLogDir()
+}
+
 
 connection.connect().then(async () => {
     await connection.query("CREATE TABLE IF NOT EXISTS user_tokens (index SERIAL, id VARCHAR(100) PRIMARY KEY, token VARCHAR(100) NOT NULL)")

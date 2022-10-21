@@ -93,6 +93,27 @@ export interface Config {
     blacklisted_words?: string[],
     blacklisted_models?: string[]
     update_generation_status_interval_seconds?: number,
+    logs?: {
+        enabled?: boolean,
+        directory?: string,
+        plain?: boolean,
+        csv?: boolean,
+        log_actions?: {
+            non_img2img?: boolean,
+            img2img?: boolean
+        }
+    },
+    img2img?: {
+        require_login?: boolean,
+        require_stable_horde_account_oauth_connection?: boolean,
+        allow_non_webp?: boolean,
+        require_nsfw_channel?: boolean,
+        whitelist?: {
+            only_allow_whitelist?: boolean,
+            user_ids?: string[],
+            bypass_checks?: boolean
+        }
+    },
     user_restrictions?: {
         width?: {
             min?: number,
