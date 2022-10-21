@@ -1,5 +1,7 @@
 # Stable_Horde_Discord
 
+## Features
+
 This package includes the code for a discord bot which interacts with the stable horde api.
 The bot has the following features:
 
@@ -10,7 +12,18 @@ The bot has the following features:
 - advanced configuration file which lets you change how the bot behaves and what actions the user can use (for limits refer to https://stablehorde.net/register)
 - logging for any malicious, nsfw or illegal content
 
-/* TODO: add how to set up */
+## How to set up
+
+1) download the code from this repository
+2) get the token of your discord bot (https://discord.com/developers/docs/reference#authentication)
+3) set up a postgres database
+4) Install the node modules using `npm i` (make sure the dev dependencies are also installed for typescript to work)
+5) fill out the `template.env` and rename it to `.env`
+6) compile the typescript code (this can be done with `npx tsc -p .` in the directory where you place the code
+7) modify the config file to fit your needs
+8) start the process
+
+Now if everything is set up it should start and give an output in the console.
 
 **IMPORTANT**
 - when setting up this repository, after installing the node modules go to the folder `/node_modules/webp-converter` and create a folder called `temp`
