@@ -197,6 +197,7 @@ export default class extends Command {
         let img = ctx.interaction.options.getAttachment("img2img")
 
         const user_token = await ctx.api_manager.getUserToken(ctx.interaction.user.id)
+        const stable_horde_user = await ctx.api_manager.getUserData(user_token  || ctx.client.config.default_token || "0000000000").catch((e) => ctx.client.config.dev ? console.error(e) : null);
         const can_bypass = ctx.client.config.img2img?.whitelist?.bypass_checks && ctx.client.config.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
         if(ctx.client.config.require_login && !user_token) return ctx.error({error: `You are required to ${ctx.client.getSlashCommandTag("login")} to use ${ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
@@ -206,7 +207,7 @@ export default class extends Command {
         if(model && ctx.client.config.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
         if(model && model !== "YOLO" && !(await ctx.api_manager.getStatusModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
         if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${ctx.client.getSlashCommandTag("login")} and agree to our ${ctx.client.getSlashCommandTag("terms")} first before being able to use img2img`, codeblock: false})
-        //if(img && ctx.client.config.img2img?.require_stable_horde_account_oauth_connection) // TODO: wait for api to add the field to check for it
+        if(img && ctx.client.config.img2img?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
         if(img && !can_bypass && ctx.client.config.img2img?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use img2img"})
         if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Image to Image input must be a image"})
         if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Image to Image input too large (max. 3072 x 3072)"})

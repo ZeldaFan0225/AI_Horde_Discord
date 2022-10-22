@@ -388,7 +388,9 @@ export interface UserDetails {
     /** This user is a trusted member of the Horde. */
     trusted?: boolean,
     /** (Privileged) How much suspicion this user has accumulated */
-    suspicious?: number
+    suspicious?: number,
+    /** If true, this user has not registered using an oauth service. */
+    pseudonymous?: boolean
 }
 
 export interface UserKudosDetails {
