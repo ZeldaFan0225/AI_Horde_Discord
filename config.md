@@ -37,7 +37,7 @@ Here you can see an explanation of what which option does
     },
     "img2img": {
         "require_login": Whether the user has to be logged in to use image to image (BOOLEAN),
-        "require_stable_horde_account_oauth_connection": Whether the user has to have a stable horde account with an oauth connection (e.g. Discord) (BOOLEAN) *5,
+        "require_stable_horde_account_oauth_connection": Whether the user has to have a stable horde account with an oauth connection (e.g. Discord) (BOOLEAN),
         "allow_non_webp": Whether to allow other image formats other than webp (BOOLEAN),
         "require_nsfw_channel": Set to true if the channel the command is used in has to be marked as age restricted (BOOLEAN),
         "whitelist": {
@@ -70,21 +70,21 @@ Here you can see an explanation of what which option does
             "min": The minimum denoising strength the user can input into the /generate command (INTEGER; DEFAULT: 0),
             "max": The maximum denoising strength the user can input into the /generate command (INTEGER; DEFAULT: 100)
         },
-        "allow_sampler": (BOOLEAN) *6
-        "allow_cfg": (BOOLEAN) *6,
-        "allow_seed": (BOOLEAN) *6,
-        "allow_height": (BOOLEAN) *6,
-        "allow_width": (BOOLEAN) *6,
-        "allow_upscale": (BOOLEAN) *6,
-        "allow_gfpgan": (BOOLEAN) *6,
-        "allow_real_esrgan": (BOOLEAN) *6,
-        "allow_ldsr": (BOOLEAN) *6,
-        "allow_seed_variation": (BOOLEAN) *6,
-        "allow_steps": (BOOLEAN) *6,
-        "allow_amount": (BOOLEAN) *6,
-        "allow_models": (BOOLEAN) *6,
-        "allow_img2img": (BOOLEAN) *6,
-        "allow_denoise": (BOOLEAN) *6,
+        "allow_sampler": (BOOLEAN) *5
+        "allow_cfg": (BOOLEAN) *5,
+        "allow_seed": (BOOLEAN) *5,
+        "allow_height": (BOOLEAN) *5,
+        "allow_width": (BOOLEAN) *5,
+        "allow_upscale": (BOOLEAN) *5,
+        "allow_gfpgan": (BOOLEAN) *5,
+        "allow_real_esrgan": (BOOLEAN) *5,
+        "allow_ldsr": (BOOLEAN) *5,
+        "allow_seed_variation": (BOOLEAN) *5,
+        "allow_steps": (BOOLEAN) *5,
+        "allow_amount": (BOOLEAN) *5,
+        "allow_models": (BOOLEAN) *5,
+        "allow_img2img": (BOOLEAN) *5,
+        "allow_denoise": (BOOLEAN) *5,
         "allow_nsfw": Set to true if you want to allow NSFW image generation for your users
     }
 }
@@ -94,5 +94,4 @@ Here you can see an explanation of what which option does
 `*2` Available Samplers: k_lms, k_heun, k_euler, k_euler_a, k_dpm_2, k_dpm_2_a, DDIM, PLMS  
 `*3` Not all models are available at all times *1  
 `*4` Developer mode will enable logging and will also show the generations ID in the embed in Discord  
-`*5` This is currently not released but will be implemented soon  
-`*6` This option changes how the /generate command is created. If set to false the user will not have the option to modify this value when generating.  
+`*5` This option changes how the /generate command is created. If set to false the user will not have the option to modify this value when generating.  
