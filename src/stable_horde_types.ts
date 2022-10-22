@@ -193,6 +193,8 @@ export interface RequestStatusCheck {
     waiting?: number,
     /** True when all images in this request are done. Else False. */
     done?: boolean,
+    /** rue when this request caused an internal server error and cannot be completed. */
+    faulted?: boolean,
     /** The expected amount to wait (in seconds) to generate all images in this request */
     wait_time?: number,
     /** The position in the requests queue. This position is determined by relative Kudos amounts. */
