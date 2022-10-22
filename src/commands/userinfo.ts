@@ -23,7 +23,7 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
-        let token = await ctx.api_manager.getUserToken(ctx.interaction.options.getUser("user")?.id ?? ctx.interaction.user.id)
+        let token = await ctx.client.getUserToken(ctx.interaction.options.getUser("user")?.id ?? ctx.interaction.user.id, ctx.database)
         if(!token && ctx.interaction.options.getUser("user")?.id) return ctx.error({error: "The user has not added their token"})
         const add_token_button = new ButtonBuilder({
             custom_id: "save_token",
@@ -41,7 +41,7 @@ export default class extends Command {
             ephemeral: true
         })
 
-        const user_data = await ctx.api_manager.getUserData(token).catch(() => null)
+        const user_data = await ctx.stable_horde_manager.findUser(token).catch(() => null)
 
         if(!user_data) return ctx.interaction.reply({
             content: "Unable to find user for saved token.",

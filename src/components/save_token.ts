@@ -13,7 +13,7 @@ export default class extends Component {
     }
 
     override async run(ctx: ComponentContext<ComponentType.SelectMenu>): Promise<any> {
-        const token = await ctx.api_manager.getUserToken(ctx.interaction.user.id)
+        const token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
         const modal = new ModalBuilder({
             title: "Save Token",
             custom_id: "save_token",

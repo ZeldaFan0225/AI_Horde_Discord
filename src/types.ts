@@ -1,3 +1,4 @@
+import StableHorde from "@zeldafan0225/stable_horde";
 import {
     ApplicationCommandData, AutocompleteInteraction,
     ButtonInteraction,
@@ -9,7 +10,6 @@ import {
     UserContextMenuCommandInteraction
 } from "discord.js";
 import { Pool } from "pg";
-import { APIManager } from "./classes/apiManager";
 import { StableHordeClient } from "./classes/client";
 import { ModelGenerationInputStableToggles } from "./stable_horde_types";
 
@@ -43,7 +43,7 @@ export interface BaseContextInitOptions {
     interaction: Interaction,
     client: StableHordeClient,
     database: Pool,
-    api_manager: APIManager
+    stable_horde_manager: StableHorde
 }
 
 export interface CommandContextInitOptions extends BaseContextInitOptions {

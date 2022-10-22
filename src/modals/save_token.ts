@@ -21,7 +21,7 @@ export default class extends Modal {
                 ephemeral: true
             })
         }
-        const user_data = await ctx.api_manager.getUserData(token)
+        const user_data = await ctx.stable_horde_manager.findUser(token).catch(() => null)
         if(!user_data) return ctx.error({error: "Unable to find user with this token!"})
         const res = await ctx.database.query("INSERT INTO user_tokens VALUES (DEFAULT, $1, $2) ON CONFLICT (id) DO UPDATE SET token=$2 RETURNING *", [ctx.interaction.user.id, token])
         if(!res.rowCount) return ctx.error({error: "Unable to save token"})

@@ -196,8 +196,8 @@ export default class extends Command {
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? true
         let img = ctx.interaction.options.getAttachment("img2img")
 
-        const user_token = await ctx.api_manager.getUserToken(ctx.interaction.user.id)
-        const stable_horde_user = await ctx.api_manager.getUserData(user_token  || ctx.client.config.default_token || "0000000000").catch((e) => ctx.client.config.dev ? console.error(e) : null);
+        const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
+        const stable_horde_user = await ctx.stable_horde_manager.findUser(user_token  || ctx.client.config.default_token || "0000000000").catch((e) => ctx.client.config.dev ? console.error(e) : null);
         const can_bypass = ctx.client.config.img2img?.whitelist?.bypass_checks && ctx.client.config.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
         if(ctx.client.config.require_login && !user_token) return ctx.error({error: `You are required to ${ctx.client.getSlashCommandTag("login")} to use ${ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
@@ -205,7 +205,7 @@ export default class extends Command {
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
         if(model && ctx.client.config.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
-        if(model && model !== "YOLO" && !(await ctx.api_manager.getStatusModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
+        if(model && model !== "YOLO" && !(await ctx.stable_horde_manager.getModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
         if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${ctx.client.getSlashCommandTag("login")} and agree to our ${ctx.client.getSlashCommandTag("terms")} first before being able to use img2img`, codeblock: false})
         if(img && ctx.client.config.img2img?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
         if(img && !can_bypass && ctx.client.config.img2img?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use img2img"})
@@ -279,7 +279,7 @@ export default class extends Command {
             console.log(generation_data)
         }
 
-        const generation_start = await ctx.api_manager.postAsyncGeneration(generation_data, token)
+        const generation_start = await ctx.stable_horde_manager.postAsyncGenerate(generation_data, token)
         .catch((e) => {
             if(ctx.client.config.dev) console.error(e)
             ctx.error({error: `Unable to start generation: ${e.message}`})
@@ -306,8 +306,8 @@ export default class extends Command {
 
         if(ctx.client.config.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " img2img":""} with prompt "${prompt}" (${generation_start?.id})`)
 
-        const start_status = await ctx.api_manager.getGenerateCheck(generation_start.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
-        const start_horde_data = await ctx.api_manager.getStatusPerformance()
+        const start_status = await ctx.stable_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+        const start_horde_data = await ctx.stable_horde_manager.getPerformance()
 
         if(ctx.client.config.dev) {
             console.log(start_status)
@@ -322,7 +322,7 @@ Workers: \`${start_horde_data.worker_count}\`
 \`${start_status?.waiting}\`/\`${amount}\` Images waiting
 \`${start_status?.processing}\`/\`${amount}\` Images processing
 \`${start_status?.finished}\`/\`${amount}\` Images finished
-​${"🟥".repeat(start_status?.waiting ?? 0)}​${"🟨".repeat(start_status?.processing ?? 0)}​${"🟩".repeat(start_status?.finished ?? 0)}
+${"🟥".repeat(start_status?.waiting ?? 0)}${"🟨".repeat(start_status?.processing ?? 0)}${"🟩".repeat(start_status?.finished ?? 0)}
 
 ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
         })
@@ -361,8 +361,8 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
         let prev_left = 1
 
         const inter = setInterval(async () => {
-            const status = await ctx.api_manager.getGenerateCheck(generation_start.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
-            const horde_data = await ctx.api_manager.getStatusPerformance()
+            const status = await ctx.stable_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+            const horde_data = await ctx.stable_horde_manager.getPerformance()
 
             if(!status || (status as any).faulted) {
                 clearInterval(inter);
@@ -379,7 +379,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
 
 
             if(error_timeout < (Date.now()-1000*60*2)) {
-                await ctx.api_manager.deleteGenerateStatus(generation_start.id!)
+                await ctx.stable_horde_manager.deleteGenerationRequest(generation_start.id!)
                 message.edit({
                     components: [],
                     content: "Generation cancelled due to errors",
@@ -392,7 +392,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
             done = status.done ?? false
 
             if(done) {
-                const images = await ctx.api_manager.getGenerateStatus(generation_start.id!)
+                const images = await ctx.stable_horde_manager.getGenerationStatus(generation_start.id!)
 
                 const image_map = images.generations?.map((g, i) => {
                     const attachment = new AttachmentBuilder(Buffer.from(g.img!, "base64"), {name: `${g.seed ?? `image${i}`}.webp`})
@@ -400,7 +400,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
                         title: `Image ${i+1}`,
                         image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
                         color: Colors.Blue,
-                        description: `**Seed:** ${g.seed}\n**Model:** ${g.model}${!i ? `\n**Prompt:** ${prompt}` : ""}`,
+                        description: `**Seed:** ${g.seed}\n**Model:** ${g.model}\n**Generated by** ${g.worker_name}\n(\`${g.worker_id}\`)${!i ? `\n**Prompt:** ${prompt}` : ""}`,
                     })
                     if(img_data) embed.setThumbnail(`attachment://original.webp`)
                     return {attachment, embed}
@@ -449,7 +449,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
         const option = context.interaction.options.getFocused(true)
         switch(option.name) {
             case "model": {
-                const models = await context.api_manager.getStatusModels()
+                const models = await context.stable_horde_manager.getModels()
                 if(context.client.config.dev) console.log(models)
                 const available = [{name: "Any Model", value: "YOLO"}, ...models.sort((a, b) => b.performance!-a.performance!).map(m => ({name: `${m.name} | Workers: ${m.count} | Performance: ${m.performance}`, value: m.name!}))]
                 context.interaction.respond(available.filter(o => o.name.includes(option.value)))

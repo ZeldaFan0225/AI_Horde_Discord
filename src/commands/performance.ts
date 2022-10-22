@@ -17,7 +17,7 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
-        const performance = await ctx.api_manager.getStatusPerformance()
+        const performance = await ctx.stable_horde_manager.getPerformance()
         const btn = new ButtonBuilder({
             label: "Refresh",
             style: 2,

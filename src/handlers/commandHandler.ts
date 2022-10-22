@@ -1,13 +1,13 @@
+import StableHorde from "@zeldafan0225/stable_horde";
 import { ChatInputCommandInteraction } from "discord.js";
 import { Pool } from "pg";
-import { APIManager } from "../classes/apiManager";
 import { StableHordeClient } from "../classes/client";
 import { CommandContext } from "../classes/commandContext";
 
-export async function handleCommands(interaction: ChatInputCommandInteraction, client: StableHordeClient, database: Pool, api_manager: APIManager) {
+export async function handleCommands(interaction: ChatInputCommandInteraction, client: StableHordeClient, database: Pool, stable_horde_manager: StableHorde) {
     const command = await client.commands.getCommand(interaction).catch(() => null)
     if(!command) return;
-    const context = new CommandContext({interaction, client, database, api_manager})
+    const context = new CommandContext({interaction, client, database, stable_horde_manager})
     if(!interaction.inGuild())
         return await context.error({
             error: "You can only use commands in guilds",

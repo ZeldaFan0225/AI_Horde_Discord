@@ -13,7 +13,7 @@ export default class extends Component {
     }
 
     override async run(ctx: ComponentContext<ComponentType.SelectMenu>): Promise<any> {
-        const performance = await ctx.api_manager.getStatusPerformance()
+        const performance = await ctx.stable_horde_manager.getPerformance()
         console.log(performance)
         const btn = new ButtonBuilder({
             label: "Refresh",

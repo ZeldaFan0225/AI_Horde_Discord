@@ -4,6 +4,7 @@ import { readFileSync } from "fs";
 import { Store } from "../stores/store";
 import { Config, StoreTypes } from "../types";
 import {existsSync, mkdirSync, writeFileSync} from "fs"
+import { Pool } from "pg";
 
 export class StableHordeClient extends Client {
 	commands: Store<StoreTypes.COMMANDS>;
@@ -11,6 +12,7 @@ export class StableHordeClient extends Client {
 	modals: Store<StoreTypes.MODALS>;
     config: Config
 	cache: SuperMap<string, any>
+
 	constructor(options: ClientOptions) {
 		super(options);
 		this.commands = new Store<StoreTypes.COMMANDS>({files_folder: "/commands", load_classes_on_init: false, storetype: StoreTypes.COMMANDS});
@@ -47,4 +49,10 @@ export class StableHordeClient extends Client {
 		else if(commands?.find(c => c.name === name)?.id) return `</${name}:${commands?.find(c => c.name === name)!.id}>`
 		else return `/${name}`
 	}
+	
+    async getUserToken(user_id: string, database: Pool): Promise<string|undefined> {
+        const rows = await database.query("SELECT * FROM user_tokens WHERE id=$1", [user_id])
+        if(!rows.rowCount || !rows.rows[0]) return undefined
+        return rows.rows[0].token
+    }
 }

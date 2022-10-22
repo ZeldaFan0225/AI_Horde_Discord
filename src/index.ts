@@ -5,8 +5,8 @@ import { handleCommands } from "./handlers/commandHandler";
 import { handleComponents } from "./handlers/componentHandler";
 import { handleModals } from "./handlers/modalHandler";
 import { Pool } from "pg"
-import { APIManager } from "./classes/apiManager";
 import { handleAutocomplete } from "./handlers/autocompleteHandler";
+import StableHorde from "@zeldafan0225/stable_horde";
 
 const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/
 for (const line of readFileSync(`${process.cwd()}/.env`, 'utf8').split(/[\r\n]/)) {
@@ -28,7 +28,14 @@ const client = new StableHordeClient({
     intents: ["Guilds"]
 })
 
-const api_manager = new APIManager({base_route: "https://stablehorde.net/api/v2", database: connection})
+const stable_horde_manager = new StableHorde({
+    default_token: client.config.default_token,
+    cache_interval: 1000,
+    cache: {
+        models: 1000 * 10,
+        performance: 1000 * 10
+    }
+})
 
 client.login(process.env["DISCORD_TOKEN"])
 
@@ -55,19 +62,19 @@ client.on("interactionCreate", async (interaction) => {
         case InteractionType.ApplicationCommand: {
             switch(interaction.commandType) {
                 case ApplicationCommandType.ChatInput: {
-                    return await handleCommands(interaction, client, connection, api_manager);
+                    return await handleCommands(interaction, client, connection, stable_horde_manager);
                 }
             }
             break;
         };
         case InteractionType.MessageComponent: {
-			return await handleComponents(interaction, client, connection, api_manager);
+			return await handleComponents(interaction, client, connection, stable_horde_manager);
         };
         case InteractionType.ApplicationCommandAutocomplete: {
-			return await handleAutocomplete(interaction, client, connection, api_manager);
+			return await handleAutocomplete(interaction, client, connection, stable_horde_manager);
         };
         case InteractionType.ModalSubmit: {
-			return await handleModals(interaction, client, connection, api_manager);
+			return await handleModals(interaction, client, connection, stable_horde_manager);
         };
     }
 })
