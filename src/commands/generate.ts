@@ -1,13 +1,13 @@
 import { AttachmentBuilder, ButtonBuilder, ChannelType, Colors, EmbedBuilder, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
-import { Config } from "../types";
+import { Config, ModelGenerationInputStableToggles } from "../types";
 import {readFileSync} from "fs"
 import { AutocompleteContext } from "../classes/autocompleteContext";
 import Centra from "centra";
 const {buffer2webpbuffer} = require("webp-converter")
 import { appendFileSync } from "fs"
-import { GenerationInput, ModelGenerationInputStableToggles } from "@zeldafan0225/stable_horde";
+import { GenerationInput } from "@zeldafan0225/stable_horde";
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 

@@ -1,4 +1,4 @@
-import StableHorde, { ModelGenerationInputStableToggles } from "@zeldafan0225/stable_horde";
+import StableHorde from "@zeldafan0225/stable_horde";
 import {
     ApplicationCommandData, AutocompleteInteraction,
     ButtonInteraction,
@@ -159,6 +159,16 @@ export interface Config {
         allow_img2img?: boolean,
         allow_denoise?: boolean
     }
+}
+
+export enum ModelGenerationInputStableToggles {
+    "k_lms" = "k_lms",
+    "k_heun" = "k_heun",
+    "k_euler" = "k_euler",
+    "k_dpm_2" = "k_dpm_2",
+    "k_dpm_2_a" = "k_dpm_2_a",
+    "DDIM" = "DDIM",
+    "PLMS" = "PLMS"
 }
 
 export const ICONS = Object.freeze({
