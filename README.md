@@ -1,5 +1,11 @@
 # Stable_Horde_Discord
 
+A basic Discord bot to generate images using the Stable Horde API.
+
+**DISCLAIMER:** THIS REPOSITORY IS IN NO WAY ASSOCIATED TO THE CREATORS OF STABLE HORDE
+
+You can support me and my projects on [Ko-Fi](https://ko-fi.com/slashbot)
+
 ## Features
 
 This package includes the code for a discord bot which interacts with the stable horde api.

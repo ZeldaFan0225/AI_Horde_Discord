@@ -1,13 +1,13 @@
 import { AttachmentBuilder, ButtonBuilder, ChannelType, Colors, EmbedBuilder, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
-import { GenerationInput, ModelGenerationInputStableToggles } from "../stable_horde_types";
 import { Config } from "../types";
 import {readFileSync} from "fs"
 import { AutocompleteContext } from "../classes/autocompleteContext";
 import Centra from "centra";
 const {buffer2webpbuffer} = require("webp-converter")
 import { appendFileSync } from "fs"
+import { GenerationInput, ModelGenerationInputStableToggles } from "@zeldafan0225/stable_horde";
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
@@ -185,10 +185,10 @@ export default class extends Command {
         const seed = ctx.interaction.options.getString("seed")
         let height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.default_res?.height ?? 512
         let width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.default_res?.width ?? 512
-        const upscale = !!ctx.interaction.options.getBoolean("upscale")
-        const gfpgan = !!ctx.interaction.options.getBoolean("gfpgan")
-        const real_esrgan = !!ctx.interaction.options.getBoolean("real_esrgan")
-        const ldsr = !!ctx.interaction.options.getBoolean("ldsr")
+        const upscale = !!ctx.interaction.options.getBoolean("upscale") ?? ctx.client.config.default_upscale
+        const gfpgan = !!ctx.interaction.options.getBoolean("gfpgan") ?? ctx.client.config.default_gfpgan
+        const real_esrgan = !!ctx.interaction.options.getBoolean("real_esrgan") ?? ctx.client.config.default_real_esrgan
+        const ldsr = !!ctx.interaction.options.getBoolean("ldsr") ?? ctx.client.config.default_ldsr
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
         const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.default_steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? 1

@@ -1,4 +1,4 @@
-import StableHorde from "@zeldafan0225/stable_horde";
+import StableHorde, { ModelGenerationInputStableToggles } from "@zeldafan0225/stable_horde";
 import {
     ApplicationCommandData, AutocompleteInteraction,
     ButtonInteraction,
@@ -11,7 +11,6 @@ import {
 } from "discord.js";
 import { Pool } from "pg";
 import { StableHordeClient } from "./classes/client";
-import { ModelGenerationInputStableToggles } from "./stable_horde_types";
 
 export enum StoreTypes {
     COMMANDS,
@@ -89,6 +88,10 @@ export interface Config {
     default_model?: string,
     default_token?: string,
     default_denoise?: number,
+    default_upscale: boolean,
+    default_gfpgan: boolean,
+    default_real_esrgan: boolean,
+    default_ldsr: boolean,
     require_login?: boolean,
     dev?: boolean,
     blacklisted_words?: string[],
