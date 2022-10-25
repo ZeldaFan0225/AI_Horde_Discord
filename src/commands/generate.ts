@@ -55,7 +55,7 @@ const command_data = new SlashCommandBuilder()
             .setName("cfg")
             .setDescription("How strictly to follow the given prompt")
             .setMinValue(config.user_restrictions.cfg?.min ?? -40)
-            .setMaxValue(config.user_restrictions.cfg?.min ?? -40)
+            .setMaxValue(config.user_restrictions.cfg?.max ?? 30)
         )
     }
     if(config.user_restrictions?.allow_denoise) {
