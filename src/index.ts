@@ -7,6 +7,7 @@ import { handleModals } from "./handlers/modalHandler";
 import { Pool } from "pg"
 import { handleAutocomplete } from "./handlers/autocompleteHandler";
 import StableHorde from "@zeldafan0225/stable_horde";
+import { handleContexts } from "./handlers/contextHandler";
 
 const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/
 for (const line of readFileSync(`${process.cwd()}/.env`, 'utf8').split(/[\r\n]/)) {
@@ -51,10 +52,11 @@ connection.connect().then(async () => {
 client.on("ready", async () => {
     client.commands.loadClasses().catch(console.error)
     client.components.loadClasses().catch(console.error)
+    client.contexts.loadClasses().catch(console.error)
     client.modals.loadClasses().catch(console.error)
     client.user?.setPresence({activities: [{type: ActivityType.Listening, name: "to your generation requests | https://stablehorde.net"}], status: PresenceUpdateStatus.DoNotDisturb, })
     console.log(`Ready`)
-    await client.application?.commands.set(client.commands.createPostBody()).catch(console.error)
+    await client.application?.commands.set([...client.commands.createPostBody(), ...client.contexts.createPostBody()]).catch(console.error)
 })
 
 client.on("interactionCreate", async (interaction) => {
@@ -63,6 +65,10 @@ client.on("interactionCreate", async (interaction) => {
             switch(interaction.commandType) {
                 case ApplicationCommandType.ChatInput: {
                     return await handleCommands(interaction, client, connection, stable_horde_manager);
+                }
+                case ApplicationCommandType.User:
+                case ApplicationCommandType.Message: {
+                    return await handleContexts(interaction, client, connection, stable_horde_manager);
                 }
             }
             break;

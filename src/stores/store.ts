@@ -13,9 +13,9 @@ import {
 } from "discord.js";
 import {join} from "path"
 import {StoreInitOptions, StoreTypes} from "../types";
-import {Context} from "vm";
 import {Modal} from "../classes/modal";
 import { Component } from "../classes/component";
+import { Context } from "../classes/context";
 
 export class Store <T extends StoreTypes> {
     files_folder: string
@@ -39,7 +39,7 @@ export class Store <T extends StoreTypes> {
         const map = new SuperMap<string, T extends StoreTypes.COMMANDS ? Command : T extends StoreTypes.COMPONENTS ? Component : T extends StoreTypes.CONTEXTS ? Context : Modal>()
         for (let command_file of files) {
             const command = new (require(join(__dirname, "../", this.files_folder, command_file)).default)() as (T extends StoreTypes.COMMANDS ? Command : T extends StoreTypes.COMPONENTS ? Component : T extends StoreTypes.CONTEXTS ? Context : Modal)
-            map.set(command.name, command)
+            map.set(command.name.toLowerCase(), command)
         }
         this.loaded_classes = map
         console.log(`Loaded ${map.size} classes`)
@@ -68,9 +68,8 @@ export class Store <T extends StoreTypes> {
     async getContext(interaction: MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction): Promise<Context> {
         if(!this.loaded_classes.size) throw new Error("No commands loaded")
         if(this.storetype !== StoreTypes.CONTEXTS) throw new Error("Wrong class type loaded")
-        let command_name = interaction.commandName
-
-        const command = this.loaded_classes.get(command_name)
+        let command_name = interaction.commandName.toLowerCase()
+        const command = this.loaded_classes.get(command_name.toLowerCase())
 
         if(!command) throw new Error("Unable to find context")
         return command as Context

@@ -9,7 +9,7 @@ export class ModalContext extends BaseContext {
         this.interaction = options.interaction
     }
 
-    async error(options: { error?: string, ephemeral?: boolean, codeblock?: boolean, type?: "user" | "guild", args?: string[] }) {
+    async error(options: { error?: string, ephemeral?: boolean, codeblock?: boolean }) {
         const err_string = options.error ?? "Unknown Error"
         const embed = new EmbedBuilder({
             color: Colors.Red,

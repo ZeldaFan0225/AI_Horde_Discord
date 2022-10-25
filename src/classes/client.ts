@@ -9,6 +9,7 @@ import { Pool } from "pg";
 export class StableHordeClient extends Client {
 	commands: Store<StoreTypes.COMMANDS>;
 	components: Store<StoreTypes.COMPONENTS>;
+	contexts: Store<StoreTypes.CONTEXTS>;
 	modals: Store<StoreTypes.MODALS>;
     config: Config
 	cache: SuperMap<string, any>
@@ -17,6 +18,7 @@ export class StableHordeClient extends Client {
 		super(options);
 		this.commands = new Store<StoreTypes.COMMANDS>({files_folder: "/commands", load_classes_on_init: false, storetype: StoreTypes.COMMANDS});
 		this.components = new Store<StoreTypes.COMPONENTS>({files_folder: "/components", load_classes_on_init: false, storetype: StoreTypes.COMPONENTS});
+		this.contexts = new Store<StoreTypes.CONTEXTS>({files_folder: "/contexts", load_classes_on_init: false, storetype: StoreTypes.CONTEXTS});
 		this.modals = new Store<StoreTypes.MODALS>({files_folder: "/modals", load_classes_on_init: false, storetype: StoreTypes.MODALS});
         this.config = {}
 		this.cache = new SuperMap({
