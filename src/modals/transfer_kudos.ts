@@ -16,7 +16,6 @@ export default class extends Modal {
         const username = (ctx.interaction.components[0]?.components[0] as TextInputModalData).value
         const amount = parseInt((ctx.interaction.components[1]?.components[0] as TextInputModalData).value)
         const token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
-        console.log(amount)
         if(isNaN(amount) || amount <= 0) return ctx.error({
             error: "You can only send one or mode kudos"
         })

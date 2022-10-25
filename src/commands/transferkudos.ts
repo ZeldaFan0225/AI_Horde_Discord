@@ -57,7 +57,6 @@ export default class extends Command {
         }, token).catch(e => e)
 
         if(typeof transfer.name === "string") return ctx.error({error: transfer.name})
-        console.log(transfer)
         ctx.interaction.reply({
             content: `Transferred ${amount} kudos to ${username}`
         })
