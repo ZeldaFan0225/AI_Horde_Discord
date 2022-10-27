@@ -68,7 +68,7 @@ export default class extends Command {
                 ephemeral: true
             })
         } else {
-            const users_workers = workers.filter(w => w.owner === user_data.username)
+            const users_workers = workers.filter(w => user_data.worker_ids?.includes(w.id!))
 
             if(users_workers.length > 25) {
                 const max_name = users_workers.sort((a,b) => (b.name?.length ?? 0)-(a.name?.length ?? 0))[0]?.name?.length ?? 9
@@ -83,10 +83,10 @@ export default class extends Command {
                 })
             } else {
                 const embed = new EmbedBuilder()
-                .setColor(Colors.Red)
-                .setTitle(`Workers - ${user_data.username}`)
+                .setColor(Colors.Blue)
+                .setTitle(`Currently running Workers - ${user_data.username}`)
                 .setDescription(`${users_workers.length}/25`)
-                .addFields(...users_workers.map(w => ({name: w.id ?? "Unknown", value: `**Name**: ${w.name}\n**Img2Img**: ${w.img2img}\n**NSFW**: ${w.nsfw}\n**Maintenance**:${w.maintenance_mode}\n**Models**: ${w.models?.join(", ")}`, inline: true})))
+                .addFields(...users_workers.map(w => ({name: w.id ?? "Unknown", value: `**Name**: ${w.name}\n**Img2Img**: ${w.img2img}\n**NSFW**: ${w.nsfw}\n**Maintenance**: ${w.maintenance_mode}\n**Models**: ${w.models?.join(", ")}`, inline: true})))
                 
                 ctx.interaction.reply({
                     embeds: [embed.toJSON()],
