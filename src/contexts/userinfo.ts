@@ -53,6 +53,7 @@ export default class extends Context {
             description: `Images Requested \`${user_data.usage?.requests}\` (\`${user_data.usage?.megapixelsteps}\` Megapixelsteps)
 Images Generated \`${user_data.contributions?.fulfillments}\` (\`${user_data.contributions?.megapixelsteps}\` Megapixelsteps)
 Allowed Concurrency \`${user_data.concurrency}\`
+Pseudonymous User \`${user_data.pseudonymous}\`
 
 **Kudos**
 Total \`${Object.values(user_data.kudos_details ?? {}).reduce((a, b) => (a) + b)}\`
