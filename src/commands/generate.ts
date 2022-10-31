@@ -200,13 +200,13 @@ export default class extends Command {
         const stable_horde_user = await ctx.stable_horde_manager.findUser(user_token  || ctx.client.config.default_token || "0000000000").catch((e) => ctx.client.config.dev ? console.error(e) : null);
         const can_bypass = ctx.client.config.img2img?.whitelist?.bypass_checks && ctx.client.config.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
-        if(ctx.client.config.require_login && !user_token) return ctx.error({error: `You are required to ${ctx.client.getSlashCommandTag("login")} to use ${ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
+        if(ctx.client.config.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
         if(ctx.client.config.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
         if(model && ctx.client.config.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
         if(model && model !== "YOLO" && !(await ctx.stable_horde_manager.getModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
-        if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${ctx.client.getSlashCommandTag("login")} and agree to our ${ctx.client.getSlashCommandTag("terms")} first before being able to use img2img`, codeblock: false})
+        if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use img2img`, codeblock: false})
         if(img && ctx.client.config.img2img?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
         if(img && !can_bypass && ctx.client.config.img2img?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use img2img"})
         if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Image to Image input must be a image"})

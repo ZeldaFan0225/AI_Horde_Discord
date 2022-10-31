@@ -71,7 +71,6 @@ client.on("interactionCreate", async (interaction) => {
                     return await handleContexts(interaction, client, connection, stable_horde_manager);
                 }
             }
-            break;
         };
         case InteractionType.MessageComponent: {
 			return await handleComponents(interaction, client, connection, stable_horde_manager);
