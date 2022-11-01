@@ -1,4 +1,4 @@
-import { Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ButtonBuilder, Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 
@@ -35,9 +35,16 @@ Performance: \`${w.performance}\``).join("\n\n")
                 inline: true
             })))
         }
+        
+        const delete_btn = new ButtonBuilder({
+            label: "Delete this message",
+            custom_id: `delete_${ctx.interaction.user.id}`,
+            style: 4
+        })
 
         return ctx.interaction.reply({
-            embeds: [embed]
+            embeds: [embed],
+            components: [{type: 1, components: [delete_btn]}]
         })
     }
 }
