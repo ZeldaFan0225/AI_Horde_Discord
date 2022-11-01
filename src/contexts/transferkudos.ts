@@ -30,8 +30,8 @@ export default class extends Context {
         })
 
         const target_token = await ctx.client.getUserToken(ctx.interaction.targetId, ctx.database)
-        const target_user = await ctx.stable_horde_manager.findUser(target_token)
-        const own_user = await ctx.stable_horde_manager.findUser(token)
+        const target_user = await ctx.stable_horde_manager.findUser({token: target_token})
+        const own_user = await ctx.stable_horde_manager.findUser({token})
         const modal = new ModalBuilder({
             title: "Transfer Kudos",
             custom_id: "transfer_kudos",

@@ -48,7 +48,7 @@ export default class extends Command {
             ephemeral: true
         }) 
 
-        const user_data = await ctx.stable_horde_manager.findUser(token).catch(() => null)
+        const user_data = await ctx.stable_horde_manager.findUser({token}).catch(() => null)
         const workers = await ctx.stable_horde_manager.getWorkers().catch(() => null)
         
         if(!workers?.length) return ctx.interaction.reply({

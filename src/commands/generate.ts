@@ -197,7 +197,7 @@ export default class extends Command {
         let img = ctx.interaction.options.getAttachment("img2img")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
-        const stable_horde_user = await ctx.stable_horde_manager.findUser(user_token  || ctx.client.config.default_token || "0000000000").catch((e) => ctx.client.config.dev ? console.error(e) : null);
+        const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config.default_token || "0000000000"}).catch((e) => ctx.client.config.dev ? console.error(e) : null);
         const can_bypass = ctx.client.config.img2img?.whitelist?.bypass_checks && ctx.client.config.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
         if(ctx.client.config.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
@@ -279,7 +279,7 @@ export default class extends Command {
             console.log(generation_data)
         }
 
-        const generation_start = await ctx.stable_horde_manager.postAsyncGenerate(generation_data, token)
+        const generation_start = await ctx.stable_horde_manager.postAsyncGenerate(generation_data, {token})
         .catch((e) => {
             if(ctx.client.config.dev) console.error(e)
             ctx.error({error: `Unable to start generation: ${e.message}`})

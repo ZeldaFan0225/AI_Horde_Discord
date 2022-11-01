@@ -26,7 +26,7 @@ export default class extends Modal {
         const transfer = await ctx.stable_horde_manager.postKudosTransfer({
             username,
             amount
-        }, token).catch(e => e)
+        }, {token}).catch(e => e)
 
         if(typeof transfer.name === "string") return ctx.error({error: transfer.name})
         

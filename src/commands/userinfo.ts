@@ -41,7 +41,7 @@ export default class extends Command {
             ephemeral: true
         })
 
-        const user_data = await ctx.stable_horde_manager.findUser(token).catch(() => null)
+        const user_data = await ctx.stable_horde_manager.findUser({token}).catch(() => null)
 
         if(!user_data) return ctx.interaction.reply({
             content: "Unable to find user for saved token.",
@@ -62,7 +62,7 @@ Allowed Concurrency \`${user_data.concurrency}\`
 Pseudonymous User \`${user_data.pseudonymous}\`
 
 **Kudos**
-Total \`${Object.values(user_data.kudos_details ?? {}).reduce((a, b) => (a) + b)}\`
+Total \`${user_data.kudos}\`
 Accumulated \`${user_data.kudos_details?.accumulated}\`
 Gifted \`${user_data.kudos_details?.gifted}\`
 Admin \`${user_data.kudos_details?.admin}\`
