@@ -8,6 +8,7 @@ import { Pool } from "pg"
 import { handleAutocomplete } from "./handlers/autocompleteHandler";
 import StableHorde from "@zeldafan0225/stable_horde";
 import { handleContexts } from "./handlers/contextHandler";
+import {existsSync, mkdirSync} from "fs"
 
 const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/
 for (const line of readFileSync(`${process.cwd()}/.env`, 'utf8').split(/[\r\n]/)) {
@@ -44,6 +45,9 @@ if(client.config.logs?.enabled) {
     client.initLogDir()
 }
 
+if(!existsSync(`${process.cwd()}/node_modules/webp-converter/temp`)) {
+    mkdirSync("./node_modules/webp-converter/temp")
+}
 
 connection.connect().then(async () => {
     await connection.query("CREATE TABLE IF NOT EXISTS user_tokens (index SERIAL, id VARCHAR(100) PRIMARY KEY, token VARCHAR(100) NOT NULL)")

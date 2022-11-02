@@ -244,8 +244,10 @@ export default class extends Command {
             
             if(img.contentType === "image/webp") img_data = img_data_res.body
             else {
-                img_data = await buffer2webpbuffer(img_data_res.body, img.contentType?.replace("image/",""),"-q 80")
-                //return ctx.error({error: "Image must be webp"})
+                img_data = await buffer2webpbuffer(img_data_res.body, img.contentType?.replace("image/",""),"-q 80").catch((e: Error) => ctx.client.config.dev ? console.error(e) : null)
+                if(!img_data) return ctx.error({
+                    error: "Image format conversion to webp failed"
+                })
             }
         }
 
