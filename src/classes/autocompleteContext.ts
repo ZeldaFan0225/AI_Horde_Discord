@@ -10,6 +10,6 @@ export class AutocompleteContext extends BaseContext {
     }
 
     async error() {
-        return await this.interaction.respond([])
+        return await this.interaction.respond([]).catch()
     }
 }

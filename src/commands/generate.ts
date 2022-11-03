@@ -83,7 +83,7 @@ const command_data = new SlashCommandBuilder()
             .setName("height")
             .setDescription("The height of the result image")
             .setMinValue(config.user_restrictions?.height?.min ?? 64)
-            .setMaxValue(config.user_restrictions?.height?.max ?? 1024)
+            .setMaxValue(config.user_restrictions?.height?.max ?? 3072)
         )
     }
     if(config.user_restrictions?.allow_width) {
@@ -93,7 +93,7 @@ const command_data = new SlashCommandBuilder()
             .setName("width")
             .setDescription("How width of the result image")
             .setMinValue(config.user_restrictions?.width?.min ?? 64)
-            .setMaxValue(config.user_restrictions?.width?.max ?? 1024)
+            .setMaxValue(config.user_restrictions?.width?.max ?? 3072)
         )
     }
     if(config.user_restrictions?.allow_upscale) {
@@ -145,7 +145,7 @@ const command_data = new SlashCommandBuilder()
             .setName("steps")
             .setDescription("How many steps to go though while creating the image")
             .setMinValue(config.user_restrictions?.steps?.min ?? 1)
-            .setMaxValue(config.user_restrictions?.steps?.max ?? 100)
+            .setMaxValue(config.user_restrictions?.steps?.max ?? 500)
         )
     }
     if(config.user_restrictions?.allow_amount) {
@@ -217,7 +217,7 @@ export default class extends Command {
         if(keep_ratio && img?.width && img?.height) {
             const ratio = img?.width/img?.height
             const largest = ratio >= 1 ? img.width : img.height
-            const m = largest > 1024 ? 1024/largest : 1
+            const m = largest > 3072 ? 3072/largest : 1
             const mod_height = Math.round(img.height*m)
             const mod_width = Math.round(img.width*m)
             height = mod_height%64 <= 32 ? mod_height-(mod_height%64) : mod_height+(64-(mod_height%64))
@@ -274,6 +274,14 @@ export default class extends Command {
             workers: ctx.client.config.workers,
             models: !model ? undefined : model === "YOLO" ? [] : [model],
             source_image: img_data?.toString("base64")
+        }
+        
+        if(token === "0000000000" && ((generation_data.params?.width ?? 512) > 1024 || (generation_data.params?.height ?? 512) > 1024 || (generation_data.params?.steps ?? 512) > 100)) return ctx.error({error: "You need to be logged in to generate images with a size over 1024*1024 or more than 100 steps"})
+
+        function calculateCost() {
+            const result = (((generation_data.params?.width ?? 512) * (generation_data.params?.height ?? 512) - (64**2)) ** 1.75) / (((1024**2)-(64**2)) ** 1.75)
+            const steps = (generation_data.params?.steps ?? ctx.client.config.default_steps ?? 50)
+            return Math.round(((0.1232 * steps) + (result * (0.1232 * steps * 8.75)))*100)/100
         }
 
         if(ctx.client.config.dev) {
@@ -357,28 +365,29 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
 
         const message = await ctx.interaction.fetchReply()
 
-        let done = false
-
         let error_timeout = Date.now()*2
         let prev_left = 1
 
+        let done = false
+
+        if((start_status?.wait_time ?? 0) <= 4.9) {
+            // wait before starting the loop so that the first iteration can already pick up the result
+            const pre_test = await new Promise((resolve) => setTimeout(async () => {resolve(await getCheckAndDisplayResult())},((start_status?.wait_time ?? 0) + 0.1) * 1000))
+            if(!pre_test) return;
+        }
+        
         const inter = setInterval(async () => {
-            const status = await ctx.stable_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
-            const horde_data = await ctx.stable_horde_manager.getPerformance()
+            const d = await getCheckAndDisplayResult()
+            if(!d) return;
+            const {status, horde_data} = d
 
-            if(!status || (status as any).faulted) {
-                clearInterval(inter);
-                return message.edit({content: "Image generation has been cancelled", embeds: []});
+            if((status.wait_time ?? 0) <= 4.9) {
+                // try to display result faster
+                setTimeout(async () => {await getCheckAndDisplayResult()},((start_status?.wait_time ?? 0) + 0.1) * 1000)
             }
-
-            if(ctx.client.config.dev) {
-                console.log(status)
-            }
-
 
             if(status?.wait_time === 0 && prev_left !== 0) error_timeout = Date.now()
             prev_left = status?.wait_time ?? 1
-
 
             if(error_timeout < (Date.now()-1000*60*2)) {
                 await ctx.stable_horde_manager.deleteGenerationRequest(generation_start.id!)
@@ -391,28 +400,6 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
                 return;
             }
 
-            done = status.done ?? false
-
-            if(done) {
-                const images = await ctx.stable_horde_manager.getGenerationStatus(generation_start.id!)
-
-                const image_map = images.generations?.map((g, i) => {
-                    const attachment = new AttachmentBuilder(Buffer.from(g.img!, "base64"), {name: `${g.seed ?? `image${i}`}.webp`})
-                    const embed = new EmbedBuilder({
-                        title: `Image ${i+1}`,
-                        image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
-                        color: Colors.Blue,
-                        description: `**Seed:** ${g.seed}\n**Model:** ${g.model}\n**Generated by** ${g.worker_name}\n(\`${g.worker_id}\`)${!i ? `\n**Prompt:** ${prompt}` : ""}`,
-                    })
-                    if(img_data) embed.setThumbnail(`attachment://original.webp`)
-                    return {attachment, embed}
-                }) || []
-                clearInterval(inter);
-                const files = image_map.map(i => i.attachment)
-                if(img_data) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
-                return message.edit({content: `Image generation finished`, components: [{type: 1, components: [delete_btn.toJSON()]}], embeds: image_map.map(i => i.embed), files});
-            }
-            
             const embed = new EmbedBuilder({
                 color: Colors.Blue,
                 title: "Generation started",
@@ -445,6 +432,43 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 components
             })
         }, 1000 * (ctx.client.config?.update_generation_status_interval_seconds || 5))
+
+        async function getCheckAndDisplayResult(precheck?: boolean) {
+            const status = await ctx.stable_horde_manager.getGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+            const horde_data = await ctx.stable_horde_manager.getPerformance()
+            if(!status || (status as any).faulted) {
+                if(!done) await message.edit({content: "Image generation has been cancelled", embeds: []});
+                if(!precheck) clearInterval(inter)
+                return null;
+            }
+
+            if(ctx.client.config.dev) {
+                console.log(status)
+            }
+
+            if(!status.done) return {status, horde_data}
+            else {
+                done = true
+                const images = await ctx.stable_horde_manager.getGenerationStatus(generation_start!.id!)
+
+                const image_map = images.generations?.map((g, i) => {
+                    const attachment = new AttachmentBuilder(Buffer.from(g.img!, "base64"), {name: `${g.seed ?? `image${i}`}.webp`})
+                    const embed = new EmbedBuilder({
+                        title: `Image ${i+1}`,
+                        image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
+                        color: Colors.Blue,
+                        description: `**Seed:** ${g.seed}\n**Model:** ${g.model}\n**Generated by** ${g.worker_name}\n(\`${g.worker_id}\`)${!i ? `\n**Prompt:** ${prompt}\n**Total Kudos Cost:** \`${calculateCost()}\`${(generation_data.params?.n ?? 1) > 1 ? ` (\`${calculateCost()*(generation_data.params?.n ?? 1)}\` total)` : ""}` : ""}`,
+                    })
+                    if(img_data) embed.setThumbnail(`attachment://original.webp`)
+                    return {attachment, embed}
+                }) || []
+                if(!precheck) clearInterval(inter)
+                const files = image_map.map(i => i.attachment)
+                if(img_data) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
+                await message.edit({content: `Image generation finished`, components: [{type: 1, components: [delete_btn.toJSON()]}], embeds: image_map.map(i => i.embed), files});
+                return null
+            } 
+        }
     }
 
     override async autocomplete(context: AutocompleteContext): Promise<any> {
