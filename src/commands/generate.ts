@@ -330,7 +330,7 @@ Workers: \`${start_horde_data.worker_count}\`
 \`${start_status?.processing}\`/\`${amount}\` Images processing
 \`${start_status?.finished}\`/\`${amount}\` Images finished
 ${"🟥".repeat(start_status?.waiting ?? 0)}${"🟨".repeat(start_status?.processing ?? 0)}${"🟩".repeat(start_status?.finished ?? 0)}
-
+${!start_status?.is_possible ? "\nRequest can not be fulfulled with current amount of workers...\n" : ""}
 ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
         })
 
@@ -401,6 +401,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
                 color: Colors.Blue,
                 title: "Generation started",
                 description: `Position: \`${status.queue_position}\`/\`${horde_data.queued_requests}\`
+Kudos consumed: \`${status?.kudos}\`
 Workers: \`${horde_data.worker_count}\`
 
 \`${status.waiting}\`/\`${amount}\` Images waiting
