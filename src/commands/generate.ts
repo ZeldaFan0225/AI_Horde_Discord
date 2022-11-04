@@ -479,7 +479,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             }
             case "width":
             case "height": {
-                const steps = Array.from({length: 3072/64}).map((_, i) => ({name: `${(i+1)*64}px${(i+1)*64 > 1024 ? " (Requires Kudos upfront)" : ""}`, value: (i+1)*64}))
+                const steps = Array.from({length: 3072/64}).map((_, i) => ({name: `${(i+1)*64}px${(i+1)*64 > 1024 ? " (Requires Kudos upfront)" : ""}`, value: (i+1)*64})).filter(v => v.value >= (context.client.config.user_restrictions?.height?.min ?? 64) && v.value <= (context.client.config.user_restrictions?.height?.max ?? 3072))
                 const inp = context.interaction.options.getFocused(true)
                 return await context.interaction.respond(steps.filter((v) => !inp.value || v.name.includes(inp.value)).slice(0,25))
             }
