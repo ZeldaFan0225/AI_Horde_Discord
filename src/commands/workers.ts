@@ -56,11 +56,14 @@ export default class extends Command {
             ephemeral: true
         })
 
-        if(show_all || !user_data) {
+        
+        const users_workers = workers.filter(w => user_data?.worker_ids?.includes(w.id!))
+        if(ctx.interaction.options.getUser("user")?.id && !users_workers.length) return ctx.error({error: "This user does not have any workers online"})
+        if(show_all || !user_data || !users_workers.length) {
             const max_name = workers.sort((a,b) => (b.name?.length ?? 0)-(a.name?.length ?? 0))[0]?.name?.length ?? 9
             const max_models = workers.sort((a,b) => (b.models?.join(", ")?.length ?? 0)-(a.models?.join(", ")?.length ?? 0))[0]?.models?.join(", ")?.length ?? 0
-            const file_header = `Worker ID                            | name${" ".repeat(max_name-4)} | models${" ".repeat(max_models-6)} | img2img | nsfw  | maintenance |`
-            const file_data = `${file_header}\n${"-".repeat(file_header.length)}\n${workers.map(w => `${w.id} | ${w.name}${" ".repeat((max_name)-(w.name?.length??9))} | ${w.models?.join(", ")}${" ".repeat((max_models)-(w.models?.join(", ")?.length??0))} | ${w.img2img ? `true ` : `false`}   | ${w.nsfw ? `true ` : `false`} | ${w.maintenance_mode ? `true ` : `false`}       |`).join("\n")}`
+            const file_header = `Worker ID                            | name${" ".repeat(max_name-4)} | img2img | nsfw  | maintenance | models${" ".repeat(max_models-5)} |`
+            const file_data = `${file_header}\n${"-".repeat(file_header.length)}\n${workers.map(w => `${w.id} | ${w.name}${" ".repeat((max_name)-(w.name?.length??9))} |  ${w.img2img ? `true ` : `false`}  | ${w.nsfw ? `true ` : `false`} | ${w.maintenance_mode ? `true ` : `false`}        | ${w.models?.join(", ")}${" ".repeat((max_models)-(w.models?.join(", ")?.length??0))} |`).join("\n")}`
         
             ctx.interaction.reply({
                 content: "Data attached below",
@@ -68,7 +71,6 @@ export default class extends Command {
                 ephemeral: true
             })
         } else {
-            const users_workers = workers.filter(w => user_data.worker_ids?.includes(w.id!))
 
             if(users_workers.length > 25) {
                 const max_name = users_workers.sort((a,b) => (b.name?.length ?? 0)-(a.name?.length ?? 0))[0]?.name?.length ?? 9
