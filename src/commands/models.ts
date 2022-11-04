@@ -31,7 +31,7 @@ Performance: \`${w.performance}\``).join("\n\n")
             embed.setDescription(null)
             embed.setFields(models.map(w => ({
                 name: w.name!,
-                value: `Workers: \`${w.count}\`\nPerformance: \`${w.performance}\``,
+                value: `Workers: \`${w.count}\`\nPerformance: \`${w.performance}\`\nQueued: \`${w.queued}\``,
                 inline: true
             })))
         }
