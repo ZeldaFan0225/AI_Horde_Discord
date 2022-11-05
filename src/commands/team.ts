@@ -39,7 +39,6 @@ export default class extends Command {
                 title: `Team Details`,
                 color: Colors.Blue,
                 description: `Name: \`${team.name}\`
-Creator: \`${team.creater}\`
 Info: ${team.info}
 
 **Stats**
