@@ -27,7 +27,7 @@ export default class extends Command {
     override async run(ctx: CommandContext): Promise<any> {
         const query = ctx.interaction.options.getString("query")
         const teams = await ctx.stable_horde_manager.getTeams()
-        const team = teams.find(t => t.id === query || t.name === query)
+        const team = teams.find(t => t.id?.toLowerCase() === query?.toLowerCase() || t.name?.toLowerCase() === query?.toLowerCase())
         if(query && team) {
             const delete_btn = new ButtonBuilder({
                 label: "Delete this message",
@@ -65,7 +65,7 @@ Speed: \`${team.speed}\` Megapixelsteps per second`,
             case "query": {
                 const teams = await context.stable_horde_manager.getTeams()
                 if(context.client.config.dev) console.log(teams)
-                const available = teams.filter(t => t.name?.includes(option.value) || t.id?.includes(option.value)).map(t => ({name: `${t.name} | ${t.id}`, value: t.id!}))
+                const available = teams.filter(t => t.name?.toLowerCase().includes(option.value.toLowerCase()) || t.id?.toLowerCase().includes(option.value.toLowerCase())).map(t => ({name: `${t.name} | ${t.id}`, value: t.id!}))
                 return await context.interaction.respond(available.slice(0, 25))
             }
         }

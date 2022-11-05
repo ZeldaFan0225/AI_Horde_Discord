@@ -27,7 +27,7 @@ export default class extends Command {
     override async run(ctx: CommandContext): Promise<any> {
         const query = ctx.interaction.options.getString("query")
         const workers = await ctx.stable_horde_manager.getWorkers()
-        const worker = workers.find(t => t.id === query || t.name === query)
+        const worker = workers.find(t => t.id?.toLowerCase() === query?.toLowerCase() || t.name?.toLowerCase() === query?.toLowerCase())
         
         if(query && worker) {
             const delete_btn = new ButtonBuilder({
@@ -84,7 +84,7 @@ Paused: \`${worker.paused}\``,
             case "query": {
                 const workers = await context.stable_horde_manager.getWorkers()
                 if(context.client.config.dev) console.log(workers)
-                const available = workers.filter(t => t.name?.includes(option.value) || t.id?.includes(option.value)).map(t => ({name: `${t.name} | ${t.id}`, value: t.id!}))
+                const available = workers.filter(t => t.name?.toLowerCase().includes(option.value.toLowerCase()) || t.id?.toLowerCase().includes(option.value.toLowerCase())).map(t => ({name: `${t.name} | ${t.id}`, value: t.id!}))
                 return await context.interaction.respond(available.slice(0, 25))
             }
         }
