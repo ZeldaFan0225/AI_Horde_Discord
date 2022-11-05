@@ -476,7 +476,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const models = await context.stable_horde_manager.getModels()
                 if(context.client.config.dev) console.log(models)
                 const available = [{name: "Any Model", value: "YOLO"}, ...models.sort((a, b) => b.performance!-a.performance!).map(m => ({name: `${m.name} | Workers: ${m.count} | Performance: ${m.performance} | Queued: ${m.queued}`, value: m.name!}))].filter(v => !context.client.config.blacklisted_models?.includes(v.value))
-                return await context.interaction.respond(available.filter(o => o.name.includes(option.value)))
+                return await context.interaction.respond(available.filter(o => o.name.includes(option.value)).slice(0,25))
             }
             case "width":
             case "height": {

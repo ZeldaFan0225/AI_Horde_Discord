@@ -44,7 +44,8 @@ const stable_horde_manager = new StableHorde({
     cache_interval: 1000,
     cache: {
         models: 1000 * 10,
-        performance: 1000 * 10
+        performance: 1000 * 10,
+        teams: 1000 * 10
     }
 })
 
