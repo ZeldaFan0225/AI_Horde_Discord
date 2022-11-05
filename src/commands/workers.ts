@@ -39,7 +39,7 @@ export default class extends Command {
                 title: `Worker Details`,
                 color: Colors.Blue,
                 description: `Name: \`${worker.name}\`
-Team: \`${worker.team}\`
+Team: \`${worker.team?.name ?? "No team"}\`
 Trusted: \`${worker.trusted}\`
 Info: ${worker.info}
 
@@ -55,8 +55,7 @@ NSFW: \`${worker.nsfw}\`
 Painting: \`${worker.painting}\`
 
 **Status**
-Maintenance: \`${worker.maintenance_mode}\`
-Paused: \`${worker.paused}\``,
+Maintenance: \`${worker.maintenance_mode}\``,
                 footer: {text: worker.id!}
             })
 
