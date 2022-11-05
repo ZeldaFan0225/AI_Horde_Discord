@@ -1,4 +1,5 @@
 {
+    "use_database": true,
     "trusted_workers": true,
     "censor_nsfw": true,
     "default_steps": 30,

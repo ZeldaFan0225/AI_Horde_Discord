@@ -4,7 +4,7 @@ import { Pool } from "pg";
 import { StableHordeClient } from "../classes/client";
 import { CommandContext } from "../classes/commandContext";
 
-export async function handleCommands(interaction: ChatInputCommandInteraction, client: StableHordeClient, database: Pool, stable_horde_manager: StableHorde) {
+export async function handleCommands(interaction: ChatInputCommandInteraction, client: StableHordeClient, database: Pool | undefined, stable_horde_manager: StableHorde) {
     const command = await client.commands.getCommand(interaction).catch(() => null)
     if(!command) return;
     const context = new CommandContext({interaction, client, database, stable_horde_manager})

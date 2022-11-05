@@ -4,7 +4,7 @@ import { Pool } from "pg";
 import { StableHordeClient } from "../classes/client";
 import { ContextContext } from "../classes/contextContext";
 
-export async function handleContexts(interaction: UserContextMenuCommandInteraction | MessageContextMenuCommandInteraction, client: StableHordeClient, database: Pool, stable_horde_manager: StableHorde) {
+export async function handleContexts(interaction: UserContextMenuCommandInteraction | MessageContextMenuCommandInteraction, client: StableHordeClient, database: Pool | undefined, stable_horde_manager: StableHorde) {
     const command = await client.contexts.getContext(interaction).catch(() => null)
     if(!command) return;
 

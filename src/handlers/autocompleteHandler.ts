@@ -4,7 +4,7 @@ import { Pool } from "pg";
 import { AutocompleteContext } from "../classes/autocompleteContext";
 import { StableHordeClient } from "../classes/client";
 
-export async function handleAutocomplete(interaction: AutocompleteInteraction, client: StableHordeClient, database: Pool, stable_horde_manager: StableHorde) {
+export async function handleAutocomplete(interaction: AutocompleteInteraction, client: StableHordeClient, database: Pool | undefined, stable_horde_manager: StableHorde) {
     const command = await client.commands.getCommand(interaction).catch(() => null)
     if(!command) return;
     const context = new AutocompleteContext({interaction, client, database, stable_horde_manager})

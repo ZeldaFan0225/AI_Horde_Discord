@@ -13,6 +13,7 @@ export default class extends Modal {
     }
 
     override async run(ctx: ModalContext): Promise<any> {
+        if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
         const username = (ctx.interaction.components[0]?.components[0] as TextInputModalData).value
         const amount = parseInt((ctx.interaction.components[1]?.components[0] as TextInputModalData).value)
         const token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)

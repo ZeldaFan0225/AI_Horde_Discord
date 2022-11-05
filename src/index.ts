@@ -18,17 +18,26 @@ for (const line of readFileSync(`${process.cwd()}/.env`, 'utf8').split(/[\r\n]/)
     process.env[key] = value?.trim()
 }
 
-const connection = new Pool({
-    user: process.env["DB_USERNAME"],
-    host: process.env["DB_IP"],
-    database: process.env["DB_NAME"],
-    password: process.env["DB_PASSWORD"],
-    port: Number(process.env["DB_PORT"]),
-})
+let connection: Pool | undefined
+
 
 const client = new StableHordeClient({
     intents: ["Guilds"]
 })
+
+if(client.config.use_database !== false) {
+    connection = new Pool({
+        user: process.env["DB_USERNAME"],
+        host: process.env["DB_IP"],
+        database: process.env["DB_NAME"],
+        password: process.env["DB_PASSWORD"],
+        port: Number(process.env["DB_PORT"]),
+    })
+    
+    connection.connect().then(async () => {
+        await connection!.query("CREATE TABLE IF NOT EXISTS user_tokens (index SERIAL, id VARCHAR(100) PRIMARY KEY, token VARCHAR(100) NOT NULL)")
+    }).catch(() => null);
+}
 
 const stable_horde_manager = new StableHorde({
     default_token: client.config.default_token,
@@ -49,9 +58,6 @@ if(!existsSync(`${process.cwd()}/node_modules/webp-converter/temp`)) {
     mkdirSync("./node_modules/webp-converter/temp")
 }
 
-connection.connect().then(async () => {
-    await connection.query("CREATE TABLE IF NOT EXISTS user_tokens (index SERIAL, id VARCHAR(100) PRIMARY KEY, token VARCHAR(100) NOT NULL)")
-}).catch(() => null);
 
 client.on("ready", async () => {
     client.commands.loadClasses().catch(console.error)

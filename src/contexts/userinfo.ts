@@ -17,6 +17,7 @@ export default class extends Context {
     }
 
     override async run(ctx: ContextContext<ApplicationCommandType.User>): Promise<any> {
+        if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
         let token = await ctx.client.getUserToken(ctx.interaction.targetId, ctx.database)
         if(!token && ctx.interaction.targetId !== ctx.interaction.user.id) return ctx.error({error: "The user has not added their token"})
         const add_token_button = new ButtonBuilder({

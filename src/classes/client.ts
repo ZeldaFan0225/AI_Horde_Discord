@@ -52,7 +52,8 @@ export class StableHordeClient extends Client {
 		else return `/${name}`
 	}
 	
-    async getUserToken(user_id: string, database: Pool): Promise<string|undefined> {
+    async getUserToken(user_id: string, database: Pool | undefined): Promise<string|undefined> {
+		if(!database) return undefined;
         const rows = await database.query("SELECT * FROM user_tokens WHERE id=$1", [user_id])
         if(!rows.rowCount || !rows.rows[0]) return undefined
         return rows.rows[0].token

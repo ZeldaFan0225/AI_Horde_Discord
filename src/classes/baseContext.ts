@@ -9,7 +9,7 @@ import { StableHordeClient } from "./client";
 export class BaseContext{
     interaction: Interaction
     client: StableHordeClient
-    database: Pool
+    database: Pool | undefined
     stable_horde_manager: StableHorde
     constructor(options: BaseContextInitOptions) {
         this.interaction = options.interaction

@@ -29,7 +29,7 @@ The bot has the following features:
 5) fill out the `template.env` and rename it to `.env`
 6) compile the typescript code (this can be done with `npx tsc -p .` in the directory where you place the code
 7) [modify the config file to fit your needs](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md)
-8) start the process
+8) start the process (`node .` since the main file is saved in config.json)
 
 Now if everything is set up it should start and give an output in the console.
 

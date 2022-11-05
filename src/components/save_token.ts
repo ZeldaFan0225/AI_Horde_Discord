@@ -13,6 +13,7 @@ export default class extends Component {
     }
 
     override async run(ctx: ComponentContext<ComponentType.SelectMenu>): Promise<any> {
+        if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
         const token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
         const modal = new ModalBuilder({
             title: "Save Token",

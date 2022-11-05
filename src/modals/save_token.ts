@@ -13,6 +13,7 @@ export default class extends Modal {
     }
 
     override async run(ctx: ModalContext): Promise<any> {
+        if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
         const token = (ctx.interaction.components[0]?.components[0] as TextInputModalData).value
         if(!token?.length || token ===  (ctx.client.config.default_token || "0000000000")) {
             await ctx.database.query("DELETE FROM user_tokens WHERE id=$1", [ctx.interaction.user.id])

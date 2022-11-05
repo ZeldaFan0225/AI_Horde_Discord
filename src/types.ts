@@ -41,7 +41,7 @@ export interface CustomIDInitOptions {
 export interface BaseContextInitOptions {
     interaction: Interaction,
     client: StableHordeClient,
-    database: Pool,
+    database: Pool | undefined,
     stable_horde_manager: StableHorde
 }
 
@@ -74,6 +74,7 @@ export interface AutocompleteContextInitOptions extends BaseContextInitOptions {
 }
 
 export interface Config {
+    use_database?: boolean,
     staff_roles?: string[],
     trusted_workers?: boolean,
     censor_nsfw?: boolean,
