@@ -34,7 +34,6 @@ export default class extends Command {
                 custom_id: `delete_${ctx.interaction.user.id}`,
                 style: 4
             })
-            console
             const embed = new EmbedBuilder({
                 title: `Team Details`,
                 color: Colors.Blue,
