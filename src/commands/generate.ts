@@ -180,6 +180,7 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
+        await ctx.interaction.deferReply({})
         const prompt = ctx.interaction.options.getString("prompt", true)
         const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.default_sampler ?? ModelGenerationInputStableToggles.k_euler) as ModelGenerationInputStableToggles
         const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.default_cfg ?? 5
@@ -235,8 +236,6 @@ export default class extends Command {
             console.log(height)
             console.log(width)
         }
-
-        await ctx.interaction.deferReply({})
 
         const token = user_token || ctx.client.config.default_token || "0000000000"
         let img_data: Buffer | undefined
