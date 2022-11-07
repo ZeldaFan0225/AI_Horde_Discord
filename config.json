@@ -16,6 +16,7 @@
     "default_gfpgan": false,
     "default_real_esrgan": false,
     "default_ldsr": false,
+    "default_karras": false,
     "require_login": true,
     "dev": true,
     "blacklisted_models": [],
@@ -81,6 +82,7 @@
         "allow_models": true,
         "allow_img2img": true,
         "allow_denoise": true,
-        "allow_nsfw": false
+        "allow_nsfw": false,
+        "allow_karras": true
     }
 }

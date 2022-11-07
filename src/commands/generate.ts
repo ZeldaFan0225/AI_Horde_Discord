@@ -37,6 +37,14 @@ const command_data = new SlashCommandBuilder()
             .setDescription("Whether to keep the aspect ratio and image size of the original image")
         )
     }
+    if(config.user_restrictions?.allow_karras) {
+        command_data
+        .addBooleanOption(
+            new SlashCommandBooleanOption()
+            .setName("karras")
+            .setDescription("Set to True to enable karras noise scheduling tweaks")
+        )
+    }
     if(config.user_restrictions?.allow_sampler) {
         command_data
         .addStringOption(
@@ -197,6 +205,7 @@ export default class extends Command {
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         const model = ctx.interaction.options.getString("model") ?? ctx.client.config.default_model
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? true
+        const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.default_karras ?? false
         let img = ctx.interaction.options.getAttachment("img2img")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
@@ -267,7 +276,8 @@ export default class extends Command {
                 use_upscaling: upscale,
                 steps,
                 n: amount,
-                denoising_strength: denoise
+                denoising_strength: denoise,
+                karras
             },
             nsfw: ctx.client.config.user_restrictions?.allow_nsfw,
             censor_nsfw: ctx.client.config.censor_nsfw,

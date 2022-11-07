@@ -93,6 +93,7 @@ export interface Config {
     default_gfpgan?: boolean,
     default_real_esrgan?: boolean,
     default_ldsr?: boolean,
+    default_karras?: boolean,
     require_login?: boolean,
     dev?: boolean,
     blacklisted_words?: string[],
@@ -158,7 +159,8 @@ export interface Config {
         allow_models?: boolean,
         allow_nsfw?: boolean,
         allow_img2img?: boolean,
-        allow_denoise?: boolean
+        allow_denoise?: boolean,
+        allow_karras?: boolean
     }
 }
 
@@ -175,7 +177,3 @@ export enum ModelGenerationInputStableToggles {
     "k_dpmpp_2s_a" = "k_dpmpp_2s_a",
     "k_dpmpp_2m" = "k_dpmpp_2m"
 }
-
-export const ICONS = Object.freeze({
-    "AMONG_US": "<a:AmongPartywo:843160353386135553>"
-} as const)
