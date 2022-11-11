@@ -386,7 +386,6 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
             const d = await getCheckAndDisplayResult()
             if(!d) return;
             const {status, horde_data} = d
-
             if((status.wait_time ?? 0) <= 4.9) {
                 // try to display result faster
                 setTimeout(async () => {await getCheckAndDisplayResult()},((start_status?.wait_time ?? 0) + 0.1) * 1000)
@@ -441,7 +440,9 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
         }, 1000 * (ctx.client.config?.update_generation_status_interval_seconds || 5))
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
+            if(done) return;
             const status = await ctx.stable_horde_manager.getGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+            done = !!status?.done
             const horde_data = await ctx.stable_horde_manager.getPerformance()
             if(!status || (status as any).faulted) {
                 if(!done) await message.edit({content: "Image generation has been cancelled", embeds: []});
