@@ -395,12 +395,14 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
             prev_left = status?.wait_time ?? 1
 
             if(error_timeout < (Date.now()-1000*60*2)) {
-                await ctx.stable_horde_manager.deleteGenerationRequest(generation_start.id!)
-                message.edit({
-                    components: [],
-                    content: "Generation cancelled due to errors",
-                    embeds: []
-                })
+                if(!done) {
+                    await ctx.stable_horde_manager.deleteGenerationRequest(generation_start.id!)
+                    message.edit({
+                        components: [],
+                        content: "Generation cancelled due to errors",
+                        embeds: []
+                    })
+                }
                 clearInterval(inter)
                 return;
             }
