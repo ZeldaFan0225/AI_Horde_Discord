@@ -26,6 +26,7 @@ Here you can see an explanation of what which option does
     "blacklisted_models": A list of blacklisted models which users are not allowed to use (ARRAY OF STRING),
     "blacklisted_words": A list of blacklisted words which users are not allowed to use (ARRAY OF STRING),
     "update_generation_status_interval_seconds": The interval at which the embed in Discord gets updated (INTEGER),
+    "improve_loading_time": Try to improve the displaying time between generation finished and generation displayed in discord (BOOLEAN) *7
     "logs": {
         "enabled": Whether logging in files are enabled (BOOLEAN),
         "directory": Which directory to create the logs in (STRING; default: "/logs"),
@@ -86,6 +87,7 @@ Here you can see an explanation of what which option does
         "allow_models": (BOOLEAN) *5,
         "allow_img2img": (BOOLEAN) *5,
         "allow_denoise": (BOOLEAN) *5,
+        "allow_karras": (BOOLEAN) * 5,
         "allow_nsfw": Set to true if you want to allow NSFW image generation for your users
     }
 }
@@ -96,4 +98,5 @@ Here you can see an explanation of what which option does
 `*3` Not all models are available at all times *1  
 `*4` Developer mode will enable logging and will also show the generations ID in the embed in Discord  
 `*5` This option changes how the /generate command is created. If set to false the user will not have the option to modify this value when generating.  
-`*6` This option must be set to false, leaving it blank will default it to true
+`*6` This option must be set to false, leaving it blank will default it to true  
+`*7` EXPERIMENTAL OPTION, ENABLE AT YOUR OWN RISK

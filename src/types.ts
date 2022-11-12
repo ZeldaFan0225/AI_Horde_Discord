@@ -99,6 +99,7 @@ export interface Config {
     blacklisted_words?: string[],
     blacklisted_models?: string[]
     update_generation_status_interval_seconds?: number,
+    improve_loading_time?: boolean,
     logs?: {
         enabled?: boolean,
         directory?: string,
