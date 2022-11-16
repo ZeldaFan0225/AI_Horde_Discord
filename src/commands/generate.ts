@@ -376,7 +376,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
 
         let done = false
 
-        if(ctx.client.config.improve_loading_time && (start_status?.wait_time ?? 0) <= 4.9) {
+        if(ctx.client.config.improve_loading_time && (start_status?.wait_time ?? 0) <= 3) {
             // wait before starting the loop so that the first iteration can already pick up the result
             const pre_test = await new Promise((resolve) => setTimeout(async () => {resolve(await getCheckAndDisplayResult())},((start_status?.wait_time ?? 0) + 0.1) * 1000))
             if(!pre_test) return;
@@ -386,7 +386,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
             const d = await getCheckAndDisplayResult()
             if(!d) return;
             const {status, horde_data} = d
-            if(ctx.client.config.improve_loading_time && (status.wait_time ?? 0) <= 4.9) {
+            if(ctx.client.config.improve_loading_time && (status.wait_time ?? 0) <= 3) {
                 // try to display result faster
                 setTimeout(async () => {await getCheckAndDisplayResult()},((start_status?.wait_time ?? 0) + 0.1) * 1000)
             }
@@ -394,7 +394,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
             if(status?.wait_time === 0 && prev_left !== 0) error_timeout = Date.now()
             prev_left = status?.wait_time ?? 1
 
-            if(error_timeout < (Date.now()-1000*60*2)) {
+            if(error_timeout < (Date.now()-1000*60*2) || start_status?.faulted) {
                 if(!done) {
                     await ctx.stable_horde_manager.deleteGenerationRequest(generation_start.id!)
                     message.edit({
