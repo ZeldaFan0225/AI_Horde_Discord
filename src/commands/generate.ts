@@ -118,7 +118,7 @@ const command_data = new SlashCommandBuilder()
         command_data
         .addBooleanOption(
             new SlashCommandBooleanOption()
-            .setName("use_realesrgan")
+            .setName("use_real_esrgan")
             .setDescription("Whether to use RealESRGAN_x4plus post processing")
         )
     }
@@ -180,8 +180,8 @@ export default class extends Command {
         const seed = ctx.interaction.options.getString("seed")
         let height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.default_res?.height ?? 512
         let width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.default_res?.width ?? 512
-        const gfpgan = !!ctx.interaction.options.getBoolean("gfpgan") ?? ctx.client.config.default_gfpgan
-        const real_esrgan = !!ctx.interaction.options.getBoolean("real_esrgan") ?? ctx.client.config.default_real_esrgan
+        const gfpgan = !!ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.default_gfpgan
+        const real_esrgan = !!ctx.interaction.options.getBoolean("use_real_esrgan") ?? ctx.client.config.default_real_esrgan
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
         const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.default_steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
@@ -246,7 +246,7 @@ export default class extends Command {
         const post_processing = []
 
         if(gfpgan) post_processing.push(ModelGenerationInputPostProcessingTypes.GFPGAN)
-        if(real_esrgan) post_processing.push(ModelGenerationInputPostProcessingTypes["RealESRGAN_x4plus"])
+        if(real_esrgan) post_processing.push(ModelGenerationInputPostProcessingTypes.RealESRGAN_x4plus)
 
         const generation_data: GenerationInput = {
             prompt,
@@ -270,6 +270,8 @@ export default class extends Command {
             models: !model ? undefined : model === "YOLO" ? [] : [model],
             source_image: img_data?.toString("base64")
         }
+
+        console.log(generation_data)
         
         if(token === "0000000000" && ((generation_data.params?.width ?? 512) > 1024 || (generation_data.params?.height ?? 512) > 1024 || (generation_data.params?.steps ?? 512) > 100)) return ctx.error({error: "You need to be logged in to generate images with a size over 1024*1024 or more than 100 steps"})
 
