@@ -89,10 +89,8 @@ export interface Config {
     default_model?: string,
     default_token?: string,
     default_denoise?: number,
-    default_upscale?: boolean,
     default_gfpgan?: boolean,
     default_real_esrgan?: boolean,
-    default_ldsr?: boolean,
     default_karras?: boolean,
     require_login?: boolean,
     dev?: boolean,
@@ -150,10 +148,8 @@ export interface Config {
         allow_seed?: boolean,
         allow_height?: boolean,
         allow_width?: boolean,
-        allow_upscale?: boolean,
         allow_gfpgan?: boolean,
         allow_real_esrgan?: boolean,
-        allow_ldsr?: boolean,
         allow_seed_variation?: boolean,
         allow_steps?: boolean,
         allow_amount?: boolean,
@@ -178,3 +174,8 @@ export enum ModelGenerationInputStableToggles {
     "k_dpmpp_2s_a" = "k_dpmpp_2s_a",
     "k_dpmpp_2m" = "k_dpmpp_2m"
 }
+
+export enum ModelGenerationInputPostProcessingTypes {
+    "GFPGAN" = "GFPGAN",
+    "RealESRGAN_x4plus" = "RealESRGAN_x4plus"
+} 

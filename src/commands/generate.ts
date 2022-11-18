@@ -1,7 +1,7 @@
 import { AttachmentBuilder, ButtonBuilder, ChannelType, Colors, EmbedBuilder, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
-import { Config, ModelGenerationInputStableToggles } from "../types";
+import { Config, ModelGenerationInputPostProcessingTypes, ModelGenerationInputStableToggles } from "../types";
 import {readFileSync} from "fs"
 import { AutocompleteContext } from "../classes/autocompleteContext";
 import Centra from "centra";
@@ -106,36 +106,20 @@ const command_data = new SlashCommandBuilder()
             .setAutocomplete(true)
         )
     }
-    if(config.user_restrictions?.allow_upscale) {
-        command_data
-        .addBooleanOption(
-            new SlashCommandBooleanOption()
-            .setName("upscale")
-            .setDescription("Whether to upscale the image")
-        )
-    }
     if(config.user_restrictions?.allow_gfpgan) {
         command_data
         .addBooleanOption(
             new SlashCommandBooleanOption()
-            .setName("gfpgan")
-            .setDescription("Whether to use gfpgan (face correction)")
+            .setName("use_gfpgan")
+            .setDescription("Whether to use GFPGAN post processing")
         )
     }
     if(config.user_restrictions?.allow_real_esrgan) {
         command_data
         .addBooleanOption(
             new SlashCommandBooleanOption()
-            .setName("real_esrgan")
-            .setDescription("Whether to use RealESRGAN")
-        )
-    }
-    if(config.user_restrictions?.allow_ldsr) {
-        command_data
-        .addBooleanOption(
-            new SlashCommandBooleanOption()
-            .setName("ldsr")
-            .setDescription("Whether to use LDSR")
+            .setName("use_realesrgan")
+            .setDescription("Whether to use RealESRGAN_x4plus post processing")
         )
     }
     if(config.user_restrictions?.allow_seed_variation) {
@@ -196,10 +180,8 @@ export default class extends Command {
         const seed = ctx.interaction.options.getString("seed")
         let height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.default_res?.height ?? 512
         let width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.default_res?.width ?? 512
-        const upscale = !!ctx.interaction.options.getBoolean("upscale") ?? ctx.client.config.default_upscale
         const gfpgan = !!ctx.interaction.options.getBoolean("gfpgan") ?? ctx.client.config.default_gfpgan
         const real_esrgan = !!ctx.interaction.options.getBoolean("real_esrgan") ?? ctx.client.config.default_real_esrgan
-        const ldsr = !!ctx.interaction.options.getBoolean("ldsr") ?? ctx.client.config.default_ldsr
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
         const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.default_steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
@@ -261,6 +243,11 @@ export default class extends Command {
             }
         }
 
+        const post_processing = []
+
+        if(gfpgan) post_processing.push(ModelGenerationInputPostProcessingTypes.GFPGAN)
+        if(real_esrgan) post_processing.push(ModelGenerationInputPostProcessingTypes["RealESRGAN_x4plus"])
+
         const generation_data: GenerationInput = {
             prompt,
             params: {
@@ -270,10 +257,7 @@ export default class extends Command {
                 height,
                 width,
                 seed_variation,
-                use_gfpgan: gfpgan,
-                use_ldsr: ldsr,
-                use_real_esrgan: real_esrgan,
-                use_upscaling: upscale,
+                post_processing,
                 steps,
                 n: amount,
                 denoising_strength: denoise,
