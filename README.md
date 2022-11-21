@@ -27,19 +27,19 @@ The bot has the following features:
 
 ## How to set up
 
-1) download the code from this repository
-2) get the token of your discord bot (https://discord.com/developers/docs/reference#authentication)
-3) Install the node modules using `npm i` (make sure the dev dependencies are also installed for typescript to work)
-
-If you want to have extra functionality do the following steps:
-4) set up a postgres database
-5) fill out the `template.env` and rename it to `.env`
-
-If you just want to generate images with no token or the default token in the config.json file do the following steps:
-4) modify the config file and set `use_database` to false
-5) fill out the `template.env` and rename it to `.env` (you can leave the keys prefixed with `DB_` empty)
-
-6) [modify the config file to fit your needs](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md)
-8) compile the code and start the process (this can be done by using `npm run deploy`)
-
-Now if everything is set up it should start and give an output in the console.
+1) download the code from this repository  
+2) get the token of your discord bot (https://discord.com/developers/docs/reference#authentication)  
+3) Install the node modules using `npm i` (make sure the dev dependencies are also installed for typescript to work)  
+  
+If you want to have extra functionality do the following steps:  
+4) set up a postgres database  
+5) fill out the `template.env` and rename it to `.env`  
+  
+If you just want to generate images with no token or the default token in the config.json file do the following steps:  
+4) modify the config file and set `use_database` to false  
+5) fill out the `template.env` and rename it to `.env` (you can leave the keys prefixed with `DB_` empty)  
+  
+6) [modify the config file to fit your needs](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md)  
+8) compile the code and start the process (this can be done by using `npm run deploy`)  
+  
+Now if everything is set up it should start and give an output in the console.  
