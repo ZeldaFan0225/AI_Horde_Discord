@@ -3,8 +3,8 @@
 A basic Discord bot to generate images using the Stable Horde API.
 
 **DISCLAIMER:** THIS REPOSITORY IS IN NO WAY ASSOCIATED TO THE CREATORS OF STABLE HORDE
-YOU DO NOT HAVE PERMISSION TO USE THIS BOT COMMERCIALLLY OR USE THIS CODE IN FORM OF A PUBLIC DISCORD BOT
-YOU ONLY HAVE PERMISSION TO USE THIS BOT IN YOUR SERVER WITH A PRIVATE BOT ACCOUNT
+YOU DO NOT HAVE PERMISSION TO USE THIS BOT COMMERCIALLLY OR USE THIS CODE IN FORM OF A PUBLIC DISCORD BOT WHICH CAN BE INVITED BY ANY DISCORD USER
+YOU HAVE PERMISSION TO USE THIS BOT IN YOUR OWN DISCORD SERVER THROUGH A BOT ACCOUNT WHICH IS SET TO PRIVATE
 
 You can support me and my projects on [Ko-Fi](https://ko-fi.com/slashbot)
 
@@ -15,10 +15,15 @@ The bot has the following features:
 
 - /generate command with all options the api supports at the time of creating this file
 - /login, /logout and /updatetoken for users to add and manage their account which they can create at https://stablehorde.net/register
-- /userinfo which shows your stable horde user information and the user information of anybody else who is logged in
+- /userinfo (Userinfo context command) which shows your stable horde user information and the user information of anybody else who is logged in
 - /terms which shows how the bot currently handles the api token and further information
-- advanced configuration file which lets you change how the bot behaves and what actions the user can use (for limits refer to https://stablehorde.net/register)
-- logging for any malicious, nsfw or illegal content
+- /models which shows all currently available models
+- /worker which lets you see information on an active worker
+- /team which lets you see information on a team
+- /news which shows latest news about the horde
+- /transferkudos (Transfer Kudos context command) to send somebody kudos
+- advanced configuration file which lets you change how the bot behaves and what actions the user can use (for limits refer to https://stablehorde.net/api)
+- logging prompts, user id and generation id to track generation of malicious, nsfw or illegal content
 
 ## How to set up
 
@@ -30,15 +35,11 @@ If you want to have extra functionality do the following steps:
 4) set up a postgres database
 5) fill out the `template.env` and rename it to `.env`
 
-If you just want to generate images with no or the default token in the config.json file do the following steps:
+If you just want to generate images with no token or the default token in the config.json file do the following steps:
 4) modify the config file and set `use_database` to false
 5) fill out the `template.env` and rename it to `.env` (you can leave the keys prefixed with `DB_` empty)
 
-6) compile the typescript code (this can be done with `npx tsc -p .` in the directory where you place the code
-7) [modify the config file to fit your needs](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md)
-8) start the process (`node .` since the main file is saved in config.json)
+6) [modify the config file to fit your needs](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md)
+8) compile the code and start the process (this can be done by using `npm run deploy`)
 
 Now if everything is set up it should start and give an output in the console.
-
-**IMPORTANT**
-- when setting up this repository, after installing the node modules go to the folder `/node_modules/webp-converter` and create a folder called `temp`
