@@ -46,14 +46,14 @@ const command_data = new SlashCommandBuilder()
         )
     }
     if(config.user_restrictions?.allow_sampler) {
-        console.log(StableHorde.ModelGenerationInputStableToggles)
+        console.log(StableHorde.ModelGenerationInputStableSamplers)
         command_data
         .addStringOption(
             new SlashCommandStringOption()
             .setName("sampler")
             .setDescription("The sampler to use")
             .setChoices(
-                ...Object.keys(StableHorde.ModelGenerationInputStableToggles).map(k => ({name: k, value: k}))
+                ...Object.keys(StableHorde.ModelGenerationInputStableSamplers).map(k => ({name: k, value: k}))
             )
         )
     }
@@ -175,7 +175,7 @@ export default class extends Command {
     override async run(ctx: CommandContext): Promise<any> {
         await ctx.interaction.deferReply({})
         const prompt = ctx.interaction.options.getString("prompt", true)
-        const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.default_sampler ?? StableHorde.ModelGenerationInputStableToggles.k_euler) as any
+        const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.default_sampler ?? StableHorde.ModelGenerationInputStableSamplers.k_euler) as any
         const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.default_cfg ?? 5
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.default_denoise ?? 50)/100
         const seed = ctx.interaction.options.getString("seed")
