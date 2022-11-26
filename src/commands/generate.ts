@@ -1,13 +1,13 @@
 import { AttachmentBuilder, ButtonBuilder, ChannelType, Colors, EmbedBuilder, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
-import { Config, ModelGenerationInputPostProcessingTypes, ModelGenerationInputStableToggles } from "../types";
+import { Config } from "../types";
 import {readFileSync} from "fs"
 import { AutocompleteContext } from "../classes/autocompleteContext";
 import Centra from "centra";
 const {buffer2webpbuffer} = require("webp-converter")
 import { appendFileSync } from "fs"
-import { GenerationInput } from "@zeldafan0225/stable_horde";
+import StableHorde from "@zeldafan0225/stable_horde";
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
@@ -46,13 +46,14 @@ const command_data = new SlashCommandBuilder()
         )
     }
     if(config.user_restrictions?.allow_sampler) {
+        console.log(StableHorde.ModelGenerationInputStableToggles)
         command_data
         .addStringOption(
             new SlashCommandStringOption()
             .setName("sampler")
             .setDescription("The sampler to use")
             .setChoices(
-                ...Object.keys(ModelGenerationInputStableToggles).map(k => ({name: k, value: k}))
+                ...Object.keys(StableHorde.ModelGenerationInputStableToggles).map(k => ({name: k, value: k}))
             )
         )
     }
@@ -174,7 +175,7 @@ export default class extends Command {
     override async run(ctx: CommandContext): Promise<any> {
         await ctx.interaction.deferReply({})
         const prompt = ctx.interaction.options.getString("prompt", true)
-        const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.default_sampler ?? ModelGenerationInputStableToggles.k_euler) as ModelGenerationInputStableToggles
+        const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.default_sampler ?? StableHorde.ModelGenerationInputStableToggles.k_euler) as any
         const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.default_cfg ?? 5
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.default_denoise ?? 50)/100
         const seed = ctx.interaction.options.getString("seed")
@@ -245,10 +246,10 @@ export default class extends Command {
 
         const post_processing = []
 
-        if(gfpgan) post_processing.push(ModelGenerationInputPostProcessingTypes.GFPGAN)
-        if(real_esrgan) post_processing.push(ModelGenerationInputPostProcessingTypes.RealESRGAN_x4plus)
+        if(gfpgan) post_processing.push(StableHorde.ModelGenerationInputPostProcessingTypes.GFPGAN)
+        if(real_esrgan) post_processing.push(StableHorde.ModelGenerationInputPostProcessingTypes.RealESRGAN_x4plus)
 
-        const generation_data: GenerationInput = {
+        const generation_data: StableHorde.GenerationInput = {
             prompt,
             params: {
                 sampler_name: sampler,

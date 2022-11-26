@@ -85,7 +85,7 @@ export interface Config {
         height?: number
     },
     default_cfg?: number,
-    default_sampler?: ModelGenerationInputStableToggles,
+    default_sampler?: typeof StableHorde.ModelGenerationInputStableToggles,
     default_model?: string,
     default_token?: string,
     default_denoise?: number,
@@ -160,23 +160,3 @@ export interface Config {
         allow_karras?: boolean
     }
 }
-
-export enum ModelGenerationInputStableToggles {
-    "k_lms" = "k_lms",
-    "k_heun" = "k_heun",
-    "k_euler" = "k_euler",
-    "k_dpm_2" = "k_dpm_2",
-    "k_dpm_2_a" = "k_dpm_2_a",
-    "DDIM" = "DDIM",
-    "PLMS" = "PLMS",
-    "k_dpm_fast" = "k_dpm_fast",
-    "k_dpm_adaptive" = "k_dpm_adaptive",
-    "k_dpmpp_2s_a" = "k_dpmpp_2s_a",
-    "k_dpmpp_2m" = "k_dpmpp_2m",
-    "dpmsolver" = "dpmsolver"
-}
-
-export enum ModelGenerationInputPostProcessingTypes {
-    "GFPGAN" = "GFPGAN",
-    "RealESRGAN_x4plus" = "RealESRGAN_x4plus"
-} 
