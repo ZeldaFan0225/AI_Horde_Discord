@@ -85,7 +85,7 @@ export interface Config {
         height?: number
     },
     default_cfg?: number,
-    default_sampler?: typeof StableHorde.ModelGenerationInputStableToggles,
+    default_sampler?: typeof StableHorde.ModelGenerationInputStableSamplers,
     default_model?: string,
     default_token?: string,
     default_denoise?: number,
