@@ -269,7 +269,8 @@ export default class extends Command {
             trusted_workers: ctx.client.config.trusted_workers,
             workers: ctx.client.config.workers,
             models: !model ? undefined : model === "YOLO" ? [] : [model],
-            source_image: img_data?.toString("base64")
+            source_image: img_data?.toString("base64"),
+            r2: true
         }
 
         console.log(generation_data)
@@ -448,8 +449,9 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 done = true
                 const images = await ctx.stable_horde_manager.getGenerationStatus(generation_start!.id!)
 
-                const image_map = images.generations?.map((g, i) => {
-                    const attachment = new AttachmentBuilder(Buffer.from(g.img!, "base64"), {name: `${g.seed ?? `image${i}`}.webp`})
+                const image_map_r = images.generations?.map(async (g, i) => {
+                    const req = await Centra(g.img!, "get").send().then(res => res.body)
+                    const attachment = new AttachmentBuilder(req, {name: `${g.seed ?? `image${i}`}.webp`})
                     const embed = new EmbedBuilder({
                         title: `Image ${i+1}`,
                         image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
@@ -460,6 +462,8 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                     return {attachment, embed}
                 }) || []
                 if(!precheck) clearInterval(inter)
+
+                const image_map = await Promise.all(image_map_r)
                 const files = image_map.map(i => i.attachment)
                 if(img_data) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
                 await message.edit({content: `Image generation finished`, components: [{type: 1, components: [delete_btn.toJSON()]}], embeds: image_map.map(i => i.embed), files});
