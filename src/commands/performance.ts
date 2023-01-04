@@ -27,9 +27,13 @@ export default class extends Command {
             color: Colors.Blue,
             title: "Stable Horde Performance",
             description: `Queued Requests \`${performance.queued_requests}\`
+Queued Interrogation Requests \`${performance.queued_forms}\`
 Queued Megapixelsteps \`${performance.queued_megapixelsteps}\`
 Queued Megapixelsteps (past minute) \`${performance.past_minute_megapixelsteps}\`
-Total Workers \`${performance.worker_count}\``
+Generation Workers \`${performance.worker_count}\`
+Interrogation Workers \`${performance.interrogator_count}\`
+Generation Thread Count \`${performance.thread_count}\`
+Interrogation Thread Count \`${performance.interrogator_thread_count}\``
         })
         ctx.interaction.reply({
             embeds: [embed],

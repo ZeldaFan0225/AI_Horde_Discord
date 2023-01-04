@@ -15,152 +15,153 @@ const command_data = new SlashCommandBuilder()
     .setName("generate")
     .setDMPermission(false)
     .setDescription(`Generates an image with stable horde`)
-    .addStringOption(
-        new SlashCommandStringOption()
-        .setName("prompt")
-        .setDescription("The prompt to generate an image with")
-        .setRequired(true)
-    )
-    if(config.generate?.user_restrictions?.allow_img2img) {
-        command_data
-        .addAttachmentOption(
-            new SlashCommandAttachmentOption()
-            .setName("img2img")
-            .setDescription("The image to use for img2img; max: 3072px")
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_img2img) {
-        command_data
-        .addBooleanOption(
-            new SlashCommandBooleanOption()
-            .setName("keep_original_ratio")
-            .setDescription("Whether to keep the aspect ratio and image size of the original image")
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_karras) {
-        command_data
-        .addBooleanOption(
-            new SlashCommandBooleanOption()
-            .setName("karras")
-            .setDescription("Set to True to enable karras noise scheduling tweaks")
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_sampler) {
-        console.log(StableHorde.ModelGenerationInputStableSamplers)
-        command_data
-        .addStringOption(
+    if(config.generate?.enabled) {
+        command_data.addStringOption(
             new SlashCommandStringOption()
-            .setName("sampler")
-            .setDescription("The sampler to use")
-            .setChoices(
-                ...Object.keys(StableHorde.ModelGenerationInputStableSamplers).map(k => ({name: k, value: k}))
+            .setName("prompt")
+            .setDescription("The prompt to generate an image with")
+            .setRequired(true)
+        )
+        if(config.generate?.user_restrictions?.allow_img2img) {
+            command_data
+            .addAttachmentOption(
+                new SlashCommandAttachmentOption()
+                .setName("img2img")
+                .setDescription("The image to use for img2img; max: 3072px")
             )
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_cfg) {
-        command_data
-        .addIntegerOption(
-            new SlashCommandIntegerOption()
-            .setName("cfg")
-            .setDescription("How strictly to follow the given prompt")
-            .setMinValue(config.generate?.user_restrictions.cfg?.min ?? -40)
-            .setMaxValue(config.generate?.user_restrictions.cfg?.max ?? 30)
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_denoise) {
-        command_data
-        .addIntegerOption(
-            new SlashCommandIntegerOption()
-            .setName("denoise")
-            .setDescription("How much to denoise in %")
-            .setMinValue(config.generate?.user_restrictions?.denoise?.min ?? 0)
-            .setMaxValue(config.generate?.user_restrictions?.denoise?.max ?? 100)
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_seed) {
-        command_data
-        .addStringOption(
-            new SlashCommandStringOption()
-            .setName("seed")
-            .setDescription("The seed to use")
-        )
-    }
-    if(config.generate?.user_restrictions?.height) {
-        command_data
-        .addIntegerOption(
-            new SlashCommandIntegerOption()
-            .setName("height")
-            .setDescription("The height of the result image")
-            .setMinValue(config.generate?.user_restrictions?.height?.min ?? 64)
-            .setMaxValue(config.generate?.user_restrictions?.height?.max ?? 3072)
-            .setAutocomplete(true)
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_width) {
-        command_data
-        .addIntegerOption(
-            new SlashCommandIntegerOption()
-            .setName("width")
-            .setDescription("How width of the result image")
-            .setMinValue(config.generate?.user_restrictions?.width?.min ?? 64)
-            .setMaxValue(config.generate?.user_restrictions?.width?.max ?? 3072)
-            .setAutocomplete(true)
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_gfpgan) {
-        command_data
-        .addBooleanOption(
-            new SlashCommandBooleanOption()
-            .setName("use_gfpgan")
-            .setDescription("Whether to use GFPGAN post processing")
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_real_esrgan) {
-        command_data
-        .addBooleanOption(
-            new SlashCommandBooleanOption()
-            .setName("use_real_esrgan")
-            .setDescription("Whether to use RealESRGAN_x4plus post processing")
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_seed_variation) {
-        command_data
-        .addIntegerOption(
-            new SlashCommandIntegerOption()
-            .setName("seed_variation")
-            .setDescription("(amount needs to be provided) increment for the seed on each image")
-            .setMinValue(1)
-            .setMaxValue(1000)
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_steps) {
-        command_data
-        .addIntegerOption(
-            new SlashCommandIntegerOption()
-            .setName("steps")
-            .setDescription("How many steps to go though while creating the image")
-            .setMinValue(config.generate?.user_restrictions?.steps?.min ?? 1)
-            .setMaxValue(config.generate?.user_restrictions?.steps?.max ?? 500)
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_amount) {
-        command_data
-        .addIntegerOption(
-            new SlashCommandIntegerOption()
-            .setName("amount")
-            .setDescription("How many images to generate")
-            .setMinValue(1)
-            .setMaxValue(config.generate?.user_restrictions?.amount?.max ?? 4)
-        )
-    }
-    if(config.generate?.user_restrictions?.allow_models) {
-        command_data
-        .addStringOption(
-            new SlashCommandStringOption()
-            .setName("model")
-            .setDescription("The model to use for this generation")
-            .setAutocomplete(true)
-        )
+        }
+        if(config.generate?.user_restrictions?.allow_img2img) {
+            command_data
+            .addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("keep_original_ratio")
+                .setDescription("Whether to keep the aspect ratio and image size of the original image")
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_karras) {
+            command_data
+            .addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("karras")
+                .setDescription("Set to True to enable karras noise scheduling tweaks")
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_sampler) {
+            command_data
+            .addStringOption(
+                new SlashCommandStringOption()
+                .setName("sampler")
+                .setDescription("The sampler to use")
+                .setChoices(
+                    ...Object.keys(StableHorde.ModelGenerationInputStableSamplers).map(k => ({name: k, value: k}))
+                )
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_cfg) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("cfg")
+                .setDescription("How strictly to follow the given prompt")
+                .setMinValue(config.generate?.user_restrictions.cfg?.min ?? -40)
+                .setMaxValue(config.generate?.user_restrictions.cfg?.max ?? 30)
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_denoise) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("denoise")
+                .setDescription("How much to denoise in %")
+                .setMinValue(config.generate?.user_restrictions?.denoise?.min ?? 0)
+                .setMaxValue(config.generate?.user_restrictions?.denoise?.max ?? 100)
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_seed) {
+            command_data
+            .addStringOption(
+                new SlashCommandStringOption()
+                .setName("seed")
+                .setDescription("The seed to use")
+            )
+        }
+        if(config.generate?.user_restrictions?.height) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("height")
+                .setDescription("The height of the result image")
+                .setMinValue(config.generate?.user_restrictions?.height?.min ?? 64)
+                .setMaxValue(config.generate?.user_restrictions?.height?.max ?? 3072)
+                .setAutocomplete(true)
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_width) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("width")
+                .setDescription("How width of the result image")
+                .setMinValue(config.generate?.user_restrictions?.width?.min ?? 64)
+                .setMaxValue(config.generate?.user_restrictions?.width?.max ?? 3072)
+                .setAutocomplete(true)
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_gfpgan) {
+            command_data
+            .addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("use_gfpgan")
+                .setDescription("Whether to use GFPGAN post processing")
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_real_esrgan) {
+            command_data
+            .addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("use_real_esrgan")
+                .setDescription("Whether to use RealESRGAN_x4plus post processing")
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_seed_variation) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("seed_variation")
+                .setDescription("(amount needs to be provided) increment for the seed on each image")
+                .setMinValue(1)
+                .setMaxValue(1000)
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_steps) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("steps")
+                .setDescription("How many steps to go though while creating the image")
+                .setMinValue(config.generate?.user_restrictions?.steps?.min ?? 1)
+                .setMaxValue(config.generate?.user_restrictions?.steps?.max ?? 500)
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_amount) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("amount")
+                .setDescription("How many images to generate")
+                .setMinValue(1)
+                .setMaxValue(config.generate?.user_restrictions?.amount?.max ?? 4)
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_models) {
+            command_data
+            .addStringOption(
+                new SlashCommandStringOption()
+                .setName("model")
+                .setDescription("The model to use for this generation")
+                .setAutocomplete(true)
+            )
+        }
     }
 
 export default class extends Command {
@@ -173,6 +174,8 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
+        if(!ctx.client.config.generate?.enabled) return ctx.error({error: "Generation is disabled."})
+
         await ctx.interaction.deferReply({})
         const prompt = ctx.interaction.options.getString("prompt", true)
         const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.generate?.default?.sampler ?? StableHorde.ModelGenerationInputStableSamplers.k_euler) as any
@@ -272,8 +275,6 @@ export default class extends Command {
             source_image: img_data?.toString("base64"),
             r2: true
         }
-
-        console.log(generation_data)
         
         if(token === "0000000000" && ((generation_data.params?.width ?? 512) > 1024 || (generation_data.params?.height ?? 512) > 1024 || (generation_data.params?.steps ?? 512) > 100)) return ctx.error({error: "You need to be logged in to generate images with a size over 1024*1024 or more than 100 steps"})
 

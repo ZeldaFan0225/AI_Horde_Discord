@@ -73,6 +73,7 @@ export interface AutocompleteContextInitOptions extends BaseContextInitOptions {
     interaction: AutocompleteInteraction
 }
 
+
 export interface Config {
     use_database?: boolean,
     dev?: boolean,
@@ -87,7 +88,22 @@ export interface Config {
             img2img?: boolean
         }
     },
+    interrogate?: {
+        enabled?: boolean,
+        update_interrogation_status_interval_seconds?: number,
+        default?: {
+            nsfw?: boolean,
+            caption?: boolean,
+            interrogation?: boolean
+        },
+        user_restrictions?: {
+            allow_nsfw?: boolean,
+            allow_caption?: boolean,
+            allow_interrogation?: boolean
+        }
+    },
     generate?: {
+        enabled?: boolean,
         require_login?: boolean,
         trusted_workers?: boolean,
         censor_nsfw?: boolean,

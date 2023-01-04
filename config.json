@@ -12,7 +12,22 @@
             "img2img": true
         }
     },
+    "interrogate": {
+        "enabled": true,
+        "update_interrogation_status_interval_seconds": 5,
+        "default": {
+            "nsfw": false,
+            "caption": false,
+            "interrogation": false
+        },
+        "user_restrictions": {
+            "allow_nsfw": true,
+            "allow_caption": true,
+            "allow_interrogation": true
+        }
+    },
     "generate": {
+        "enabled": true,
         "require_login": true,
         "trusted_workers": true,
         "censor_nsfw": true,
