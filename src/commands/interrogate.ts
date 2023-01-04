@@ -104,9 +104,9 @@ export default class extends Command {
 Interrogation workers: \`${start_horde_data.interrogator_count}\`
 Interrogations queued: \`${start_horde_data.queued_forms}\`
 ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.nsfw)?.state}\`` : ""}${caption ? `\n**Caption** \`${start_status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.caption)?.state}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${start_status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.interrogation)?.state}\`` : ""}`,
-image: {
-    url: attachment.url
-}
+            image: {
+                url: attachment.url
+            }
         })
 
 
