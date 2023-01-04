@@ -1,26 +1,7 @@
 {
     "use_database": true,
-    "trusted_workers": true,
-    "censor_nsfw": true,
-    "default_steps": 30,
-    "default_res": {
-        "width": 512,
-        "height": 512
-    },
-    "default_cfg": 7,
-    "default_sampler": "k_euler",
-    "default_model": "stable_diffusion",
-    "default_token": "0000000000",
-    "default_denoise": 50,
-    "default_gfpgan": false,
-    "default_real_esrgan": false,
-    "default_karras": false,
-    "require_login": true,
     "dev": true,
-    "blacklisted_models": [],
-    "blacklisted_words": [],
-    "update_generation_status_interval_seconds": 5,
-    "improve_loading_time": false,
+    "default_token": "0000000000",
     "logs": {
         "enabled": true,
         "directory": "/logs",
@@ -31,55 +12,78 @@
             "img2img": true
         }
     },
-    "img2img": {
+    "generate": {
         "require_login": true,
-        "require_stable_horde_account_oauth_connection": false,
-        "allow_non_webp": true,
-        "require_nsfw_channel": false,
-        "whitelist": {
-            "only_allow_whitelist": false,
-            "user_ids": ["683655307356143706"],
-            "bypass_checks": true
+        "trusted_workers": true,
+        "censor_nsfw": true,
+        "blacklisted_models": [],
+        "blacklisted_words": [],
+        "update_generation_status_interval_seconds": 5,
+        "improve_loading_time": false,
+        "default": {
+            "steps": 30,
+            "resolution": {
+                "width": 512,
+                "height": 512
+            },
+            "cfg": 7,
+            "sampler": "k_euler",
+            "model": "stable_diffusion",
+            "denoise": 50,
+            "gfpgan": false,
+            "real_esrgan": false,
+            "karras": false
+        },
+        "img2img": {
+            "require_login": true,
+            "require_stable_horde_account_oauth_connection": false,
+            "allow_non_webp": true,
+            "require_nsfw_channel": false,
+            "whitelist": {
+                "only_allow_whitelist": false,
+                "user_ids": ["683655307356143706"],
+                "bypass_checks": true
+            }
+        },
+        "user_restrictions": {
+            "width": {
+                "min": 64,
+                "max": 3072
+            },
+            "height": {
+                "min": 64,
+                "max": 3072
+            },
+            "amount": {
+                "max": 4
+            },
+            "steps": {
+                "min": 1,
+                "max": 500
+            },
+            "cfg": {
+                "min": -40,
+                "max": 30
+            },
+            "denoise": {
+                "min": 0,
+                "max": 100
+            },
+            "allow_sampler": true,
+            "allow_cfg": true,
+            "allow_seed": true,
+            "allow_height": true,
+            "allow_width": true,
+            "allow_gfpgan": true,
+            "allow_real_esrgan": true,
+            "allow_seed_variation": true,
+            "allow_steps": true,
+            "allow_amount": true,
+            "allow_models": true,
+            "allow_img2img": true,
+            "allow_denoise": true,
+            "allow_nsfw": false,
+            "allow_karras": true
         }
-    },
-    "user_restrictions": {
-        "width": {
-            "min": 64,
-            "max": 3072
-        },
-        "height": {
-            "min": 64,
-            "max": 3072
-        },
-        "amount": {
-            "max": 4
-        },
-        "steps": {
-            "min": 1,
-            "max": 500
-        },
-        "cfg": {
-            "min": -40,
-            "max": 30
-        },
-        "denoise": {
-            "min": 0,
-            "max": 100
-        },
-        "allow_sampler": true,
-        "allow_cfg": true,
-        "allow_seed": true,
-        "allow_height": true,
-        "allow_width": true,
-        "allow_gfpgan": true,
-        "allow_real_esrgan": true,
-        "allow_seed_variation": true,
-        "allow_steps": true,
-        "allow_amount": true,
-        "allow_models": true,
-        "allow_img2img": true,
-        "allow_denoise": true,
-        "allow_nsfw": false,
-        "allow_karras": true
     }
 }

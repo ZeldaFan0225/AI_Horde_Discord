@@ -21,7 +21,7 @@ const command_data = new SlashCommandBuilder()
         .setDescription("The prompt to generate an image with")
         .setRequired(true)
     )
-    if(config.user_restrictions?.allow_img2img) {
+    if(config.generate?.user_restrictions?.allow_img2img) {
         command_data
         .addAttachmentOption(
             new SlashCommandAttachmentOption()
@@ -29,7 +29,7 @@ const command_data = new SlashCommandBuilder()
             .setDescription("The image to use for img2img; max: 3072px")
         )
     }
-    if(config.user_restrictions?.allow_img2img) {
+    if(config.generate?.user_restrictions?.allow_img2img) {
         command_data
         .addBooleanOption(
             new SlashCommandBooleanOption()
@@ -37,7 +37,7 @@ const command_data = new SlashCommandBuilder()
             .setDescription("Whether to keep the aspect ratio and image size of the original image")
         )
     }
-    if(config.user_restrictions?.allow_karras) {
+    if(config.generate?.user_restrictions?.allow_karras) {
         command_data
         .addBooleanOption(
             new SlashCommandBooleanOption()
@@ -45,7 +45,7 @@ const command_data = new SlashCommandBuilder()
             .setDescription("Set to True to enable karras noise scheduling tweaks")
         )
     }
-    if(config.user_restrictions?.allow_sampler) {
+    if(config.generate?.user_restrictions?.allow_sampler) {
         console.log(StableHorde.ModelGenerationInputStableSamplers)
         command_data
         .addStringOption(
@@ -57,27 +57,27 @@ const command_data = new SlashCommandBuilder()
             )
         )
     }
-    if(config.user_restrictions?.allow_cfg) {
+    if(config.generate?.user_restrictions?.allow_cfg) {
         command_data
         .addIntegerOption(
             new SlashCommandIntegerOption()
             .setName("cfg")
             .setDescription("How strictly to follow the given prompt")
-            .setMinValue(config.user_restrictions.cfg?.min ?? -40)
-            .setMaxValue(config.user_restrictions.cfg?.max ?? 30)
+            .setMinValue(config.generate?.user_restrictions.cfg?.min ?? -40)
+            .setMaxValue(config.generate?.user_restrictions.cfg?.max ?? 30)
         )
     }
-    if(config.user_restrictions?.allow_denoise) {
+    if(config.generate?.user_restrictions?.allow_denoise) {
         command_data
         .addIntegerOption(
             new SlashCommandIntegerOption()
             .setName("denoise")
             .setDescription("How much to denoise in %")
-            .setMinValue(config.user_restrictions?.denoise?.min ?? 0)
-            .setMaxValue(config.user_restrictions?.denoise?.max ?? 100)
+            .setMinValue(config.generate?.user_restrictions?.denoise?.min ?? 0)
+            .setMaxValue(config.generate?.user_restrictions?.denoise?.max ?? 100)
         )
     }
-    if(config.user_restrictions?.allow_seed) {
+    if(config.generate?.user_restrictions?.allow_seed) {
         command_data
         .addStringOption(
             new SlashCommandStringOption()
@@ -85,29 +85,29 @@ const command_data = new SlashCommandBuilder()
             .setDescription("The seed to use")
         )
     }
-    if(config.user_restrictions?.height) {
+    if(config.generate?.user_restrictions?.height) {
         command_data
         .addIntegerOption(
             new SlashCommandIntegerOption()
             .setName("height")
             .setDescription("The height of the result image")
-            .setMinValue(config.user_restrictions?.height?.min ?? 64)
-            .setMaxValue(config.user_restrictions?.height?.max ?? 3072)
+            .setMinValue(config.generate?.user_restrictions?.height?.min ?? 64)
+            .setMaxValue(config.generate?.user_restrictions?.height?.max ?? 3072)
             .setAutocomplete(true)
         )
     }
-    if(config.user_restrictions?.allow_width) {
+    if(config.generate?.user_restrictions?.allow_width) {
         command_data
         .addIntegerOption(
             new SlashCommandIntegerOption()
             .setName("width")
             .setDescription("How width of the result image")
-            .setMinValue(config.user_restrictions?.width?.min ?? 64)
-            .setMaxValue(config.user_restrictions?.width?.max ?? 3072)
+            .setMinValue(config.generate?.user_restrictions?.width?.min ?? 64)
+            .setMaxValue(config.generate?.user_restrictions?.width?.max ?? 3072)
             .setAutocomplete(true)
         )
     }
-    if(config.user_restrictions?.allow_gfpgan) {
+    if(config.generate?.user_restrictions?.allow_gfpgan) {
         command_data
         .addBooleanOption(
             new SlashCommandBooleanOption()
@@ -115,7 +115,7 @@ const command_data = new SlashCommandBuilder()
             .setDescription("Whether to use GFPGAN post processing")
         )
     }
-    if(config.user_restrictions?.allow_real_esrgan) {
+    if(config.generate?.user_restrictions?.allow_real_esrgan) {
         command_data
         .addBooleanOption(
             new SlashCommandBooleanOption()
@@ -123,7 +123,7 @@ const command_data = new SlashCommandBuilder()
             .setDescription("Whether to use RealESRGAN_x4plus post processing")
         )
     }
-    if(config.user_restrictions?.allow_seed_variation) {
+    if(config.generate?.user_restrictions?.allow_seed_variation) {
         command_data
         .addIntegerOption(
             new SlashCommandIntegerOption()
@@ -133,27 +133,27 @@ const command_data = new SlashCommandBuilder()
             .setMaxValue(1000)
         )
     }
-    if(config.user_restrictions?.allow_steps) {
+    if(config.generate?.user_restrictions?.allow_steps) {
         command_data
         .addIntegerOption(
             new SlashCommandIntegerOption()
             .setName("steps")
             .setDescription("How many steps to go though while creating the image")
-            .setMinValue(config.user_restrictions?.steps?.min ?? 1)
-            .setMaxValue(config.user_restrictions?.steps?.max ?? 500)
+            .setMinValue(config.generate?.user_restrictions?.steps?.min ?? 1)
+            .setMaxValue(config.generate?.user_restrictions?.steps?.max ?? 500)
         )
     }
-    if(config.user_restrictions?.allow_amount) {
+    if(config.generate?.user_restrictions?.allow_amount) {
         command_data
         .addIntegerOption(
             new SlashCommandIntegerOption()
             .setName("amount")
             .setDescription("How many images to generate")
             .setMinValue(1)
-            .setMaxValue(config.user_restrictions?.amount?.max ?? 4)
+            .setMaxValue(config.generate?.user_restrictions?.amount?.max ?? 4)
         )
     }
-    if(config.user_restrictions?.allow_models) {
+    if(config.generate?.user_restrictions?.allow_models) {
         command_data
         .addStringOption(
             new SlashCommandStringOption()
@@ -175,39 +175,39 @@ export default class extends Command {
     override async run(ctx: CommandContext): Promise<any> {
         await ctx.interaction.deferReply({})
         const prompt = ctx.interaction.options.getString("prompt", true)
-        const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.default_sampler ?? StableHorde.ModelGenerationInputStableSamplers.k_euler) as any
-        const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.default_cfg ?? 5
-        const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.default_denoise ?? 50)/100
+        const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.generate?.default?.sampler ?? StableHorde.ModelGenerationInputStableSamplers.k_euler) as any
+        const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.generate?.default?.cfg ?? 5
+        const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.generate?.default?.denoise ?? 50)/100
         const seed = ctx.interaction.options.getString("seed")
-        let height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.default_res?.height ?? 512
-        let width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.default_res?.width ?? 512
-        const gfpgan = !!ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.default_gfpgan
-        const real_esrgan = !!ctx.interaction.options.getBoolean("use_real_esrgan") ?? ctx.client.config.default_real_esrgan
+        let height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.generate?.default?.resolution?.height ?? 512
+        let width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.generate?.default?.resolution?.width ?? 512
+        const gfpgan = !!ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.generate?.default?.gfpgan
+        const real_esrgan = !!ctx.interaction.options.getBoolean("use_real_esrgan") ?? ctx.client.config.generate?.default?.real_esrgan
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
-        const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.default_steps ?? 30
+        const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.generate?.default?.steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
-        const model = ctx.interaction.options.getString("model") ?? ctx.client.config.default_model
+        const model = ctx.interaction.options.getString("model") ?? ctx.client.config.generate?.default?.model
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? true
-        const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.default_karras ?? false
+        const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.generate?.default?.karras ?? false
         let img = ctx.interaction.options.getAttachment("img2img")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
-        const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config.default_token || "0000000000"}).catch((e) => ctx.client.config.dev ? console.error(e) : null);
-        const can_bypass = ctx.client.config.img2img?.whitelist?.bypass_checks && ctx.client.config.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
+        const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+        const can_bypass = ctx.client.config.generate?.img2img?.whitelist?.bypass_checks && ctx.client.config.generate?.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
-        if(ctx.client.config.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
-        if(ctx.client.config.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
+        if(ctx.client.config.generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
+        if(ctx.client.config.generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
-        if(model && ctx.client.config.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
+        if(model && ctx.client.config.generate?.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
         if(model && model !== "YOLO" && !(await ctx.stable_horde_manager.getModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
         if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use img2img`, codeblock: false})
-        if(img && ctx.client.config.img2img?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
-        if(img && !can_bypass && ctx.client.config.img2img?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use img2img"})
+        if(img && ctx.client.config.generate?.img2img?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
+        if(img && !can_bypass && ctx.client.config.generate?.img2img?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use img2img"})
         if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Image to Image input must be a image"})
         if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Image to Image input too large (max. 3072 x 3072)"})
-        if(img && !can_bypass && !ctx.client.config?.img2img?.allow_non_webp && img.contentType !== "image/webp") return ctx.error({error: "You can only upload webp for img2img"})
-        if(img && ctx.client.config.img2img?.whitelist?.only_allow_whitelist && !ctx.client.config.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)) return ctx.error({error: "You are not whitelisted to use img2img"})
+        if(img && !can_bypass && !ctx.client.config?.generate?.img2img?.allow_non_webp && img.contentType !== "image/webp") return ctx.error({error: "You can only upload webp for img2img"})
+        if(img && ctx.client.config.generate?.img2img?.whitelist?.only_allow_whitelist && !ctx.client.config.generate?.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)) return ctx.error({error: "You are not whitelisted to use img2img"})
 
         if(keep_ratio && img?.width && img?.height) {
             const ratio = img?.width/img?.height
@@ -264,10 +264,10 @@ export default class extends Command {
                 denoising_strength: denoise,
                 karras
             },
-            nsfw: ctx.client.config.user_restrictions?.allow_nsfw,
-            censor_nsfw: ctx.client.config.censor_nsfw,
-            trusted_workers: ctx.client.config.trusted_workers,
-            workers: ctx.client.config.workers,
+            nsfw: ctx.client.config.generate?.user_restrictions?.allow_nsfw,
+            censor_nsfw: ctx.client.config.generate?.censor_nsfw,
+            trusted_workers: ctx.client.config.generate?.trusted_workers,
+            workers: ctx.client.config.generate?.workers,
             models: !model ? undefined : model === "YOLO" ? [] : [model],
             source_image: img_data?.toString("base64"),
             r2: true
@@ -364,7 +364,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
 
         let done = false
 
-        if(ctx.client.config.improve_loading_time && (start_status?.wait_time ?? 0) <= 3) {
+        if(ctx.client.config.generate?.improve_loading_time && (start_status?.wait_time ?? 0) <= 3) {
             // wait before starting the loop so that the first iteration can already pick up the result
             const pre_test = await new Promise((resolve) => setTimeout(async () => {resolve(await getCheckAndDisplayResult())},((start_status?.wait_time ?? 0) + 0.1) * 1000))
             if(!pre_test) return;
@@ -374,7 +374,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
             const d = await getCheckAndDisplayResult()
             if(!d) return;
             const {status, horde_data} = d
-            if(ctx.client.config.improve_loading_time && (status.wait_time ?? 0) <= 3) {
+            if(ctx.client.config.generate?.improve_loading_time && (status.wait_time ?? 0) <= 3) {
                 // try to display result faster
                 setTimeout(async () => {await getCheckAndDisplayResult()},((start_status?.wait_time ?? 0) + 0.1) * 1000)
             }
@@ -427,7 +427,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 embeds,
                 components
             })
-        }, 1000 * (ctx.client.config?.update_generation_status_interval_seconds || 5))
+        }, 1000 * (ctx.client.config?.generate?.update_generation_status_interval_seconds || 5))
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
             if(done) return;
@@ -478,12 +478,12 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             case "model": {
                 const models = await context.stable_horde_manager.getModels()
                 if(context.client.config.dev) console.log(models)
-                const available = [{name: "Any Model", value: "YOLO"}, ...models.sort((a, b) => b.performance!-a.performance!).map(m => ({name: `${m.name} | Workers: ${m.count} | Performance: ${m.performance} | Queued: ${m.queued}`, value: m.name!}))].filter(v => !context.client.config.blacklisted_models?.includes(v.value)).filter(v => !option.value || v.name.toLowerCase().includes(option.value.toLowerCase()))
+                const available = [{name: "Any Model", value: "YOLO"}, ...models.sort((a, b) => b.performance!-a.performance!).map(m => ({name: `${m.name} | Workers: ${m.count} | Performance: ${m.performance} | Queued: ${m.queued}`, value: m.name!}))].filter(v => !context.client.config.generate?.blacklisted_models?.includes(v.value)).filter(v => !option.value || v.name.toLowerCase().includes(option.value.toLowerCase()))
                 return await context.interaction.respond(available.filter(o => o.name?.toLowerCase().includes(option.value.toLowerCase())).slice(0,25))
             }
             case "width":
             case "height": {
-                const steps = Array.from({length: 3072/64}).map((_, i) => ({name: `${(i+1)*64}px${(i+1)*64 > 1024 ? " (Requires Kudos upfront)" : ""}`, value: (i+1)*64})).filter(v => v.value >= (context.client.config.user_restrictions?.height?.min ?? 64) && v.value <= (context.client.config.user_restrictions?.height?.max ?? 3072))
+                const steps = Array.from({length: 3072/64}).map((_, i) => ({name: `${(i+1)*64}px${(i+1)*64 > 1024 ? " (Requires Kudos upfront)" : ""}`, value: (i+1)*64})).filter(v => v.value >= (context.client.config.generate?.user_restrictions?.height?.min ?? 64) && v.value <= (context.client.config.generate?.user_restrictions?.height?.max ?? 3072))
                 const inp = context.interaction.options.getFocused(true)
                 return await context.interaction.respond(steps.filter((v) => !inp.value || v.name.includes(inp.value)).slice(0,25))
             }
