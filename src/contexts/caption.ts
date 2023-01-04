@@ -18,6 +18,7 @@ export default class extends Context {
     }
 
     override async run(ctx: ContextContext<ApplicationCommandType.User>): Promise<any> {
+        if(!ctx.client.config.interrogate?.enable_user_captioning) return ctx.error({error: "This feature has been disabled"})
         const target_user = ctx.interaction.targetUser
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
 

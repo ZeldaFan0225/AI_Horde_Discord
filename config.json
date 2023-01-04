@@ -15,6 +15,7 @@
     "interrogate": {
         "enabled": true,
         "update_interrogation_status_interval_seconds": 5,
+        "enable_user_captioning": true,
         "default": {
             "nsfw": false,
             "caption": false,

@@ -91,6 +91,7 @@ export interface Config {
     interrogate?: {
         enabled?: boolean,
         update_interrogation_status_interval_seconds?: number,
+        enable_user_captioning?: boolean,
         default?: {
             nsfw?: boolean,
             caption?: boolean,
