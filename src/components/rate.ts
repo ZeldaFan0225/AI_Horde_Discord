@@ -56,7 +56,7 @@ export default class extends Component {
             image: {
                 url: img.url
             },
-            description: `How good does this image look to you?\nKudos earned for previous rating: \`${res.transfered}\``,
+            description: `How good does this image look to you?\nPrevious Rating: ${"⭐".repeat(Number(rate))}${"⬛".repeat(10-Number(rate))}\nKudos earned for previous rating: \`${res.transfered}\``,
             color: Colors.Blurple,
             footer: {
                 text: `${user.join("_")} | ImgID ${img.id}`
