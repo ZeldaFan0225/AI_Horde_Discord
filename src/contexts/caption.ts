@@ -68,7 +68,7 @@ export default class extends Context {
                 custom_id: `delete_${ctx.interaction.user.id}`,
                 style: 4
             })
-            ctx.interaction.editReply({embeds: [embed], components: [{type: 1, components: [delete_btn.toJSON()]}]})
+            ctx.interaction.editReply({embeds: [embed], components: [{type: 1, components: [delete_btn.toJSON()]}]}).catch(console.error)
         }
     }
 }

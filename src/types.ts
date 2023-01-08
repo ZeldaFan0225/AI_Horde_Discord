@@ -73,6 +73,17 @@ export interface AutocompleteContextInitOptions extends BaseContextInitOptions {
     interaction: AutocompleteInteraction
 }
 
+export interface RateNewImageData {
+    dataset_id: string,
+    id: string,
+    url: string
+}
+
+export interface RateImageResponse {
+    message: string,
+    success: boolean,
+    transfered: number
+}
 
 export interface Config {
     use_database?: boolean,
