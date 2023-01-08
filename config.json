@@ -101,7 +101,8 @@
             "allow_denoise": true,
             "allow_nsfw": false,
             "allow_karras": true,
-            "allow_sharing": true
+            "allow_sharing": true,
+            "allow_rating": true
         }
     }
 }

@@ -189,7 +189,8 @@ export interface Config {
             allow_img2img?: boolean,
             allow_denoise?: boolean,
             allow_karras?: boolean,
-            allow_sharing?: boolean
+            allow_sharing?: boolean,
+            allow_rating?: boolean
         }
     }
 }

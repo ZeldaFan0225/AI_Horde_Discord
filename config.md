@@ -106,7 +106,8 @@ Here you can see an explanation of what which option does
             "allow_denoise": (BOOLEAN) *5,
             "allow_karras": (BOOLEAN) * 5,
             "allow_nsfw": Set to true if you want to allow NSFW image generation for your users,
-            "allow_sharing": (BOOLEAN) *5
+            "allow_sharing": (BOOLEAN) *5,
+            "allow_rating": Allow the user to rate their generated images
         }
     }
 }
