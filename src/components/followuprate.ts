@@ -27,7 +27,7 @@ export default class extends Component {
         }).catch(console.error)
 
         if(ctx.client.config.dev) console.log(res)
-        if(!res?.reward) return ctx.error({error: "Unable to post review"})
+        if(!res?.reward) await ctx.interaction.followUp({content: "Unable to post review", ephemeral: true})
 
         const del = ctx.interaction.message.components[2]!
         ctx.interaction.editReply({
