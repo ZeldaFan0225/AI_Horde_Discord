@@ -48,7 +48,8 @@
             "denoise": 50,
             "gfpgan": false,
             "real_esrgan": false,
-            "karras": false
+            "karras": false,
+            "share": false
         },
         "img2img": {
             "require_login": true,
@@ -99,7 +100,8 @@
             "allow_img2img": true,
             "allow_denoise": true,
             "allow_nsfw": false,
-            "allow_karras": true
+            "allow_karras": true,
+            "allow_sharing": true
         }
     }
 }

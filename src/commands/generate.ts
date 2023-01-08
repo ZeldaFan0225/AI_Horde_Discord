@@ -162,6 +162,14 @@ const command_data = new SlashCommandBuilder()
                 .setAutocomplete(true)
             )
         }
+        if(config.generate?.user_restrictions?.allow_sharing) {
+            command_data
+            .addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("share_result")
+                .setDescription("Whether to share your generation result for research")
+            )
+        }
     }
 
 export default class extends Command {
@@ -192,6 +200,7 @@ export default class extends Command {
         const model = ctx.interaction.options.getString("model") ?? ctx.client.config.generate?.default?.model
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? true
         const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.generate?.default?.karras ?? false
+        const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.generate?.default?.share
         let img = ctx.interaction.options.getAttachment("img2img")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
@@ -273,7 +282,8 @@ export default class extends Command {
             workers: ctx.client.config.generate?.workers,
             models: !model ? undefined : model === "YOLO" ? [] : [model],
             source_image: img_data?.toString("base64"),
-            r2: true
+            r2: true,
+            shared: share_result
         }
         
         if(token === "0000000000" && ((generation_data.params?.width ?? 512) > 1024 || (generation_data.params?.height ?? 512) > 1024 || (generation_data.params?.steps ?? 512) > 100)) return ctx.error({error: "You need to be logged in to generate images with a size over 1024*1024 or more than 100 steps"})

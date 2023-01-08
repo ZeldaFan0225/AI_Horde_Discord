@@ -136,7 +136,8 @@ export interface Config {
             denoise?: number,
             gfpgan?: boolean,
             real_esrgan?: boolean,
-            karras?: boolean
+            karras?: boolean,
+            share?: boolean
         },
         img2img?: {
             require_login?: boolean,
@@ -187,7 +188,8 @@ export interface Config {
             allow_nsfw?: boolean,
             allow_img2img?: boolean,
             allow_denoise?: boolean,
-            allow_karras?: boolean
+            allow_karras?: boolean,
+            allow_sharing?: boolean
         }
     }
 }
