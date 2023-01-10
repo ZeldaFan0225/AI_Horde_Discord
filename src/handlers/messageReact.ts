@@ -27,12 +27,12 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
     if(!target_usertoken) {
         // target user has not logged in
         if(client.config.react_to_transfer.allow_delayed_claim) {
-            const res = await database.query(`INSERT INTO pending_kudos (unique_id, target_id, from_id, amount) VALUES ($1, $2, $3, $4) ON CONFLICT (unique_id) DO UPDATE SET amount = pending_kudos.amount + $4 RETURNING *`, [`${r.message.author.id}_${u.id}`, r.message.author.id, u.id, emoji.amount]).catch(console.error)
+            const res = await database.query(`INSERT INTO pending_kudos (unique_id, target_id, from_id, amount) VALUES ($1, $2, $3, $4) ON CONFLICT (unique_id) DO UPDATE SET amount = pending_kudos.amount + $4, updated_at = CURRENT_TIMESTAMP RETURNING *`, [`${r.message.author.id}_${u.id}`, r.message.author.id, u.id, emoji.amount]).catch(console.error)
             if(res?.rowCount) {
                 await r.message.author.send({
                     embeds: [{
                         title: emoji.title ?? "Surprise",
-                        description: `**${u.tag}** tried to gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}\n\nSince you are not logged in you **did not** receive them. Log in now to claim your Kudos.`,
+                        description: `**${u.tag}** tried to gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}\n\nSince you are not logged in you **did not** receive them. Log in with your [stable horde account](https://stablehorde.net/register) within a week to claim your Kudos.`,
                         color: Colors.Red
                     }]
                 })
