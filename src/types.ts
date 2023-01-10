@@ -89,6 +89,16 @@ export interface Config {
     use_database?: boolean,
     dev?: boolean,
     default_token?: string,
+    react_to_transfer?: {
+        enabled?: boolean,
+        emojis?: {
+            id?: string,
+            amount?: number,
+            title?: string,
+            message?: string
+        }[],
+        allow_delayed_claim?: boolean
+    },
     logs?: {
         enabled?: boolean,
         directory?: string,

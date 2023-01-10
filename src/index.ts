@@ -1,5 +1,5 @@
 import {readFileSync} from "fs"
-import {ActivityType, ApplicationCommandType, InteractionType, PresenceUpdateStatus} from "discord.js";
+import {ActivityType, ApplicationCommandType, InteractionType, PartialMessageReaction, Partials, PartialUser, PresenceUpdateStatus} from "discord.js";
 import { StableHordeClient } from "./classes/client";
 import { handleCommands } from "./handlers/commandHandler";
 import { handleComponents } from "./handlers/componentHandler";
@@ -9,6 +9,7 @@ import { handleAutocomplete } from "./handlers/autocompleteHandler";
 import StableHorde from "@zeldafan0225/stable_horde";
 import { handleContexts } from "./handlers/contextHandler";
 import {existsSync, mkdirSync} from "fs"
+import { handleMessageReact } from "./handlers/messageReact";
 
 const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/
 for (const line of readFileSync(`${process.cwd()}/.env`, 'utf8').split(/[\r\n]/)) {
@@ -22,7 +23,8 @@ let connection: Pool | undefined
 
 
 const client = new StableHordeClient({
-    intents: ["Guilds"]
+    intents: ["Guilds", "GuildMessageReactions"],
+    partials: [Partials.Reaction, Partials.Message]
 })
 
 if(client.config.use_database !== false) {
@@ -36,6 +38,7 @@ if(client.config.use_database !== false) {
     
     connection.connect().then(async () => {
         await connection!.query("CREATE TABLE IF NOT EXISTS user_tokens (index SERIAL, id VARCHAR(100) PRIMARY KEY, token VARCHAR(100) NOT NULL)")
+        await connection!.query("CREATE TABLE IF NOT EXISTS pending_kudos (index SERIAL, unique_id VARCHAR(200) PRIMARY KEY, target_id VARCHAR(100) NOT NULL, from_id VARCHAR(100) NOT NULL, amount int NOT NULL, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)")
     }).catch(() => null);
 }
 
@@ -70,6 +73,8 @@ client.on("ready", async () => {
     await client.application?.commands.set([...client.commands.createPostBody(), ...client.contexts.createPostBody()]).catch(console.error)
     if((client.config.generate?.user_restrictions?.amount?.max ?? 4) > 10) throw new Error("More than 10 images are not supported in the bot")
 })
+
+client.on("messageReactionAdd", async (r, u) => await handleMessageReact(r as PartialMessageReaction, u as PartialUser, client, connection, stable_horde_manager))
 
 client.on("interactionCreate", async (interaction) => {
     switch(interaction.type) {

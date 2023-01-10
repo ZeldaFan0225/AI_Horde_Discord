@@ -2,6 +2,18 @@
     "use_database": true,
     "dev": true,
     "default_token": "0000000000",
+    "react_to_transfer": {
+        "enabled": true,
+        "emojis": [
+            {
+                "id": "1062407992760336495",
+                "amount": 69,
+                "title": "Marvelous!",
+                "message": "They thought your message was nice"
+            }
+        ],
+        "allow_delayed_claim": true
+    },
     "logs": {
         "enabled": true,
         "directory": "/logs",
