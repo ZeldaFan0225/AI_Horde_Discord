@@ -7,6 +7,19 @@ Here you can see an explanation of what which option does
     "use_database": Set to false if you do not want to use a database *6,
     "dev": Whether this instance is for development or not (BOOLEAN) *4,
     "default_token": The default token to use for requests if user is not logged in (STRING; recommended default: "0000000000"),
+    "react_to_transfer": {
+        "enabled": Whether transferring kudos by reacting is enabled (BOOLEAN),
+        "emojis": [
+            {
+                "id": The ID of the Emoji (STRING),
+                "amount": The amount to transfer when reacted (NUMBER),
+                "title": The title of the emoji transfer (STRING) (OPTIONAL),
+                "message": The message of the emoji transfer (STRING) (OPTIONAL)
+            }
+        ],
+        "emojis" can be an infinitely long list with emojis, if there are duplicate emoji ids always the first will get used
+        "allow_delayed_claim": When set to true the transaction is done as soon as the targeted user is logged in
+    },
     "logs": {
         "enabled": Whether logging in files are enabled (BOOLEAN),
         "directory": Which directory to create the logs in (STRING; default: "/logs"),
