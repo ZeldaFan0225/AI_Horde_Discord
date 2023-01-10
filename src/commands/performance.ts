@@ -35,11 +35,16 @@ Interrogation Workers \`${performance.interrogator_count}\`
 Generation Thread Count \`${performance.thread_count}\`
 Interrogation Thread Count \`${performance.interrogator_thread_count}\``
         })
+        const delete_btn = new ButtonBuilder({
+            label: "Delete this message",
+            custom_id: `delete_${ctx.interaction.user.id}`,
+            style: 4
+        })
         ctx.interaction.reply({
             embeds: [embed],
             components: [{
                 type: 1,
-                components: [btn.toJSON()]
+                components: [btn.toJSON(), delete_btn.toJSON()]
             }]
         })
     }
