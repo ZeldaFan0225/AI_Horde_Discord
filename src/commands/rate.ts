@@ -1,17 +1,15 @@
-import Centra from "centra";
 import { ActionRowData, ButtonBuilder, Colors, EmbedBuilder, InteractionButtonComponentData, SlashCommandBuilder } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
-import { RateNewImageData } from "../types";
 
 const command_data = new SlashCommandBuilder()
     .setName("rate")
     .setDMPermission(false)
     .setDescription(`Earn kudos by rating images`)
 
-function generateButtons(username: string, id: string) {
+function generateButtons(id: string) {
     let i = 0
-    const getId = () => `rate_${i+1}_${id}_${username}`
+    const getId = () => `rate_${i+1}_${id}`
     const components: ActionRowData<InteractionButtonComponentData>[] = []
     while(i < 10) {
         const btn = {
@@ -51,7 +49,7 @@ export default class extends Command {
             ephemeral: true
         })
 
-        const user_data = await ctx.stable_horde_manager.findUser({token: "g9ZF0z8i13oNVQhsIlQ2WQ"}).catch(() => null)
+        const user_data = await ctx.stable_horde_manager.findUser({token}).catch(() => null)
 
         if(!user_data) return ctx.interaction.reply({
             content: "Unable to find user for saved token.",
@@ -59,7 +57,7 @@ export default class extends Command {
             ephemeral: true
         })
 
-        const img: RateNewImageData = await Centra(`https://droom.cloud/api/rating/new`, "GET").send().then(res => res.json()).catch(console.error)
+        const img = await ctx.stable_horde_manager.ratings.getNewRating(undefined, {token}).catch(console.error)
         if(!img?.url) return ctx.error({error: "Unable to request Image"})
 
         if(ctx.client.config.dev) console.log(img)
@@ -72,14 +70,14 @@ export default class extends Command {
             description: `How good does this image look to you?`,
             color: Colors.Blurple,
             footer: {
-                text: `${user_data.username} | ImgID ${img.id}`
+                text: `ImgID ${img.id}`
             }
         })
 
 
         ctx.interaction.editReply({
             embeds: [embed.toJSON()],
-            components: generateButtons(`${user_data.username}`, img.id)
+            components: generateButtons(img.id!)
         })
     }
 }

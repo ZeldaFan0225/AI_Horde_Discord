@@ -30,16 +30,17 @@ The bot has the following features:
 1) download the code from this repository  
 2) get the token of your discord bot (https://discord.com/developers/docs/reference#authentication)  
 3) Install the node modules using `npm i` (make sure the dev dependencies are also installed for typescript to work)  
+4) remove the `template.` from the `template.config.json` file  
   
 If you want to have extra functionality do the following steps:  
-4) set up a postgres database  
-5) fill out the `template.env` and rename it to `.env`  
+5) set up a postgres database  
+6) fill out the `template.env` and rename it to `.env`  
   
 If you just want to generate images with no token or the default token in the config.json file do the following steps:  
-4) modify the config file and set `use_database` to false  
-5) fill out the `template.env` and rename it to `.env` (you can leave the keys prefixed with `DB_` empty)  
+5) modify the config file and set `use_database` to false  
+6) fill out the `template.env` and rename it to `.env` (you can leave the keys prefixed with `DB_` empty)  
   
-6) modify the [config.json](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.json) file to fit your needs (you can read about what which property does in [config.md](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md))  
+7) modify the [config.json](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.json) file (from step 4) to fit your needs (you can read about what which property does in [config.md](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md))  
 8) compile the code and start the process (this can be done by using `npm run deploy`)  
   
 Now if everything is set up it should start and give an output in the console.  
