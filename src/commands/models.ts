@@ -1,4 +1,4 @@
-import { ButtonBuilder, Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { AttachmentBuilder, ButtonBuilder, Colors, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 
@@ -19,6 +19,8 @@ export default class extends Command {
     override async run(ctx: CommandContext): Promise<any> {
         const models = await ctx.stable_horde_manager.getModels({force: true})
 
+        let files = []
+
         const embed = new EmbedBuilder({
             color: Colors.Blue,
             title: "Currently available models",
@@ -35,6 +37,16 @@ Performance: \`${w.performance}\``).join("\n\n")
                 inline: true
             })))
         }
+
+        if((embed.data.description?.length ?? 0) > 4096) {
+            const longest_name = models.sort((a,b) => b.name!.length - a.name!.length)[0]?.name?.length ?? 0
+            const header = `Model Name${" ".repeat(longest_name - 10)} | Workers | Performance`
+            const dividor = "-".repeat(header.length)
+            const rows = models.sort((a,b) => a.name!.localeCompare(b.name!)).map(m => `${m.name}${" ".repeat(longest_name - (m.name?.length ?? 0))} | ${m.count?.toString().padStart(7, " ")} | ${m.performance}`).join("\n")
+            const content = [header, dividor, rows].join("\n")
+            files.push(new AttachmentBuilder(Buffer.from(content), {name: "models.txt"}))
+            embed.setDescription("Models attached")
+        }
         
         const delete_btn = new ButtonBuilder({
             label: "Delete this message",
@@ -44,7 +56,8 @@ Performance: \`${w.performance}\``).join("\n\n")
 
         return ctx.interaction.reply({
             embeds: [embed],
-            components: [{type: 1, components: [delete_btn]}]
+            components: [{type: 1, components: [delete_btn]}],
+            files
         })
     }
 }
