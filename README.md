@@ -25,6 +25,13 @@ The bot has the following features:
 - advanced configuration file which lets you change how the bot behaves and what actions the user can use (for limits refer to https://stablehorde.net/api)
 - logging prompts, user id and generation id to track generation of malicious, nsfw or illegal content
 
+## Version Requirements
+
+- NodeJS >= 16.16
+
+Optional:  
+- PostgreSQL >= 14.6
+
 ## How to set up
 
 1) download the code from this repository  
