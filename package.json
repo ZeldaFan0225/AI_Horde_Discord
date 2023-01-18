@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "deploy": "npx tsc -p . && node .",
-    "generate-key": "node dist/generate_salt.js"
+    "generate-key": "npx tsc -p . && node dist/generate_salt.js"
   },
   "repository": {
     "type": "git",
