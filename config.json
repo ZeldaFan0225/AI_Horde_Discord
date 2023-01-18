@@ -1,15 +1,15 @@
 {
     "use_database": true,
-    "dev": false,
+    "dev": true,
     "default_token": "0000000000",
     "apply_roles_to_worker_owners": [
-
+        "1007615653940842517"
     ],
     "react_to_transfer": {
         "enabled": true,
         "emojis": [
             {
-                "id": "1234567890123456789",
+                "id": "1062407992760336495",
                 "amount": 69,
                 "title": "Marvelous!",
                 "message": "They thought your message was nice"
@@ -50,7 +50,7 @@
         "blacklisted_models": [],
         "blacklisted_words": [],
         "update_generation_status_interval_seconds": 5,
-        "convert_a1111_weight_to_horde_weight": false,
+        "convert_a1111_weight_to_horde_weight": true,
         "improve_loading_time": false,
         "default": {
             "steps": 30,
@@ -74,7 +74,7 @@
             "require_nsfw_channel": false,
             "whitelist": {
                 "only_allow_whitelist": false,
-                "user_ids": [],
+                "user_ids": ["683655307356143706"],
                 "bypass_checks": true
             }
         },
@@ -115,7 +115,7 @@
             "allow_models": true,
             "allow_img2img": true,
             "allow_denoise": true,
-            "allow_nsfw": true,
+            "allow_nsfw": false,
             "allow_karras": true,
             "allow_sharing": true,
             "allow_rating": true
