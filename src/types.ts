@@ -134,6 +134,7 @@ export interface Config {
         blacklisted_models?: string[],
         update_generation_status_interval_seconds?: number,
         improve_loading_time?: boolean,
+        convert_a1111_weight_to_horde_weight?: boolean,
         default?: {
             steps?: number,
             resolution?: {

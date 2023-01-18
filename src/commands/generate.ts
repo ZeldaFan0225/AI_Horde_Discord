@@ -203,7 +203,7 @@ export default class extends Command {
         if(!ctx.client.config.generate?.enabled) return ctx.error({error: "Generation is disabled."})
 
         await ctx.interaction.deferReply({})
-        const prompt = ctx.interaction.options.getString("prompt", true)
+        let prompt = ctx.interaction.options.getString("prompt", true)
         const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.generate?.default?.sampler ?? StableHorde.ModelGenerationInputStableSamplers.k_euler) as any
         const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.generate?.default?.cfg ?? 5
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.generate?.default?.denoise ?? 50)/100
@@ -251,6 +251,14 @@ export default class extends Command {
 
         height = ctx.interaction.options.getInteger("height") ?? height
         width = ctx.interaction.options.getInteger("width") ?? width
+
+        if(ctx.client.config.generate.convert_a1111_weight_to_horde_weight) {
+            prompt = prompt.replace(/(\(+|\[+)|(\)+|\]+)/g, (w) => {
+                if(w.startsWith("(") || w.startsWith("[")) return "("
+                const weight = 1 + (0.1 * (w.startsWith(")") ? 1 : -1) * w.length)
+                return `:${weight.toFixed(1)})`
+            })
+        }
         
         if(ctx.client.config.dev) {
             console.log(img?.height)

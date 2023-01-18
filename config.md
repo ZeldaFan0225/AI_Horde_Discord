@@ -53,6 +53,7 @@ Here you can see an explanation of what which option does
         "blacklisted_models": A list of blacklisted models which users are not allowed to use (ARRAY OF STRING),
         "blacklisted_words": A list of blacklisted words which users are not allowed to use (ARRAY OF STRING),
         "update_generation_status_interval_seconds": The interval at which the embed in Discord gets updated (INTEGER),
+        "convert_a1111_weight_to_horde_weight": Whether to convert a1111 to weighted prompt required by the api (BOOLEAN) *7 *8,
         "improve_loading_time": Try to improve the displaying time between generation finished and generation displayed in discord (BOOLEAN) *7
         "default": {
             "steps": How many steps to go through by default if nothing is specified (INTEGER) *1,
@@ -132,4 +133,5 @@ Here you can see an explanation of what which option does
 `*4` Developer mode will enable logging and will also show the generations ID in the embed in Discord  
 `*5` This option changes how the /generate command is created. If set to false the user will not have the option to modify this value when generating.  
 `*6` This option must be set to false, leaving it blank will default it to true  
-`*7` EXPERIMENTAL OPTION, ENABLE AT YOUR OWN RISK
+`*7` EXPERIMENTAL OPTION, ENABLE AT YOUR OWN RISK  
+`*8` For example (((test))) will be automatically converted to (test:1.3)  
