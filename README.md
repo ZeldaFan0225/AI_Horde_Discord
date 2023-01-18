@@ -47,7 +47,7 @@ If you just want to generate images with no token or the default token in the co
 5) modify the config file and set `use_database` to false  
 6) fill out the `template.env` and rename it to `.env` (you can leave the keys prefixed with `DB_` empty)  
   
-7) modify the [config.json](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.json) file (from step 4) to fit your needs (you can read about what which property does in [config.md](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md))  
+7) modify the [config.json](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/template.config.json) file (from step 4) to fit your needs (you can read about what which property does in [config.md](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md))  
 8) compile the code and start the process (this can be done by using `npm run deploy`)  
   
 Now if everything is set up it should start and give an output in the console.  
