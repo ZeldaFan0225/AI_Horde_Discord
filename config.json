@@ -2,6 +2,9 @@
     "use_database": true,
     "dev": true,
     "default_token": "0000000000",
+    "apply_roles_to_worker_owners": [
+        "1007615653940842517"
+    ],
     "react_to_transfer": {
         "enabled": true,
         "emojis": [

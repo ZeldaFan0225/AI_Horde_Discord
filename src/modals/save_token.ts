@@ -1,4 +1,4 @@
-import { Colors, TextInputModalData } from "discord.js";
+import { Colors, GuildMember, TextInputModalData } from "discord.js";
 import { Modal } from "../classes/modal";
 import { ModalContext } from "../classes/modalContext";
 
@@ -23,6 +23,10 @@ export default class extends Modal {
             })
         }
         const user_data = await ctx.stable_horde_manager.findUser({token}).catch(() => null)
+        if(user_data?.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length && ctx.interaction.inCachedGuild()) {
+            if(ctx.interaction.member?.roles && ctx.client.config.apply_roles_to_worker_owners.some(r => !(ctx.interaction.member as GuildMember).roles.cache.has(r)))
+                await ctx.interaction.member.roles.add(ctx.client.config.apply_roles_to_worker_owners).catch(console.error)
+        }
         if(!user_data) return ctx.error({error: "Unable to find user with this token!"})
         const res = await ctx.database.query("INSERT INTO user_tokens VALUES (DEFAULT, $1, $2) ON CONFLICT (id) DO UPDATE SET token=$2 RETURNING *", [ctx.interaction.user.id, token])
         if(!res.rowCount) return ctx.error({error: "Unable to save token"})
