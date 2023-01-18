@@ -322,10 +322,9 @@ export default class extends Command {
         const generation_start = await ctx.stable_horde_manager.postAsyncGenerate(generation_data, {token})
         .catch((e) => {
             if(ctx.client.config.advanced?.dev) console.error(e)
-            ctx.error({error: `Unable to start generation: ${e.message}`})
-            return null;
+            return e;
         })
-        if(!generation_start || !generation_start.id) return;
+        if(!generation_start || !generation_start.id) return ctx.error({error: `Unable to start generation: ${generation_start.message}`});
 
 
         if (ctx.client.config.logs?.enabled) {
