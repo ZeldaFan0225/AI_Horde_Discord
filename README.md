@@ -54,7 +54,7 @@ If you just want to generate images with no token or the default token in the co
 Now if everything is set up it should start and give an output in the console.  
 
 
-**Encryption Key**
+## Encryption Key
 When changing your encryption key after deployment the tokens won't be decrypted properly.  
 Avoid changing the encryption key after initial setup.
 Disabling encryption at any point will make commands for users who saved their tokens in an encrypted form not work any more.
