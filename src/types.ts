@@ -136,7 +136,7 @@ export interface Config {
             allow_interrogation?: boolean
         }
     },
-    generate?: {
+    advanced_generate?: {
         enabled?: boolean,
         require_login?: boolean,
         trusted_workers?: boolean,
