@@ -7,6 +7,7 @@ Here you can see an explanation of what which option does
     "use_database": Set to false if you do not want to use a database *6,
     "dev": Whether this instance is for development or not (BOOLEAN) *4,
     "default_token": The default token to use for requests if user is not logged in (STRING; recommended default: "0000000000"),
+    "apply_roles_to_worker_owners": Roles to apply if the user has a worker running (ARRAY OF ROLE IDS),
     "react_to_transfer": {
         "enabled": Whether transferring kudos by reacting is enabled (BOOLEAN),
         "emojis": [

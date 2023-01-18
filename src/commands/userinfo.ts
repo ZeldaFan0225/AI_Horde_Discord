@@ -24,7 +24,8 @@ export default class extends Command {
 
     override async run(ctx: CommandContext): Promise<any> {
         if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
-        let token = await ctx.client.getUserToken(ctx.interaction.options.getUser("user")?.id ?? ctx.interaction.user.id, ctx.database)
+        const user = ctx.interaction.options.getUser("user")?.id ?? ctx.interaction.user.id
+        let token = await ctx.client.getUserToken(user, ctx.database)
         if(!token && ctx.interaction.options.getUser("user")?.id) return ctx.error({error: "The user has not added their token"})
         const add_token_button = new ButtonBuilder({
             custom_id: "save_token",
@@ -43,6 +44,12 @@ export default class extends Command {
         })
 
         const user_data = await ctx.stable_horde_manager.findUser({token}).catch(() => null)
+        
+        if(user_data?.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length) {
+            const member = await ctx.interaction.guild?.members.fetch(user).catch(console.error)
+            if(member?.roles && ctx.client.config.apply_roles_to_worker_owners.some(r => !member.roles.cache.has(r)))
+                await member.roles.add(ctx.client.config.apply_roles_to_worker_owners).catch(console.error)
+        }
 
         if(!user_data) return ctx.interaction.reply({
             content: "Unable to find user for saved token.",

@@ -89,6 +89,7 @@ export interface Config {
     use_database?: boolean,
     dev?: boolean,
     default_token?: string,
+    apply_roles_to_worker_owners?: string[],
     react_to_transfer?: {
         enabled?: boolean,
         emojis?: {
