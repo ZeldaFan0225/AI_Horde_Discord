@@ -5,9 +5,20 @@ Here you can see an explanation of what which option does
 ```
 {
     "use_database": Set to false if you do not want to use a database *6,
-    "dev": Whether this instance is for development or not (BOOLEAN) *4,
     "default_token": The default token to use for requests if user is not logged in (STRING; recommended default: "0000000000"),
     "apply_roles_to_worker_owners": Roles to apply if the user has a worker running (ARRAY OF ROLE IDS),
+    "advanced": {
+        "dev": Whether this instance is for development or not (BOOLEAN) *4,
+        "encrypt_token": Encrypt the users token before saving in the database (BOOLEAN) *9
+    },
+    "filter_actions": {
+        "mode": The mode on how the guilds list should act ('whitelist' or 'blacklist'),
+        "guilds": The list of guilds to apply the filters to (ARRAY OF GUILD IDS),
+        "apply_filter_to": {
+            "react_to_transfer": Whether to apply the filter to this action (BOOLEAN),
+            "apply_roles_to_worker_owners": Whether to apply the filter to this action (BOOLEAN)
+        }
+    },
     "react_to_transfer": {
         "enabled": Whether transferring kudos by reacting is enabled (BOOLEAN),
         "emojis": [
@@ -136,3 +147,4 @@ Here you can see an explanation of what which option does
 `*6` This option must be set to false, leaving it blank will default it to true  
 `*7` EXPERIMENTAL OPTION, ENABLE AT YOUR OWN RISK  
 `*8` For example (((test))) will be automatically converted to (test:1.3)  
+`*9` Uses an encryption key only known to you to encrypt the users tokens. This is recommended to increase security. Enabling this option may have an impact on speed.

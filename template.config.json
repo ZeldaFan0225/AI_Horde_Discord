@@ -1,10 +1,23 @@
 {
     "use_database": true,
-    "dev": false,
     "default_token": "0000000000",
     "apply_roles_to_worker_owners": [
 
     ],
+    "advanced": {
+        "dev": false,
+        "encrypt_token": true
+    },
+    "filter_actions": {
+        "mode": "whitelist",
+        "guilds": [
+            "1007615132299448392"
+        ],
+        "apply_filter_to": {
+            "react_to_transfer": true,
+            "apply_roles_to_worker_owners": true
+        }
+    },
     "react_to_transfer": {
         "enabled": true,
         "emojis": [

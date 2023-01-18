@@ -222,7 +222,7 @@ export default class extends Command {
         let img = ctx.interaction.options.getAttachment("img2img")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
-        const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+        const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const can_bypass = ctx.client.config.generate?.img2img?.whitelist?.bypass_checks && ctx.client.config.generate?.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
         if(ctx.client.config.generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
@@ -260,7 +260,7 @@ export default class extends Command {
             })
         }
         
-        if(ctx.client.config.dev) {
+        if(ctx.client.config.advanced?.dev) {
             console.log(img?.height)
             console.log(img?.width)
             console.log(height)
@@ -275,7 +275,7 @@ export default class extends Command {
             
             if(img.contentType === "image/webp") img_data = img_data_res.body
             else {
-                img_data = await buffer2webpbuffer(img_data_res.body, img.contentType?.replace("image/",""),"-q 80").catch((e: Error) => ctx.client.config.dev ? console.error(e) : null)
+                img_data = await buffer2webpbuffer(img_data_res.body, img.contentType?.replace("image/",""),"-q 80").catch((e: Error) => ctx.client.config.advanced?.dev ? console.error(e) : null)
                 if(!img_data) return ctx.error({
                     error: "Image format conversion to webp failed"
                 })
@@ -314,14 +314,14 @@ export default class extends Command {
         
         if(token === "0000000000" && ((generation_data.params?.width ?? 512) > 1024 || (generation_data.params?.height ?? 512) > 1024 || (generation_data.params?.steps ?? 512) > 100)) return ctx.error({error: "You need to be logged in to generate images with a size over 1024*1024 or more than 100 steps"})
 
-        if(ctx.client.config.dev) {
+        if(ctx.client.config.advanced?.dev) {
             console.log(token)
             console.log(generation_data)
         }
 
         const generation_start = await ctx.stable_horde_manager.postAsyncGenerate(generation_data, {token})
         .catch((e) => {
-            if(ctx.client.config.dev) console.error(e)
+            if(ctx.client.config.advanced?.dev) console.error(e)
             ctx.error({error: `Unable to start generation: ${e.message}`})
             return null;
         })
@@ -344,12 +344,12 @@ export default class extends Command {
             }
         }
 
-        if(ctx.client.config.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " img2img":""} with prompt "${prompt}" (${generation_start?.id})`)
+        if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " img2img":""} with prompt "${prompt}" (${generation_start?.id})`)
 
-        const start_status = await ctx.stable_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+        const start_status = await ctx.stable_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const start_horde_data = await ctx.stable_horde_manager.getPerformance()
 
-        if(ctx.client.config.dev) {
+        if(ctx.client.config.advanced?.dev) {
             console.log(start_status)
         }
 
@@ -374,7 +374,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
             description: `This will make your requests appear anonymous.\nThis can result in low generation speed due to low priority.\nLog in now with ${await ctx.client.getSlashCommandTag("login")}\n\nDon't know what the token is?\nCreate a stable horde account here: https://stablehorde.net/register`
         })
 
-        if(ctx.client.config.dev) embed.setFooter({text: generation_start.id})
+        if(ctx.client.config.advanced?.dev) embed.setFooter({text: generation_start.id})
 
         const btn = new ButtonBuilder({
             label: "Cancel",
@@ -448,7 +448,7 @@ ${!status.is_possible ? "\nRequest can not be fulfulled with current amount of w
 ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             })
 
-            if(ctx.client.config.dev) embed.setFooter({text: generation_start?.id ?? "Unknown ID"})
+            if(ctx.client.config.advanced?.dev) embed.setFooter({text: generation_start?.id ?? "Unknown ID"})
 
             let embeds = token === (ctx.client.config.default_token ?? "0000000000") ? [embed.toJSON(), login_embed.toJSON()] : [embed.toJSON()]
 
@@ -469,7 +469,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
             if(done) return;
-            const status = await ctx.stable_horde_manager.getGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+            const status = await ctx.stable_horde_manager.getGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
             done = !!status?.done
             const horde_data = await ctx.stable_horde_manager.getPerformance()
             if(!status || (status as any).faulted) {
@@ -478,7 +478,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 return null;
             }
 
-            if(ctx.client.config.dev) {
+            if(ctx.client.config.advanced?.dev) {
                 console.log(status)
             }
 
@@ -494,7 +494,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                         title: `Image ${i+1}`,
                         image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
                         color: Colors.Blue,
-                        description: `**Seed:** ${g.seed}\n**Model:** ${g.model}\n**Generated by** ${g.worker_name}\n(\`${g.worker_id}\`)${!i ? `\n**Prompt:** ${prompt}\n**Total Kudos Cost:** \`${images.kudos}\`${(generation_data.params?.n ?? 1) > 1 ? ` (\`${(images.kudos ?? 0)*(generation_data.params?.n ?? 1)}\` total)` : ""}` : ""}${ctx.client.config.dev ? `\n\n**ID** ${g.id}` : ""}`,
+                        description: `**Seed:** ${g.seed}\n**Model:** ${g.model}\n**Generated by** ${g.worker_name}\n(\`${g.worker_id}\`)${!i ? `\n**Prompt:** ${prompt}\n**Total Kudos Cost:** \`${images.kudos}\`${(generation_data.params?.n ?? 1) > 1 ? ` (\`${(images.kudos ?? 0)*(generation_data.params?.n ?? 1)}\` total)` : ""}` : ""}${ctx.client.config.advanced?.dev ? `\n\n**ID** ${g.id}` : ""}`,
                     })
                     if(img_data) embed.setThumbnail(`attachment://original.webp`)
                     return {attachment, embed}
@@ -503,7 +503,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
 
                 const image_map = await Promise.all(image_map_r)
                 const embeds = image_map.map(i => i.embed)
-                if(ctx.client.config.dev) embeds.at(-1)?.setFooter({text: `ID ${generation_start!.id}`})
+                if(ctx.client.config.advanced?.dev) embeds.at(-1)?.setFooter({text: `ID ${generation_start!.id}`})
                 const files = image_map.map(i => i.attachment)
                 if(img_data) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
                 let components = [{type: 1, components: [delete_btn]}]
@@ -521,7 +521,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
         switch(option.name) {
             case "model": {
                 const models = await context.stable_horde_manager.getModels()
-                if(context.client.config.dev) console.log(models)
+                if(context.client.config.advanced?.dev) console.log(models)
                 const available = [{name: "Any Model", value: "YOLO"}, ...models.sort((a, b) => b.performance!-a.performance!).map(m => ({name: `${m.name} | Workers: ${m.count} | Performance: ${m.performance} | Queued: ${m.queued}`, value: m.name!}))].filter(v => !context.client.config.generate?.blacklisted_models?.includes(v.value)).filter(v => !option.value || v.name.toLowerCase().includes(option.value.toLowerCase()))
                 return await context.interaction.respond(available.filter(o => o.name?.toLowerCase().includes(option.value.toLowerCase())).slice(0,25))
             }

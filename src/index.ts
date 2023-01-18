@@ -16,7 +16,7 @@ for (const line of readFileSync(`${process.cwd()}/.env`, 'utf8').split(/[\r\n]/)
     const [, key, value] = line.match(RE_INI_KEY_VAL) || []
     if (!key) continue
 
-    process.env[key] = value?.trim()
+    process.env[key] = value?.trim() || ""
 }
 
 let connection: Pool | undefined
@@ -26,6 +26,9 @@ const client = new StableHordeClient({
     intents: ["Guilds", "GuildMessageReactions"],
     partials: [Partials.Reaction, Partials.Message]
 })
+
+if(client.config.advanced?.encrypt_token && !process.env["ENCRYPTION_KEY"]?.length)
+    throw new Error("Either give a valid encryption key (you can generate one with 'npm run generate-key') or disable token encryption in your config.json file.")
 
 if(client.config.use_database !== false) {
     connection = new Pool({
@@ -78,6 +81,7 @@ client.on("ready", async () => {
     console.log(`Ready`)
     await client.application?.commands.set([...client.commands.createPostBody(), ...client.contexts.createPostBody()]).catch(console.error)
     if((client.config.generate?.user_restrictions?.amount?.max ?? 4) > 10) throw new Error("More than 10 images are not supported in the bot")
+    if(client.config.filter_actions?.guilds?.length && (client.config.filter_actions?.mode !== "whitelist" && client.config.filter_actions?.mode !== "blacklist")) throw new Error("The actions filter mode must be set to either whitelist, blacklist.")
 })
 
 client.on("messageReactionAdd", async (r, u) => await handleMessageReact(r as PartialMessageReaction, u as PartialUser, client, connection, stable_horde_manager))

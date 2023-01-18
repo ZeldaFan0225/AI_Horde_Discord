@@ -11,6 +11,13 @@ export async function handleComponents(interaction: ButtonInteraction | SelectMe
 
     if(interaction.componentType === ComponentType.Button) context = new ComponentContext({interaction, client, database, stable_horde_manager})
     else context = new ComponentContext<ComponentType.SelectMenu>({interaction, client, database, stable_horde_manager})
+    
+    if(interaction.appPermissions?.missing(client.required_permissions).length)
+        return await context.error({
+            error: `I require the following permissions to work:\n${interaction.appPermissions?.missing(client.required_permissions).join(", ")}`,
+            codeblock: false,
+            ephemeral: true
+        })
 
     return await command.run(context).catch(console.error)
 }

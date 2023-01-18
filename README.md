@@ -47,7 +47,19 @@ If you just want to generate images with no token or the default token in the co
 5) modify the config file and set `use_database` to false  
 6) fill out the `template.env` and rename it to `.env` (you can leave the keys prefixed with `DB_` empty)  
   
-7) modify the [config.json](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/template.config.json) file (from step 4) to fit your needs (you can read about what which property does in [config.md](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md))  
-8) compile the code and start the process (this can be done by using `npm run deploy`)  
+7) Run `npm run generate-key` and copy the generated encryption key in your `.env` (If you disabled token encryption you can leave it blank)
+8) modify the [config.json](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/template.config.json) file (from step 4) to fit your needs (you can read about what which property does in [config.md](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/config.md))  
+9) compile the code and start the process (this can be done by using `npm run deploy`)  
   
 Now if everything is set up it should start and give an output in the console.  
+
+
+**Encryption Key**
+When changing your encryption key after deployment the tokens won't be decrypted properly.  
+Avoid changing the encryption key after initial setup.
+Disabling encryption at any point will make commands for users who saved their tokens in an encrypted form not work any more.
+
+## How to update
+
+1) Pull the code from this repository
+2) Update your config. Reading through the [changelog](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/changelog.md) might help.

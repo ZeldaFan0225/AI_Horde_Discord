@@ -1,5 +1,5 @@
 import StableHorde from "@zeldafan0225/stable_horde";
-import { ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, PermissionsBitField } from "discord.js";
 import { Pool } from "pg";
 import { StableHordeClient } from "../classes/client";
 import { CommandContext } from "../classes/commandContext";
@@ -16,6 +16,12 @@ export async function handleCommands(interaction: ChatInputCommandInteraction, c
     if(!interaction.channel)
         return await context.error({
             error: "Please add me to the private thread (by mentioning me) to use commands",
+            ephemeral: true
+        })
+    if(interaction.appPermissions?.missing(client.required_permissions).length)
+        return await context.error({
+            error: `I require the following permissions to work:\n${(interaction.appPermissions || new PermissionsBitField).missing(client.required_permissions).join(", ")}`,
+            codeblock: false,
             ephemeral: true
         })
     return await command.run(context).catch(console.error)

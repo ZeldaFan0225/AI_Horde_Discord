@@ -81,18 +81,18 @@ export default class extends Command {
 
         const interrogation_start = await ctx.stable_horde_manager.postAsyncInterrogate(interrogation_data, {token})
         .catch((e) => {
-            if(ctx.client.config.dev) console.error(e)
+            if(ctx.client.config.advanced?.dev) console.error(e)
             ctx.error({error: `Unable to start interrogation: ${e.message}`})
             return null;
         })
         if(!interrogation_start || !interrogation_start.id) return;
 
-        if(ctx.client.config.dev) console.log(`${ctx.interaction.user.id} interrogated ${attachment.url} (${interrogation_start?.id})`)
+        if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} interrogated ${attachment.url} (${interrogation_start?.id})`)
 
-        const start_status = await ctx.stable_horde_manager.getInterrogationStatus(interrogation_start.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+        const start_status = await ctx.stable_horde_manager.getInterrogationStatus(interrogation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const start_horde_data = await ctx.stable_horde_manager.getPerformance()
 
-        if(ctx.client.config.dev) {
+        if(ctx.client.config.advanced?.dev) {
             console.log(start_status)
         }
 
@@ -110,7 +110,7 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.M
         })
 
 
-        if(ctx.client.config.dev) embed.setFooter({text: interrogation_start.id})
+        if(ctx.client.config.advanced?.dev) embed.setFooter({text: interrogation_start.id})
 
         const btn = new ButtonBuilder({
             label: "Cancel",
@@ -165,7 +165,7 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.M
                 }
             })
 
-            if(ctx.client.config.dev) embed.setFooter({text: interrogation_start?.id ?? "Unknown ID"})
+            if(ctx.client.config.advanced?.dev) embed.setFooter({text: interrogation_start?.id ?? "Unknown ID"})
 
             return message.edit({
                 content: "",
@@ -177,7 +177,7 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.M
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
             if(done) return;
-            const status = await ctx.stable_horde_manager.getInterrogationStatus(interrogation_start!.id!).catch((e) => ctx.client.config.dev ? console.error(e) : null);
+            const status = await ctx.stable_horde_manager.getInterrogationStatus(interrogation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
             done = status?.state === StableHorde.HordeAsyncRequestStates.done
             const horde_data = await ctx.stable_horde_manager.getPerformance()
             if(!status || status.state === StableHorde.HordeAsyncRequestStates.faulted) {
@@ -186,7 +186,7 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.M
                 return null;
             }
 
-            if(ctx.client.config.dev) {
+            if(ctx.client.config.advanced?.dev) {
                 console.log(status)
             }
 

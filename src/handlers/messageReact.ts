@@ -5,6 +5,7 @@ import { StableHordeClient } from "../classes/client";
 
 export async function handleMessageReact(reaction: PartialMessageReaction | MessageReaction, user: User | PartialUser, client: StableHordeClient, database: Pool | undefined, stable_horde_manager: StableHorde): Promise<any> {
     if(!database || !client.config.react_to_transfer?.enabled) return;
+    if(!client.checkGuildPermissions(reaction.message.guildId, "react_to_transfer")) return;
     const emoji = client.config.react_to_transfer?.emojis?.find(e => e.id === reaction.emoji.id)
     if(!emoji) return;
     const u = await (user.partial ? user.fetch() : user)

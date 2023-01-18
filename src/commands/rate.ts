@@ -60,7 +60,7 @@ export default class extends Command {
         const img = await ctx.stable_horde_manager.ratings.getNewRating(undefined, {token}).catch(console.error)
         if(!img?.url) return ctx.error({error: "Unable to request Image"})
 
-        if(ctx.client.config.dev) console.log(img)
+        if(ctx.client.config.advanced?.dev) console.log(img)
 
         const embed = new EmbedBuilder({
             title: "Rate the Image below",

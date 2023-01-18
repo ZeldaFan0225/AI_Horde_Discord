@@ -1,10 +1,11 @@
 {
   "name": "zeldafan_discord_bot",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "deploy": "npx tsc -p . && node ."
+    "deploy": "npx tsc -p . && node .",
+    "generate-key": "node dist/generate_salt.js"
   },
   "repository": {
     "type": "git",

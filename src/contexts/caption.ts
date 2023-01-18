@@ -37,11 +37,11 @@ export default class extends Context {
             forms
         }
 
-        if(ctx.client.config.dev) console.log(interrogation_data)
+        if(ctx.client.config.advanced?.dev) console.log(interrogation_data)
 
         const interrogation_start = await ctx.stable_horde_manager.postAsyncInterrogate(interrogation_data, {token})
         .catch((e) => {
-            if(ctx.client.config.dev) console.error(e)
+            if(ctx.client.config.advanced?.dev) console.error(e)
             ctx.error({error: `Unable to perform this action\n${e.message}`})
             return null;
         })
@@ -49,7 +49,7 @@ export default class extends Context {
 
         const inter = setInterval(async () => {
             const status = await ctx.stable_horde_manager.getInterrogationStatus(interrogation_start?.id!)
-            if(ctx.client.config.dev) console.log(status)
+            if(ctx.client.config.advanced?.dev) console.log(status)
             if(status.state !== StableHorde.HordeAsyncRequestStates.waiting && status.state !== StableHorde.HordeAsyncRequestStates.processing) displayResult(status)
         }, 1000 * (ctx.client.config.interrogate?.update_interrogation_status_interval_seconds ?? 5))
 

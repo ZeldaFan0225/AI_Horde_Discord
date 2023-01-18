@@ -87,9 +87,20 @@ export interface RateImageResponse {
 
 export interface Config {
     use_database?: boolean,
-    dev?: boolean,
     default_token?: string,
     apply_roles_to_worker_owners?: string[],
+    advanced?: {
+        dev?: boolean,
+        encrypt_token?: boolean
+    },
+    filter_actions?: {
+        mode?: "whitelist" | "blacklist",
+        guilds?: string[],
+        apply_filter_to?: {
+            react_to_transfer?: boolean,
+            apply_roles_to_worker_owners?: boolean
+        }
+    },
     react_to_transfer?: {
         enabled?: boolean,
         emojis?: {

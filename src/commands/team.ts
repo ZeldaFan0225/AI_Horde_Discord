@@ -64,7 +64,7 @@ Speed: \`${team.speed}\` Megapixelsteps per second`,
         switch(option.name) {
             case "query": {
                 const teams = await context.stable_horde_manager.getTeams()
-                if(context.client.config.dev) console.log(teams)
+                if(context.client.config.advanced?.dev) console.log(teams)
                 const available = teams.filter(t => t.name?.toLowerCase().includes(option.value.toLowerCase()) || t.id?.toLowerCase().includes(option.value.toLowerCase())).map(t => ({name: `${t.name} | ${t.id}`, value: t.id!}))
                 return await context.interaction.respond(available.slice(0, 25))
             }

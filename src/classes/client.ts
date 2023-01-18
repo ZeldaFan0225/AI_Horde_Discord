@@ -1,10 +1,11 @@
 import SuperMap from "@thunder04/supermap";
-import { Client, ClientOptions } from "discord.js";
+import { Client, ClientOptions, PermissionFlagsBits, PermissionsBitField } from "discord.js";
 import { readFileSync } from "fs";
 import { Store } from "../stores/store";
 import { Config, StoreTypes } from "../types";
 import {existsSync, mkdirSync, writeFileSync} from "fs"
 import { Pool } from "pg";
+import crypto from "crypto"
 
 export class StableHordeClient extends Client {
 	commands: Store<StoreTypes.COMMANDS>;
@@ -13,6 +14,8 @@ export class StableHordeClient extends Client {
 	modals: Store<StoreTypes.MODALS>;
     config: Config
 	cache: SuperMap<string, any>
+	security_key?: Buffer
+	required_permissions: PermissionsBitField
 
 	constructor(options: ClientOptions) {
 		super(options);
@@ -25,6 +28,16 @@ export class StableHordeClient extends Client {
 			intervalTime: 1000
 		})
         this.loadConfig()
+		this.security_key = this.config.advanced?.encrypt_token ? Buffer.from(process.env["ENCRYPTION_KEY"] || "", "hex") : undefined
+
+		this.required_permissions = new PermissionsBitField(
+			PermissionFlagsBits.ViewChannel |
+			PermissionFlagsBits.SendMessages |
+			PermissionFlagsBits.AttachFiles |
+			PermissionFlagsBits.EmbedLinks |
+			PermissionFlagsBits.ManageRoles |
+			PermissionFlagsBits.UseExternalEmojis
+		)
 	}
 
     loadConfig() {
@@ -56,6 +69,39 @@ export class StableHordeClient extends Client {
 		if(!database) return undefined;
         const rows = await database.query("SELECT * FROM user_tokens WHERE id=$1", [user_id])
         if(!rows.rowCount || !rows.rows[0]) return undefined
-        return rows.rows[0].token
+		const token = this.config.advanced?.encrypt_token ? this.decryptString(rows.rows[0].token) : rows.rows[0].token
+        return token
     }
+
+	decryptString(hash: string){
+		if(!hash.includes(":")) return hash
+		if(!this.security_key) return undefined;
+		const iv = Buffer.from(hash.split(':')[1]!, 'hex');
+		const encryptedText =  Buffer.from(hash.split(':')[0]!, "hex");
+		const decipher = crypto.createDecipheriv('aes-256-ctr', this.security_key, iv);
+		const decrpyted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
+		return decrpyted.toString("utf-8");
+	};
+
+	encryptString(text: string){
+		if(!this.security_key) return undefined;
+		const iv = crypto.randomBytes(16);
+		const cipher = crypto.createCipheriv('aes-256-ctr', this.security_key, iv);
+		const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
+		return encrypted.toString('hex') + ":" + iv.toString('hex');
+	};
+
+	checkGuildPermissions(id: string | null | undefined, action: "apply_roles_to_worker_owners" | "react_to_transfer"): boolean {
+		if(!id) return false;
+		if(!this.config.filter_actions?.mode) return false
+		if(this.config.filter_actions.mode === "blacklist") {
+			if(!!this.config.filter_actions.apply_filter_to?.[action]) return !this.config.filter_actions.guilds?.includes(id)
+			else return true
+		}
+		if(this.config.filter_actions.mode === "whitelist") {
+			if(!!this.config.filter_actions.apply_filter_to?.[action]) return !!this.config.filter_actions.guilds?.includes(id)
+			else return false
+		}
+		return false
+	}
 }
