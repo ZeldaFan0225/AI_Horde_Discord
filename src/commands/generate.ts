@@ -1,21 +1,15 @@
-import { ActionRowData, AttachmentBuilder, ButtonBuilder, ChannelType, Colors, EmbedBuilder, InteractionButtonComponentData, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
-import { Config } from "../types";
-import {readFileSync} from "fs"
 import { AutocompleteContext } from "../classes/autocompleteContext";
-import Centra from "centra";
-const {buffer2webpbuffer} = require("webp-converter")
-import { appendFileSync } from "fs"
-import StableHorde from "@zeldafan0225/stable_horde";
 
-const config = JSON.parse(readFileSync("./config.json").toString()) as Config
+//const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
 const command_data = new SlashCommandBuilder()
     .setName("generate")
     .setDMPermission(false)
     .setDescription(`Generates an image with stable horde`)
-    if(config.generate?.enabled) {
+    /*if(config.generate?.enabled) {
         command_data.addStringOption(
             new SlashCommandStringOption()
             .setName("prompt")
@@ -170,9 +164,9 @@ const command_data = new SlashCommandBuilder()
                 .setDescription("Whether to share your generation result for research")
             )
         }
-    }
+    }*/
 
-function generateButtons(id: string) {
+/*function generateButtons(id: string) {
     let i = 0
     const getId = () => `followuprate_${i+1}_${id}`
     const components: ActionRowData<InteractionButtonComponentData>[] = []
@@ -188,7 +182,7 @@ function generateButtons(id: string) {
         ++i
     }
     return components
-}
+}*/
 
 export default class extends Command {
     constructor() {
@@ -200,7 +194,8 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
-        if(!ctx.client.config.generate?.enabled) return ctx.error({error: "Generation is disabled."})
+        return ctx.interaction.reply({content: `Coming soon.\nUse ${await ctx.client.getSlashCommandTag("advanced_generate")} for now`, ephemeral: true})
+        /*if(!ctx.client.config.generate?.enabled) return ctx.error({error: "Generation is disabled."})
 
         await ctx.interaction.deferReply({})
         let prompt = ctx.interaction.options.getString("prompt", true)
@@ -513,7 +508,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 await message.edit({content: `Image generation finished`, components, embeds, files});
                 return null
             } 
-        }
+        }*/
     }
 
     override async autocomplete(context: AutocompleteContext): Promise<any> {
