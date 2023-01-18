@@ -39,7 +39,7 @@
             "allow_interrogation": true
         }
     },
-    "generate": {
+    "advanced_generate": {
         "enabled": true,
         "require_login": true,
         "trusted_workers": true,

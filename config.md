@@ -45,7 +45,7 @@ Here you can see an explanation of what which option does
             "allow_interrogation": Allow users to get an interrogation result (BOOLEAN)
         }
     },
-    "generate": {
+    "advanced_generate": {
         "enabled": Whether the generate command is enabled (BOOLEAN),
         "require_login": Set to true if you want the user to log in with their stable horde token (BOOLEAN),
         "trusted_workers": Whether to only use trusted workers (BOOLEAN) *1,
