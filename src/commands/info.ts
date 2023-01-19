@@ -23,7 +23,7 @@ export default class extends Command {
             color: Colors.Blue,
             title: "Stable Horde",
             //TODO: Add more info in the future
-            description: `Find out more about stable horder here:\nhttps://stablehorde.net${article ? `\n\n**Latest News**\n${article.newspiece}\n<t:${Math.round(Number(new Date(article.date_published!))/1000)}>` : ""}`
+            description: `The [Stable Horde](https://stablehorde.net) is a crowdsourced service providing Stable Diffusion for everyone.\nIt is free, open sourced, and relies on volunteer processing power.\n\nIf you enjoy using it, please consider [onboarding your own PC as a worker](https://github.com/db0/AI-Horde-Worker#readme) or supporting its development [on patreon](https://www.patreon.com/db0)${article ? `\n\n**Latest News**\n${article.newspiece}\n<t:${Math.round(Number(new Date(article.date_published!))/1000)}>` : ""}`
         })
         return ctx.interaction.reply({
             embeds: [embed],
