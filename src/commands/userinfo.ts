@@ -76,6 +76,7 @@ Accumulated \`${user_data.kudos_details?.accumulated}\`
 Gifted \`${user_data.kudos_details?.gifted}\`
 Admin \`${user_data.kudos_details?.admin}\`
 Received \`${user_data.kudos_details?.received}\`
+Awarded \`${user_data.kudos_details?.awarded}\`
 Recurring \`${user_data.kudos_details?.recurring}\`
 
 **Workers**
