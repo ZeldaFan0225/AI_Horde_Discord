@@ -45,13 +45,18 @@ export default class extends Modal {
                 else return {success: true, unique_id: transaction.unique_id, from: transaction.from_id, amount: res.transferred}
             })
             const res = await Promise.all(res_promise)
-            ctx.interaction.user.send({
-                embeds: [{
-                    title: "Kudos",
-                    description: `You claimed the following:\n${res.filter(r => r.success).map(r => `<@${r.from}> gifted you **${r.amount}** Kudos`).join("\n") || "none"}\n\nFollowing gifts failed:\n${res.filter(r => !r.success).map(r => `<@${r.from}>: **${r.amount}** Kudos`).join("\n") || "none"}`.slice(0,4000),
-                    color: Colors.Green
-                }]
-            })
+            const embed = {
+                title: "Kudos",
+                description: `You claimed the following:\n${res.filter(r => r.success).map(r => `<@${r.from}> gifted you **${r.amount}** Kudos`).join("\n") || "none"}\n\nFollowing gifts failed:\n${res.filter(r => !r.success).map(r => `<@${r.from}>: **${r.amount}** Kudos`).join("\n") || "none"}`.slice(0,4000),
+                color: Colors.Green
+            }
+            const sent = await ctx.interaction.user.send({
+                embeds: [embed]
+            }).catch(console.error)
+            if(!sent?.id) await ctx.interaction.followUp({
+                ephemeral: true,
+                embeds: [embed]
+            }).catch(console.error)
         }
     }
 }

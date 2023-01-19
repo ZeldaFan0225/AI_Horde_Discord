@@ -29,7 +29,7 @@ export default class extends Modal {
             amount
         }, {token}).catch(e => e)
 
-        if(typeof transfer.name === "string") return ctx.error({error: transfer.name})
+        if(!transfer?.transferred) return ctx.error({error: "Unable to transfer kudos"})
         
         ctx.interaction.reply({
             content: `Transferred ${amount} kudos to ${username}`
