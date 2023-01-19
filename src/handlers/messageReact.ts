@@ -11,10 +11,10 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
     const u = await (user.partial ? user.fetch() : user)
     const r = await (reaction.partial ? reaction.fetch() : reaction)
     const usertoken = await client.getUserToken(u.id, database)
-    if(!r.message.author?.id) return await r.remove()
-    if(r.message.author?.id === user.id || r.message.author?.bot) return await r.remove()
+    if(!r.message.author?.id) return await r.users.remove(u)
+    if(r.message.author?.id === user.id || r.message.author?.bot) return await r.users.remove(u)
     if(!usertoken) {
-        await r.remove()
+        await r.users.remove(u)
         await u.send({
             embeds: [{
                 title: "Gifting Kudos",
@@ -46,14 +46,14 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
                 })
             }
         }
-        return await r.remove();
+        return await r.users.remove(u);
     }
     const target_shuser = await stable_horde_manager.findUser({token: target_usertoken})
-    if(!target_shuser) return await r.remove();
+    if(!target_shuser) return await r.users.remove(u);
     const transfer = await stable_horde_manager.postKudosTransfer({username: target_shuser.username!, amount: emoji.amount ?? 1}, {token: usertoken}).catch(console.error)
 
     if(!transfer?.transferred) {
-        await r.remove();
+        await r.users.remove(u);
         await u.send({
             embeds: [{
                 title: "Gifting Kudos",
