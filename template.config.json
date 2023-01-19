@@ -6,7 +6,11 @@
     ],
     "advanced": {
         "dev": false,
-        "encrypt_token": true
+        "encrypt_token": true,
+        "pre_check_prompts_for_suspicion": {
+            "enabled": false,
+            "timeout_duration": 3600000
+        }
     },
     "filter_actions": {
         "mode": "whitelist",

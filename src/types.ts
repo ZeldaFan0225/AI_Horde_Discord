@@ -92,6 +92,10 @@ export interface Config {
     advanced?: {
         dev?: boolean,
         encrypt_token?: boolean
+        pre_check_prompts_for_suspicion?: {
+            enabled: boolean,
+            timeout_duration?: number
+        }
     },
     filter_actions?: {
         mode?: "whitelist" | "blacklist",

@@ -14,6 +14,7 @@ export class StableHordeClient extends Client {
 	modals: Store<StoreTypes.MODALS>;
     config: Config
 	cache: SuperMap<string, any>
+	timeout_users: SuperMap<string, any>
 	security_key?: Buffer
 	required_permissions: PermissionsBitField
 
@@ -25,6 +26,9 @@ export class StableHordeClient extends Client {
 		this.modals = new Store<StoreTypes.MODALS>({files_folder: "/modals", load_classes_on_init: false, storetype: StoreTypes.MODALS});
         this.config = {}
 		this.cache = new SuperMap({
+			intervalTime: 1000
+		})
+		this.timeout_users = new SuperMap({
 			intervalTime: 1000
 		})
         this.loadConfig()

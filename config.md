@@ -10,6 +10,10 @@ Here you can see an explanation of what which option does
     "advanced": {
         "dev": Whether this instance is for development or not (BOOLEAN) *4,
         "encrypt_token": Encrypt the users token before saving in the database (BOOLEAN) *9
+        "pre_check_prompts_for_suspicion": {
+            "enabled": Check if the prompt the user gave is suspicious and would get your IP banned (BOOLEAN) *10,
+            "timeout_duration": The duration to put the user into timeout for
+        }
     },
     "filter_actions": {
         "mode": The mode on how the guilds list should act ('whitelist' or 'blacklist'),
@@ -148,3 +152,4 @@ Here you can see an explanation of what which option does
 `*7` EXPERIMENTAL OPTION, ENABLE AT YOUR OWN RISK  
 `*8` For example (((test))) will be automatically converted to (test:1.3)  
 `*9` Uses an encryption key only known to you to encrypt the users tokens. This is recommended to increase security. Enabling this option may have an impact on speed.
+`*10` This Option requires a `OPERATOR_API_KEY` to be set in the `.env`

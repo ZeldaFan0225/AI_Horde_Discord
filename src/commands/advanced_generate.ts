@@ -282,6 +282,17 @@ export default class extends Command {
             }
         }
 
+        if(ctx.client.config.advanced?.pre_check_prompts_for_suspicion?.enabled) {
+            if(ctx.client.timeout_users.has(ctx.interaction.user.id)) return ctx.error({error: "Your previous prompt has been marked as suspicious.\nYou have been timed out, try again later."})
+            const filter_result = await ctx.stable_horde_manager.postFilters({
+                prompt
+            }, {token: process.env["OPERATOR_API_KEY"]}).catch(console.error)
+            if(filter_result && Number(filter_result.suspicion) >= 2) {
+                ctx.client.timeout_users.set(ctx.interaction.user.id, ctx.interaction.user.id, (ctx.client.config.advanced.pre_check_prompts_for_suspicion.timeout_duration ?? 1000 * 60 * 60))
+            }
+            if(ctx.client.timeout_users.has(ctx.interaction.user.id)) return ctx.error({error: "Your prompt has been marked as suspicious.\nTherefore you have been timed out!"})
+        }
+
         const post_processing = []
 
         if(gfpgan) post_processing.push(StableHorde.ModelGenerationInputPostProcessingTypes.GFPGAN)

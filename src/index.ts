@@ -82,6 +82,7 @@ client.on("ready", async () => {
     await client.application?.commands.set([...client.commands.createPostBody(), ...client.contexts.createPostBody()]).catch(console.error)
     if((client.config.advanced_generate?.user_restrictions?.amount?.max ?? 4) > 10) throw new Error("More than 10 images are not supported in the bot")
     if(client.config.filter_actions?.guilds?.length && (client.config.filter_actions?.mode !== "whitelist" && client.config.filter_actions?.mode !== "blacklist")) throw new Error("The actions filter mode must be set to either whitelist, blacklist.")
+    if(client.config.advanced?.pre_check_prompts_for_suspicion?.enabled && !process.env["OPERATOR_API_KEY"]) throw new Error("The OPERATOR_API_KEY in the .env is required when pre checking prompts for being suspicious")
 })
 
 client.on("messageReactionAdd", async (r, u) => await handleMessageReact(r as PartialMessageReaction, u as PartialUser, client, connection, stable_horde_manager))
