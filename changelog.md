@@ -1,5 +1,10 @@
 # Changelog
 
+## V2.2.1
+
+- fix bugs
+- add `pre_check_prompts_for_suspicion` function to prevent the bots IP to be banned from the API (requires special access to the api)
+
 ## V2.2.0
 
 - added token encryption
