@@ -44,6 +44,7 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
                         color: Colors.Red
                     }]
                 })
+                return;
             }
         }
         return await r.users.remove(u);
@@ -72,7 +73,14 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
             color: Colors.Green
         }]
     })
-    await r.message.author.send({
+    const res = await r.message.author.send({
+        embeds: [{
+            title: emoji.title ?? "Surprise",
+            description: `**${u.tag}** gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}`,
+            color: Colors.Yellow
+        }]
+    }).catch(console.error)
+    if(!res?.id) await r.message.reply({
         embeds: [{
             title: emoji.title ?? "Surprise",
             description: `**${u.tag}** gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}`,
