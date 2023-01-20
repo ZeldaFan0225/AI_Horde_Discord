@@ -21,7 +21,7 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
                 description: `You tried gifting kudos to ${r.message.author?.tag ?? "somebody"} but you are not logged in.\nTo gift kudos use /login.`,
                 color: Colors.Blue
             }]
-        })
+        }).catch(console.error)
         return;
     }
     const target_usertoken = await client.getUserToken(r.message.author.id, database)

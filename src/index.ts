@@ -85,29 +85,29 @@ client.on("ready", async () => {
     if(client.config.advanced?.pre_check_prompts_for_suspicion?.enabled && !process.env["OPERATOR_API_KEY"]) throw new Error("The OPERATOR_API_KEY in the .env is required when pre checking prompts for being suspicious")
 })
 
-client.on("messageReactionAdd", async (r, u) => await handleMessageReact(r as PartialMessageReaction, u as PartialUser, client, connection, stable_horde_manager))
+client.on("messageReactionAdd", async (r, u) => await handleMessageReact(r as PartialMessageReaction, u as PartialUser, client, connection, stable_horde_manager).catch(console.error))
 
 client.on("interactionCreate", async (interaction) => {
     switch(interaction.type) {
         case InteractionType.ApplicationCommand: {
             switch(interaction.commandType) {
                 case ApplicationCommandType.ChatInput: {
-                    return await handleCommands(interaction, client, connection, stable_horde_manager);
+                    return await handleCommands(interaction, client, connection, stable_horde_manager).catch(console.error);
                 }
                 case ApplicationCommandType.User:
                 case ApplicationCommandType.Message: {
-                    return await handleContexts(interaction, client, connection, stable_horde_manager);
+                    return await handleContexts(interaction, client, connection, stable_horde_manager).catch(console.error);
                 }
             }
         };
         case InteractionType.MessageComponent: {
-			return await handleComponents(interaction, client, connection, stable_horde_manager);
+			return await handleComponents(interaction, client, connection, stable_horde_manager).catch(console.error);
         };
         case InteractionType.ApplicationCommandAutocomplete: {
-			return await handleAutocomplete(interaction, client, connection, stable_horde_manager);
+			return await handleAutocomplete(interaction, client, connection, stable_horde_manager).catch(console.error);
         };
         case InteractionType.ModalSubmit: {
-			return await handleModals(interaction, client, connection, stable_horde_manager);
+			return await handleModals(interaction, client, connection, stable_horde_manager).catch(console.error);
         };
     }
 })
