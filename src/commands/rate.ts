@@ -43,18 +43,16 @@ export default class extends Command {
             label: "Save Token",
             style: 1
         })
-        if(!token) return ctx.interaction.reply({
+        if(!token) return ctx.interaction.editReply({
             content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://stablehorde.net/register`,
-            components: [{type: 1, components: [add_token_button.toJSON()]}],
-            ephemeral: true
+            components: [{type: 1, components: [add_token_button.toJSON()]}]
         })
 
         const user_data = await ctx.stable_horde_manager.findUser({token}).catch(() => null)
 
-        if(!user_data) return ctx.interaction.reply({
+        if(!user_data) return ctx.interaction.editReply({
             content: "Unable to find user for saved token.",
-            components: [{type: 1, components: [add_token_button.toJSON()]}],
-            ephemeral: true
+            components: [{type: 1, components: [add_token_button.toJSON()]}]
         })
 
         const img = await ctx.stable_horde_manager.ratings.getNewRating(undefined, {token}).catch(console.error)
