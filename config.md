@@ -72,6 +72,7 @@ Here you can see an explanation of what which option does
         "convert_a1111_weight_to_horde_weight": Whether to convert a1111 to weighted prompt required by the api (BOOLEAN) *7 *8,
         "improve_loading_time": Try to improve the displaying time between generation finished and generation displayed in discord (BOOLEAN) *7
         "default": {
+            "tiling": Whether the result should be tileable if nothing is specified (BOOLEAN) *1,
             "steps": How many steps to go through by default if nothing is specified (INTEGER) *1,
             "resolution": {
                 "width": The default outputs width (INTEGER) *1,
@@ -129,6 +130,7 @@ Here you can see an explanation of what which option does
             "allow_gfpgan": (BOOLEAN) *1 *5,
             "allow_real_esrgan": (BOOLEAN) *1 *5,
             "allow_seed_variation": (BOOLEAN) *5,
+            "allow_tiling": (BOOLEAN) *5,
             "allow_steps": (BOOLEAN) *5,
             "allow_amount": (BOOLEAN) *5,
             "allow_models": (BOOLEAN) *5,
@@ -147,7 +149,7 @@ Here you can see an explanation of what which option does
 `*2` Available Samplers: k_lms, k_heun, k_euler, k_euler_a, k_dpm_2, k_dpm_2_a, DDIM, PLMS, k_dpm_fast, k_dpm_adaptive, k_dpmpp_2s_a, k_dpmpp_2m, dpmsolver  
 `*3` Not all models are available at all times *1  
 `*4` Developer mode will enable logging and will also show the generations ID in the embed in Discord  
-`*5` This option changes how the /generate command is created. If set to false the user will not have the option to modify this value when generating.  
+`*5` This option changes how the /advanced_generate command is created. If set to false the user will not have the option to modify this value when generating.  
 `*6` This option must be set to false, leaving it blank will default it to true  
 `*7` EXPERIMENTAL OPTION, ENABLE AT YOUR OWN RISK  
 `*8` For example (((test))) will be automatically converted to (test:1.3)  
