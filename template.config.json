@@ -70,6 +70,7 @@
         "convert_a1111_weight_to_horde_weight": false,
         "improve_loading_time": false,
         "default": {
+            "tiling": false,
             "steps": 30,
             "resolution": {
                 "width": 512,
@@ -127,6 +128,7 @@
             "allow_gfpgan": true,
             "allow_real_esrgan": true,
             "allow_seed_variation": true,
+            "allow_tiling": true,
             "allow_steps": true,
             "allow_amount": true,
             "allow_models": true,

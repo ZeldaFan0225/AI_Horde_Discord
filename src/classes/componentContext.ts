@@ -1,19 +1,36 @@
 import {
+    AnySelectMenuInteraction,
     ButtonInteraction,
+    ChannelSelectMenuInteraction,
     Colors,
     ComponentType,
     EmbedBuilder,
+    MentionableSelectMenuInteraction,
     MessageComponentType,
-    SelectMenuInteraction
+    RoleSelectMenuInteraction,
+    StringSelectMenuInteraction,
+    UserSelectMenuInteraction
 } from "discord.js";
 import { BaseContext } from "./baseContext";
 import {ButtonContextInitOptions, SelectMenuContextInitOptions} from "../types";
 
 export class ComponentContext<T extends MessageComponentType> extends BaseContext {
-    override interaction: T extends ComponentType.Button ? ButtonInteraction : SelectMenuInteraction
+    override interaction:   T extends ComponentType.Button ? ButtonInteraction
+                            : T extends ComponentType.ChannelSelect ? ChannelSelectMenuInteraction
+                            : T extends ComponentType.MentionableSelect ? MentionableSelectMenuInteraction
+                            : T extends ComponentType.RoleSelect ? RoleSelectMenuInteraction
+                            : T extends ComponentType.StringSelect ? StringSelectMenuInteraction
+                            : T extends ComponentType.UserSelect ? UserSelectMenuInteraction : AnySelectMenuInteraction
     constructor(options: T extends ComponentType.Button ? ButtonContextInitOptions : SelectMenuContextInitOptions) {
         super(options)
-        this.interaction = options.interaction as (T extends ComponentType.Button ? ButtonInteraction : SelectMenuInteraction)
+        this.interaction = options.interaction as (
+            T extends ComponentType.Button ? ButtonInteraction
+            : T extends ComponentType.ChannelSelect ? ChannelSelectMenuInteraction
+            : T extends ComponentType.MentionableSelect ? MentionableSelectMenuInteraction
+            : T extends ComponentType.RoleSelect ? RoleSelectMenuInteraction
+            : T extends ComponentType.StringSelect ? StringSelectMenuInteraction
+            : T extends ComponentType.UserSelect ? UserSelectMenuInteraction : AnySelectMenuInteraction
+        )
     }
 
     async error(options: { error?: string, ephemeral?: boolean, codeblock?: boolean }) {

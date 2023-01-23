@@ -10,7 +10,7 @@ export class Component {
         this.regex = options.regex
     }
 
-    async run(_context: ComponentContext<ComponentType.Button | ComponentType.SelectMenu>): Promise<any> {
+    async run(_context: ComponentContext<ComponentType.Button | ComponentType.ChannelSelect | ComponentType.RoleSelect | ComponentType.MentionableSelect | ComponentType.StringSelect | ComponentType.UserSelect>): Promise<any> {
         throw new Error("You need to override the base run method")
     }
 }

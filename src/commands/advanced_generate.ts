@@ -133,6 +133,14 @@ const command_data = new SlashCommandBuilder()
                 .setMaxValue(1000)
             )
         }
+        if(config.advanced_generate?.user_restrictions?.allow_tiling) {
+            command_data
+            .addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("tiling")
+                .setDescription("Makes generated image have a seemless transition when stitched together")
+            )
+        }
         if(config.advanced_generate?.user_restrictions?.allow_steps) {
             command_data
             .addIntegerOption(
@@ -210,9 +218,10 @@ export default class extends Command {
         const seed = ctx.interaction.options.getString("seed")
         let height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.advanced_generate?.default?.resolution?.height ?? 512
         let width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.advanced_generate?.default?.resolution?.width ?? 512
-        const gfpgan = !!ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.advanced_generate?.default?.gfpgan
-        const real_esrgan = !!ctx.interaction.options.getBoolean("use_real_esrgan") ?? ctx.client.config.advanced_generate?.default?.real_esrgan
+        const gfpgan = !!(ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.advanced_generate?.default?.gfpgan)
+        const real_esrgan = !!(ctx.interaction.options.getBoolean("use_real_esrgan") ?? ctx.client.config.advanced_generate?.default?.real_esrgan)
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
+        const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.advanced_generate?.default?.tiling)
         const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.advanced_generate?.default?.steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         const model = ctx.interaction.options.getString("model") ?? ctx.client.config.advanced_generate?.default?.model
@@ -309,6 +318,7 @@ export default class extends Command {
                 width,
                 seed_variation,
                 post_processing,
+                tiling,
                 steps,
                 n: amount,
                 denoising_strength: denoise,

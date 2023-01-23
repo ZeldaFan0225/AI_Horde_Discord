@@ -1,12 +1,12 @@
 import StableHorde from "@zeldafan0225/stable_horde";
 import {
+    AnySelectMenuInteraction,
     ApplicationCommandData, AutocompleteInteraction,
     ButtonInteraction,
     ChatInputCommandInteraction,
     Interaction,
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
-    SelectMenuInteraction,
     UserContextMenuCommandInteraction
 } from "discord.js";
 import { Pool } from "pg";
@@ -62,7 +62,7 @@ export interface ButtonContextInitOptions extends BaseContextInitOptions {
 }
 
 export interface SelectMenuContextInitOptions extends BaseContextInitOptions {
-    interaction: SelectMenuInteraction
+    interaction: AnySelectMenuInteraction
 }
 
 export interface ModalContextInitOptions extends BaseContextInitOptions {
@@ -152,6 +152,7 @@ export interface Config {
         improve_loading_time?: boolean,
         convert_a1111_weight_to_horde_weight?: boolean,
         default?: {
+            tiling?: boolean,
             steps?: number,
             resolution?: {
                 width?: number,
@@ -209,6 +210,7 @@ export interface Config {
             allow_gfpgan?: boolean,
             allow_real_esrgan?: boolean,
             allow_seed_variation?: boolean,
+            allow_tiling?: boolean,
             allow_steps?: boolean,
             allow_amount?: boolean,
             allow_models?: boolean,

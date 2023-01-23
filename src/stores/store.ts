@@ -2,13 +2,13 @@ import SuperMap from "@thunder04/supermap";
 import { Command } from "../classes/command";
 import { existsSync, readdirSync } from "fs"
 import {
+    AnySelectMenuInteraction,
     ApplicationCommandData,
     AutocompleteInteraction,
     ButtonInteraction,
     ChatInputCommandInteraction,
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
-    SelectMenuInteraction,
     UserContextMenuCommandInteraction
 } from "discord.js";
 import {join} from "path"
@@ -75,7 +75,7 @@ export class Store <T extends StoreTypes> {
         return command as Context
     }
 
-    async getComponent(interaction: ButtonInteraction | SelectMenuInteraction): Promise<Component> {
+    async getComponent(interaction: ButtonInteraction | AnySelectMenuInteraction): Promise<Component> {
         if(!this.loaded_classes.size) throw new Error("No commands loaded")
         if(this.storetype !== StoreTypes.COMPONENTS) throw new Error("Wrong class type loaded")
 
