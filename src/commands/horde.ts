@@ -3,14 +3,14 @@ import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 
 const command_data = new SlashCommandBuilder()
-    .setName("info")
+    .setName("horde")
     .setDMPermission(false)
     .setDescription(`Shows info on stable horde`)
 
 export default class extends Command {
     constructor() {
         super({
-            name: "info",
+            name: "horde",
             command_data: command_data.toJSON(),
             staff_only: false,
         })
@@ -23,7 +23,7 @@ export default class extends Command {
             color: Colors.Blue,
             title: "Stable Horde",
             //TODO: Add more info in the future
-            description: `The [Stable Horde](https://stablehorde.net) is a crowdsourced service providing Stable Diffusion for everyone.\nIt is free, open sourced, and relies on volunteer processing power.\n\nIf you enjoy using it, please consider [onboarding your own PC as a worker](https://github.com/db0/AI-Horde-Worker#readme) or supporting its development [on patreon](https://www.patreon.com/db0)${article ? `\n\n**Latest News**\n${article.newspiece}\n<t:${Math.round(Number(new Date(article.date_published!))/1000)}>` : ""}\n\nThis bot currently is in ${ctx.client.guilds.cache.size} servers`
+            description: `The [Stable Horde](https://stablehorde.net) is a crowdsourced service providing Stable Diffusion for everyone.\nIt is free, open sourced, and relies on volunteer processing power.\n\nIf you enjoy using it, please consider [onboarding your own PC as a worker](https://github.com/db0/AI-Horde-Worker#readme) or supporting its development [on patreon](https://www.patreon.com/db0)${article ? `\n\n**Latest News**\n${article.newspiece}\n<t:${Math.round(Number(new Date(article.date_published!))/1000)}>` : ""}`
         })
         return ctx.interaction.reply({
             embeds: [embed],

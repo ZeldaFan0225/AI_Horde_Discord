@@ -49,7 +49,6 @@ if(client.config.use_database !== false) {
     }, 1000 * 60 * 60 * 24)
 }
 
-const bot_version = JSON.parse(readFileSync("./package.json", "utf-8")).version
 const stable_horde_manager = new StableHorde({
     default_token: client.config.default_token,
     cache_interval: 1000,
@@ -58,7 +57,7 @@ const stable_horde_manager = new StableHorde({
         performance: 1000 * 10,
         teams: 1000 * 10
     },
-    client_agent: `ZeldaFan-Discord-Bot:${bot_version}:https://github.com/ZeldaFan0225/Stable_Horde_Discord`
+    client_agent: `ZeldaFan-Discord-Bot:${client.bot_version}:https://github.com/ZeldaFan0225/Stable_Horde_Discord`
 })
 
 client.login(process.env["DISCORD_TOKEN"])

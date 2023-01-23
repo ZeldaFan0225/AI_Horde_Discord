@@ -4,8 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "deploy": "npm i && npx tsc -p . && node .",
-    "update": "npm update && npx tsc -p . && node .",
+    "deploy": "node cleanup.js && npm i && npx tsc -p . && node .",
+    "update": "node cleanup.js && npm update && npx tsc -p . && node .",
     "generate-key": "npx tsc -p . && node dist/generate_salt.js"
   },
   "repository": {
@@ -20,7 +20,7 @@
   "homepage": "https://github.com/ZeldaFan0225/Stable_Horde_Discord#readme",
   "dependencies": {
     "@thunder04/supermap": "^3.0.2",
-    "@zeldafan0225/stable_horde": "^2.3.1",
+    "@zeldafan0225/stable_horde": "^2.3.2",
     "centra": "^2.5.0",
     "discord.js": "^14.6.0",
     "pg": "^8.8.0",

@@ -17,6 +17,7 @@ export class StableHordeClient extends Client {
 	timeout_users: SuperMap<string, any>
 	security_key?: Buffer
 	required_permissions: PermissionsBitField
+	bot_version: string
 
 	constructor(options: ClientOptions) {
 		super(options);
@@ -42,6 +43,8 @@ export class StableHordeClient extends Client {
 			PermissionFlagsBits.ManageRoles |
 			PermissionFlagsBits.UseExternalEmojis
 		)
+
+		this.bot_version = JSON.parse(readFileSync("./package.json", "utf-8")).version
 	}
 
     loadConfig() {
