@@ -77,6 +77,7 @@
                 "height": 512
             },
             "cfg": 7,
+            "amount": 1,
             "sampler": "k_euler",
             "model": "stable_diffusion",
             "denoise": 50,
@@ -136,6 +137,36 @@
             "allow_denoise": true,
             "allow_nsfw": true,
             "allow_karras": true,
+            "allow_sharing": true,
+            "allow_rating": true
+        }
+    },
+    "generate": {
+        "enabled": true,
+        "require_login": true,
+        "trusted_workers": true,
+        "censor_nsfw": true,
+        "blacklisted_styles": [],
+        "blacklisted_words": [],
+        "update_generation_status_interval_seconds": 5,
+        "convert_a1111_weight_to_horde_weight": true,
+        "improve_loading_time": false,
+        "styles_source": "https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/styles.json",
+        "default": {
+            "tiling": false,
+            "amount": 1,
+            "share": false,
+            "style": "raw"
+        },
+        "user_restrictions": {
+            "amount": {
+                "max": 4
+            },
+            "allow_negative_prompt": true,
+            "allow_style": true,
+            "allow_tiling": true,
+            "allow_amount": true,
+            "allow_nsfw": false,
             "allow_sharing": true,
             "allow_rating": true
         }

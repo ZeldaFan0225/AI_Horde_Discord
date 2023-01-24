@@ -1,162 +1,61 @@
-import { SlashCommandBuilder } from "discord.js";
+import { ActionRowData, AttachmentBuilder, ButtonBuilder, Colors, EmbedBuilder, InteractionButtonComponentData, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 import { AutocompleteContext } from "../classes/autocompleteContext";
+import { readFileSync, appendFileSync } from "fs";
+import { Config } from "../types";
+import StableHorde from "@zeldafan0225/stable_horde";
+import Centra from "centra";
 
-//const config = JSON.parse(readFileSync("./config.json").toString()) as Config
+const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
 const command_data = new SlashCommandBuilder()
     .setName("generate")
     .setDMPermission(false)
     .setDescription(`Generates an image with stable horde`)
-    /*if(config.advanced_generate?.enabled) {
+    if(config.generate?.enabled) {
         command_data.addStringOption(
             new SlashCommandStringOption()
             .setName("prompt")
             .setDescription("The prompt to generate an image with")
             .setRequired(true)
         )
-        if(config.advanced_generate?.user_restrictions?.allow_img2img) {
-            command_data
-            .addAttachmentOption(
-                new SlashCommandAttachmentOption()
-                .setName("img2img")
-                .setDescription("The image to use for img2img; max: 3072px")
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_img2img) {
-            command_data
-            .addBooleanOption(
-                new SlashCommandBooleanOption()
-                .setName("keep_original_ratio")
-                .setDescription("Whether to keep the aspect ratio and image size of the original image")
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_karras) {
-            command_data
-            .addBooleanOption(
-                new SlashCommandBooleanOption()
-                .setName("karras")
-                .setDescription("Set to True to enable karras noise scheduling tweaks")
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_sampler) {
-            command_data
-            .addStringOption(
+        if(config.generate?.user_restrictions?.allow_negative_prompt) {
+            command_data.addStringOption(
                 new SlashCommandStringOption()
-                .setName("sampler")
-                .setDescription("The sampler to use")
-                .setChoices(
-                    ...Object.keys(StableHorde.ModelGenerationInputStableSamplers).map(k => ({name: k, value: k}))
-                )
+                .setName("negative_prompt")
+                .setDescription("The negative prompt to generate an image with")
+                .setRequired(false)
             )
         }
-        if(config.advanced_generate?.user_restrictions?.allow_cfg) {
-            command_data
-            .addIntegerOption(
-                new SlashCommandIntegerOption()
-                .setName("cfg")
-                .setDescription("How strictly to follow the given prompt")
-                .setMinValue(config.advanced_generate?.user_restrictions.cfg?.min ?? -40)
-                .setMaxValue(config.advanced_generate?.user_restrictions.cfg?.max ?? 30)
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_denoise) {
-            command_data
-            .addIntegerOption(
-                new SlashCommandIntegerOption()
-                .setName("denoise")
-                .setDescription("How much to denoise in %")
-                .setMinValue(config.advanced_generate?.user_restrictions?.denoise?.min ?? 0)
-                .setMaxValue(config.advanced_generate?.user_restrictions?.denoise?.max ?? 100)
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_seed) {
-            command_data
-            .addStringOption(
+        if(config.generate?.user_restrictions?.allow_style) {
+            command_data.addStringOption(
                 new SlashCommandStringOption()
-                .setName("seed")
-                .setDescription("The seed to use")
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.height) {
-            command_data
-            .addIntegerOption(
-                new SlashCommandIntegerOption()
-                .setName("height")
-                .setDescription("The height of the result image")
-                .setMinValue(config.advanced_generate?.user_restrictions?.height?.min ?? 64)
-                .setMaxValue(config.advanced_generate?.user_restrictions?.height?.max ?? 3072)
+                .setName("style")
+                .setDescription("The style for this image")
+                .setRequired(false)
                 .setAutocomplete(true)
             )
         }
-        if(config.advanced_generate?.user_restrictions?.allow_width) {
-            command_data
-            .addIntegerOption(
-                new SlashCommandIntegerOption()
-                .setName("width")
-                .setDescription("How width of the result image")
-                .setMinValue(config.advanced_generate?.user_restrictions?.width?.min ?? 64)
-                .setMaxValue(config.advanced_generate?.user_restrictions?.width?.max ?? 3072)
-                .setAutocomplete(true)
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_gfpgan) {
-            command_data
-            .addBooleanOption(
-                new SlashCommandBooleanOption()
-                .setName("use_gfpgan")
-                .setDescription("Whether to use GFPGAN post processing")
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_real_esrgan) {
-            command_data
-            .addBooleanOption(
-                new SlashCommandBooleanOption()
-                .setName("use_real_esrgan")
-                .setDescription("Whether to use RealESRGAN_x4plus post processing")
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_seed_variation) {
-            command_data
-            .addIntegerOption(
-                new SlashCommandIntegerOption()
-                .setName("seed_variation")
-                .setDescription("(amount needs to be provided) increment for the seed on each image")
-                .setMinValue(1)
-                .setMaxValue(1000)
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_steps) {
-            command_data
-            .addIntegerOption(
-                new SlashCommandIntegerOption()
-                .setName("steps")
-                .setDescription("How many steps to go though while creating the image")
-                .setMinValue(config.advanced_generate?.user_restrictions?.steps?.min ?? 1)
-                .setMaxValue(config.advanced_generate?.user_restrictions?.steps?.max ?? 500)
-            )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_amount) {
+        if(config.generate?.user_restrictions?.allow_amount) {
             command_data
             .addIntegerOption(
                 new SlashCommandIntegerOption()
                 .setName("amount")
                 .setDescription("How many images to generate")
                 .setMinValue(1)
-                .setMaxValue(config.advanced_generate?.user_restrictions?.amount?.max ?? 4)
+                .setMaxValue(config.generate?.user_restrictions?.amount?.max ?? 4)
             )
         }
-        if(config.advanced_generate?.user_restrictions?.allow_models) {
+        if(config.generate?.user_restrictions?.allow_tiling) {
             command_data
-            .addStringOption(
-                new SlashCommandStringOption()
-                .setName("model")
-                .setDescription("The model to use for this generation")
-                .setAutocomplete(true)
+            .addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("tiling")
+                .setDescription("Makes generated image have a seemless transition when stitched together")
             )
         }
-        if(config.advanced_generate?.user_restrictions?.allow_sharing) {
+        if(config.generate?.user_restrictions?.allow_sharing) {
             command_data
             .addBooleanOption(
                 new SlashCommandBooleanOption()
@@ -164,9 +63,9 @@ const command_data = new SlashCommandBuilder()
                 .setDescription("Whether to share your generation result for research")
             )
         }
-    }*/
+    }
 
-/*function generateButtons(id: string) {
+function generateButtons(id: string) {
     let i = 0
     const getId = () => `followuprate_${i+1}_${id}`
     const components: ActionRowData<InteractionButtonComponentData>[] = []
@@ -182,7 +81,7 @@ const command_data = new SlashCommandBuilder()
         ++i
     }
     return components
-}*/
+}
 
 export default class extends Command {
     constructor() {
@@ -194,58 +93,29 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
-        return ctx.interaction.reply({content: `Coming soon.\nUse ${await ctx.client.getSlashCommandTag("advanced_generate")} for now`, ephemeral: true})
-        /*if(!ctx.client.config.advanced_generate?.enabled) return ctx.error({error: "Generation is disabled."})
+        //return ctx.interaction.reply({content: `Coming soon.\nUse ${await ctx.client.getSlashCommandTag("generate")} for now`, ephemeral: true})
+        if(!ctx.client.config.generate?.enabled) return ctx.error({error: "Generation is disabled."})
 
         await ctx.interaction.deferReply({})
         let prompt = ctx.interaction.options.getString("prompt", true)
-        const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.advanced_generate?.default?.sampler ?? StableHorde.ModelGenerationInputStableSamplers.k_euler) as any
-        const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.advanced_generate?.default?.cfg ?? 5
-        const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.advanced_generate?.default?.denoise ?? 50)/100
-        const seed = ctx.interaction.options.getString("seed")
-        let height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.advanced_generate?.default?.resolution?.height ?? 512
-        let width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.advanced_generate?.default?.resolution?.width ?? 512
-        const gfpgan = !!ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.advanced_generate?.default?.gfpgan
-        const real_esrgan = !!ctx.interaction.options.getBoolean("use_real_esrgan") ?? ctx.client.config.advanced_generate?.default?.real_esrgan
-        const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
-        const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.advanced_generate?.default?.steps ?? 30
+        const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
+        const style_raw = ctx.interaction.options.getString("style") ?? ctx.client.config.generate?.default?.style ?? "raw"
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
-        const model = ctx.interaction.options.getString("model") ?? ctx.client.config.advanced_generate?.default?.model
-        const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? true
-        const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.advanced_generate?.default?.karras ?? false
-        const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.advanced_generate?.default?.share
-        let img = ctx.interaction.options.getAttachment("img2img")
+        const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.generate?.default?.tiling)
+        const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.generate?.default?.share
 
-        const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
-        const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
-        const can_bypass = ctx.client.config.advanced_generate?.img2img?.whitelist?.bypass_checks && ctx.client.config.advanced_generate?.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
+        const style = ctx.client.horde_styles[style_raw.toLowerCase()]
 
-        if(ctx.client.config.advanced_generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
-        if(ctx.client.config.advanced_generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
-        if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
-        if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
-        if(model && ctx.client.config.advanced_generate?.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
-        if(model && model !== "YOLO" && !(await ctx.stable_horde_manager.getModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
-        if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use img2img`, codeblock: false})
-        if(img && ctx.client.config.advanced_generate?.img2img?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
-        if(img && !can_bypass && ctx.client.config.advanced_generate?.img2img?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use img2img"})
-        if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Image to Image input must be a image"})
-        if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Image to Image input too large (max. 3072 x 3072)"})
-        if(img && !can_bypass && !ctx.client.config?.advanced_generate?.img2img?.allow_non_webp && img.contentType !== "image/webp") return ctx.error({error: "You can only upload webp for img2img"})
-        if(img && ctx.client.config.advanced_generate?.img2img?.whitelist?.only_allow_whitelist && !ctx.client.config.advanced_generate?.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)) return ctx.error({error: "You are not whitelisted to use img2img"})
-
-        if(keep_ratio && img?.width && img?.height) {
-            const ratio = img?.width/img?.height
-            const largest = ratio >= 1 ? img.width : img.height
-            const m = largest > 3072 ? 3072/largest : 1
-            const mod_height = Math.round(img.height*m)
-            const mod_width = Math.round(img.width*m)
-            height = mod_height%64 <= 32 ? mod_height-(mod_height%64) : mod_height+(64-(mod_height%64))
-            width = mod_width%64 <= 32 ? mod_width-(mod_width%64) : mod_width+(64-(mod_width%64))
+        if(ctx.client.config.advanced?.dev) {
+            console.log(style)
         }
 
-        height = ctx.interaction.options.getInteger("height") ?? height
-        width = ctx.interaction.options.getInteger("width") ?? width
+        const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
+
+        if(!style?.prompt?.length) return ctx.error({error: "Unable to find style for input"})
+        if(ctx.client.config.generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
+        if(ctx.client.config.generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
+        if(ctx.client.config.generate?.blacklisted_styles?.includes(style_raw.toLowerCase())) return ctx.error({error: "The chosen style is blacklisted"})
 
         if(ctx.client.config.generate.convert_a1111_weight_to_horde_weight) {
             prompt = prompt.replace(/(\(+|\[+)|(\)+|\]+)/g, (w) => {
@@ -255,54 +125,24 @@ export default class extends Command {
             })
         }
         
-        if(ctx.client.config.advanced?.dev) {
-            console.log(img?.height)
-            console.log(img?.width)
-            console.log(height)
-            console.log(width)
-        }
+        prompt = style.prompt.slice().replace("{p}", prompt)
+        prompt = prompt.replace("{np}", prompt.includes("###") ? negative_prompt : `###${negative_prompt}`)
 
         const token = user_token || ctx.client.config.default_token || "0000000000"
-        let img_data: Buffer | undefined
-        if(img) {
-            let img_data_res = await Centra(img.url, "GET")
-                .send()
-            
-            if(img.contentType === "image/webp") img_data = img_data_res.body
-            else {
-                img_data = await buffer2webpbuffer(img_data_res.body, img.contentType?.replace("image/",""),"-q 80").catch((e: Error) => ctx.client.config.advanced?.dev ? console.error(e) : null)
-                if(!img_data) return ctx.error({
-                    error: "Image format conversion to webp failed"
-                })
-            }
-        }
-
-        const post_processing = []
-
-        if(gfpgan) post_processing.push(StableHorde.ModelGenerationInputPostProcessingTypes.GFPGAN)
-        if(real_esrgan) post_processing.push(StableHorde.ModelGenerationInputPostProcessingTypes.RealESRGAN_x4plus)
 
         const generation_data: StableHorde.GenerationInput = {
             prompt,
             params: {
-                sampler_name: sampler,
-                cfg_scale: cfg,
-                seed: seed ?? undefined,
-                height,
-                width,
-                seed_variation,
-                post_processing,
-                steps,
+                sampler_name: style.sampler_name as typeof StableHorde.ModelGenerationInputStableSamplers[keyof typeof StableHorde.ModelGenerationInputStableSamplers],
+                height: style.height,
+                width: style.width,
                 n: amount,
-                denoising_strength: denoise,
-                karras
+                tiling
             },
-            nsfw: ctx.client.config.advanced_generate?.user_restrictions?.allow_nsfw,
-            censor_nsfw: ctx.client.config.advanced_generate?.censor_nsfw,
-            trusted_workers: ctx.client.config.advanced_generate?.trusted_workers,
-            workers: ctx.client.config.advanced_generate?.workers,
-            models: !model ? undefined : model === "YOLO" ? [] : [model],
-            source_image: img_data?.toString("base64"),
+            nsfw: ctx.client.config.generate?.user_restrictions?.allow_nsfw,
+            censor_nsfw: ctx.client.config.generate?.censor_nsfw,
+            trusted_workers: ctx.client.config.generate?.trusted_workers,
+            models: style.model ? [style.model] : undefined,
             r2: true,
             shared: share_result
         }
@@ -324,22 +164,19 @@ export default class extends Command {
 
 
         if (ctx.client.config.logs?.enabled) {
-            if (ctx.client.config.logs.log_actions?.img2img && img) {
-                if (ctx.client.config.logs.plain) logGeneration("txt");
-                if (ctx.client.config.logs.csv) logGeneration("csv");
-            } else if(ctx.client.config.logs.log_actions?.non_img2img && !img) {
+            if(ctx.client.config.logs.log_actions?.non_img2img) {
                 if (ctx.client.config.logs.plain) logGeneration("txt");
                 if (ctx.client.config.logs.csv) logGeneration("csv");
             }
             function logGeneration(type: "txt" | "csv") {
                 ctx.client.initLogDir();
                 const log_dir = ctx.client.config.logs?.directory ?? "/logs";
-                const content = type === "csv" ? `\n${new Date().toISOString()},${ctx.interaction.user.id},${generation_start?.id},${!!img},"${prompt}"` : `\n${new Date().toISOString()} | ${ctx.interaction.user.id}${" ".repeat(20 - ctx.interaction.user.id.length)} | ${generation_start?.id} | ${!!img}${" ".repeat(img ? 10 : 9)} | ${prompt}`;
+                const content = type === "csv" ? `\n${new Date().toISOString()},${ctx.interaction.user.id},${generation_start?.id},${false},"${prompt}"` : `\n${new Date().toISOString()} | ${ctx.interaction.user.id}${" ".repeat(20 - ctx.interaction.user.id.length)} | ${generation_start?.id} | ${false}${" ".repeat(9)} | ${prompt}`;
                 appendFileSync(`${process.cwd()}${log_dir}/logs_${new Date().getMonth() + 1}-${new Date().getFullYear()}.${type}`, content);
             }
         }
 
-        if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " img2img":""} with prompt "${prompt}" (${generation_start?.id})`)
+        if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated with prompt "${prompt}" (${generation_start?.id})`)
 
         const start_status = await ctx.stable_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const start_horde_data = await ctx.stable_horde_manager.getPerformance()
@@ -397,7 +234,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
 
         let done = false
 
-        if(ctx.client.config.advanced_generate?.improve_loading_time && (start_status?.wait_time ?? 0) <= 3) {
+        if(ctx.client.config.generate?.improve_loading_time && (start_status?.wait_time ?? 0) <= 3) {
             // wait before starting the loop so that the first iteration can already pick up the result
             const pre_test = await new Promise((resolve) => setTimeout(async () => {resolve(await getCheckAndDisplayResult())},((start_status?.wait_time ?? 0) + 0.1) * 1000))
             if(!pre_test) return;
@@ -407,7 +244,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
             const d = await getCheckAndDisplayResult()
             if(!d) return;
             const {status, horde_data} = d
-            if(ctx.client.config.advanced_generate?.improve_loading_time && (status.wait_time ?? 0) <= 3) {
+            if(ctx.client.config.generate?.improve_loading_time && (status.wait_time ?? 0) <= 3) {
                 // try to display result faster
                 setTimeout(async () => {await getCheckAndDisplayResult()},((start_status?.wait_time ?? 0) + 0.1) * 1000)
             }
@@ -460,7 +297,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 embeds,
                 components
             })
-        }, 1000 * (ctx.client.config?.advanced_generate?.update_generation_status_interval_seconds || 5))
+        }, 1000 * (ctx.client.config?.generate?.update_generation_status_interval_seconds || 5))
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
             if(done) return;
@@ -489,9 +326,8 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                         title: `Image ${i+1}`,
                         image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
                         color: Colors.Blue,
-                        description: `**Seed:** ${g.seed}\n**Model:** ${g.model}\n**Generated by** ${g.worker_name}\n(\`${g.worker_id}\`)${!i ? `\n**Prompt:** ${prompt}\n**Total Kudos Cost:** \`${images.kudos}\`${(generation_data.params?.n ?? 1) > 1 ? ` (\`${(images.kudos ?? 0)*(generation_data.params?.n ?? 1)}\` total)` : ""}` : ""}${ctx.client.config.advanced?.dev ? `\n\n**ID** ${g.id}` : ""}`,
+                        description: `${!i ? `**Raw Prompt:** ${ctx.interaction.options.getString("prompt", true)}\n**Processed Prompt:** ${prompt}\n**Style:** ${style_raw}\n**Total Kudos Cost:** \`${images.kudos}\`` : ""}${ctx.client.config.advanced?.dev ? `\n\n**ID** ${g.id}` : ""}` || undefined,
                     })
-                    if(img_data) embed.setThumbnail(`attachment://original.webp`)
                     return {attachment, embed}
                 }) || []
                 if(!precheck) clearInterval(inter)
@@ -500,31 +336,24 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const embeds = image_map.map(i => i.embed)
                 if(ctx.client.config.advanced?.dev) embeds.at(-1)?.setFooter({text: `ID ${generation_start!.id}`})
                 const files = image_map.map(i => i.attachment)
-                if(img_data) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
                 let components = [{type: 1, components: [delete_btn]}]
-                if(ctx.client.config.advanced_generate?.user_restrictions?.allow_rating && (generation_data.shared ?? true) && files.length === 1) {
+                if(ctx.client.config.generate?.user_restrictions?.allow_rating && (generation_data.shared ?? true) && files.length === 1) {
                     components = [...generateButtons(generation_start!.id!), ...components]
                 }
                 await message.edit({content: `Image generation finished`, components, embeds, files});
                 return null
             } 
-        }*/
+        }
     }
 
     override async autocomplete(context: AutocompleteContext): Promise<any> {
         const option = context.interaction.options.getFocused(true)
         switch(option.name) {
-            case "model": {
-                const models = await context.stable_horde_manager.getModels()
-                if(context.client.config.advanced?.dev) console.log(models)
-                const available = [{name: "Any Model", value: "YOLO"}, ...models.sort((a, b) => b.performance!-a.performance!).map(m => ({name: `${m.name} | Workers: ${m.count} | Performance: ${m.performance} | Queued: ${m.queued}`, value: m.name!}))].filter(v => !context.client.config.advanced_generate?.blacklisted_models?.includes(v.value)).filter(v => !option.value || v.name.toLowerCase().includes(option.value.toLowerCase()))
-                return await context.interaction.respond(available.filter(o => o.name?.toLowerCase().includes(option.value.toLowerCase())).slice(0,25))
-            }
-            case "width":
-            case "height": {
-                const steps = Array.from({length: 3072/64}).map((_, i) => ({name: `${(i+1)*64}px${(i+1)*64 > 1024 ? " (Requires Kudos upfront)" : ""}`, value: (i+1)*64})).filter(v => v.value >= (context.client.config.advanced_generate?.user_restrictions?.height?.min ?? 64) && v.value <= (context.client.config.advanced_generate?.user_restrictions?.height?.max ?? 3072))
-                const inp = context.interaction.options.getFocused(true)
-                return await context.interaction.respond(steps.filter((v) => !inp.value || v.name.includes(inp.value)).slice(0,25))
+            case "style": {
+                const styles = Object.keys(context.client.horde_styles)
+                const available = styles.map(s => ({name: s, value: s}))
+                const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase())) : available
+                return await context.interaction.respond(ret.slice(0,25))
             }
         }
     }

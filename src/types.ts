@@ -159,6 +159,7 @@ export interface Config {
                 height?: number
             },
             cfg?: number,
+            amount?: number,
             sampler?: typeof StableHorde.ModelGenerationInputStableSamplers,
             model?: string,
             denoise?: number,
@@ -218,6 +219,36 @@ export interface Config {
             allow_img2img?: boolean,
             allow_denoise?: boolean,
             allow_karras?: boolean,
+            allow_sharing?: boolean,
+            allow_rating?: boolean
+        }
+    },
+    generate?: {
+        enabled?: boolean,
+        require_login?: boolean,
+        trusted_workers?: boolean,
+        censor_nsfw?: boolean,
+        blacklisted_words?: string[],
+        blacklisted_styles?: string[],
+        update_generation_status_interval_seconds?: number,
+        improve_loading_time?: boolean,
+        convert_a1111_weight_to_horde_weight?: boolean,
+        styles_source?: string
+        default?: {
+            tiling?: boolean,
+            amount?: number,
+            share?: boolean,
+            style?: string
+        },
+        user_restrictions?: {
+            amount?: {
+                max?: number
+            },
+            allow_negative_prompt: boolean,
+            allow_style: boolean,
+            allow_tiling?: boolean,
+            allow_amount?: boolean,
+            allow_nsfw?: boolean,
             allow_sharing?: boolean,
             allow_rating?: boolean
         }
