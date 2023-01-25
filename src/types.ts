@@ -89,6 +89,7 @@ export interface Config {
     use_database?: boolean,
     default_token?: string,
     apply_roles_to_worker_owners?: string[],
+    apply_roles_to_trusted_users?: string[],
     advanced?: {
         dev?: boolean,
         encrypt_token?: boolean
@@ -102,7 +103,8 @@ export interface Config {
         guilds?: string[],
         apply_filter_to?: {
             react_to_transfer?: boolean,
-            apply_roles_to_worker_owners?: boolean
+            apply_roles_to_worker_owners?: boolean,
+            apply_roles_to_trusted_users?: boolean
         }
     },
     react_to_transfer?: {

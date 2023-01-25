@@ -1,4 +1,4 @@
-import { Colors, GuildMember, TextInputModalData } from "discord.js";
+import { Colors, TextInputModalData } from "discord.js";
 import { Modal } from "../classes/modal";
 import { ModalContext } from "../classes/modalContext";
 
@@ -23,9 +23,14 @@ export default class extends Modal {
             })
         }
         const user_data = await ctx.stable_horde_manager.findUser({token: raw_token}).catch(() => null)
-        if(user_data?.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length && ctx.interaction.inCachedGuild() && ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_worker_owners")) {
-            if(ctx.interaction.member?.roles && ctx.client.config.apply_roles_to_worker_owners.some(r => !(ctx.interaction.member as GuildMember).roles.cache.has(r)))
-                await ctx.interaction.member.roles.add(ctx.client.config.apply_roles_to_worker_owners).catch(console.error)
+        if(ctx.interaction.inCachedGuild()) {
+            const member = ctx.interaction.member
+            let apply_roles = []
+            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_worker_owners") && user_data?.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length) apply_roles.push(...ctx.client.config.apply_roles_to_worker_owners)
+            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_trusted_users") && user_data?.trusted && ctx.client.config.apply_roles_to_trusted_users?.length) apply_roles.push(...ctx.client.config.apply_roles_to_trusted_users)
+    
+            apply_roles = apply_roles.filter(r => !member?.roles.cache.has(r))
+            if(apply_roles.length) await member?.roles.add(apply_roles).catch(console.error)
         }
         if(!user_data) return ctx.error({error: "Unable to find user with this token!"})
         const token = ctx.client.config.advanced?.encrypt_token ? ctx.client.encryptString(raw_token) : raw_token

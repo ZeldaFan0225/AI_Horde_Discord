@@ -7,6 +7,7 @@ Here you can see an explanation of what which option does
     "use_database": Set to false if you do not want to use a database *6,
     "default_token": The default token to use for requests if user is not logged in (STRING; recommended default: "0000000000"),
     "apply_roles_to_worker_owners": Roles to apply if the user has a worker running (ARRAY OF ROLE IDS),
+    "apply_roles_to_trusted_users": Roles to apply if the useris trusted (ARRAY OF ROLE IDS),
     "advanced": {
         "dev": Whether this instance is for development or not (BOOLEAN) *4,
         "encrypt_token": Encrypt the users token before saving in the database (BOOLEAN) *9
@@ -20,7 +21,8 @@ Here you can see an explanation of what which option does
         "guilds": The list of guilds to apply the filters to (ARRAY OF GUILD IDS),
         "apply_filter_to": {
             "react_to_transfer": Whether to apply the filter to this action (BOOLEAN),
-            "apply_roles_to_worker_owners": Whether to apply the filter to this action (BOOLEAN)
+            "apply_roles_to_worker_owners": Whether to apply the filter to this action (BOOLEAN),
+            "apply_roles_to_trusted_users": Whether to apply the filter to this action (BOOLEAN)
         }
     },
     "react_to_transfer": {

@@ -1,6 +1,6 @@
 {
   "name": "zeldafan_discord_bot",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {

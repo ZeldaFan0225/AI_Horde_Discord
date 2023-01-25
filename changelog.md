@@ -1,9 +1,17 @@
 # Changelog
 
+## V2.3.1
+
+- rename /generate to /advanced_generate
+- add /generate as a simpler and easier way to generate images
+- add apply_roles_to_trusted_users
+
+
 ## V2.2.1
 
 - fix bugs
 - add `pre_check_prompts_for_suspicion` function to prevent the bots IP to be banned from the API (requires special access to the api)
+
 
 ## V2.2.0
 

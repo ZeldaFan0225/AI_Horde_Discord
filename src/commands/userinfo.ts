@@ -47,11 +47,17 @@ export default class extends Command {
 
         const user_data = await ctx.stable_horde_manager.findUser({token}).catch(() => null)
         
-        if(user_data?.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length && ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_worker_owners")) {
-            const member = await ctx.interaction.guild?.members.fetch(user).catch(console.error)
-            if(member?.roles && ctx.client.config.apply_roles_to_worker_owners.some(r => !member.roles.cache.has(r)))
-                await member.roles.add(ctx.client.config.apply_roles_to_worker_owners).catch(console.error)
+
+        const member = await ctx.interaction.guild?.members.fetch(user).catch(console.error)
+        if(member) {
+            let apply_roles = []
+            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_worker_owners") && user_data?.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length) apply_roles.push(...ctx.client.config.apply_roles_to_worker_owners)
+            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_trusted_users") && user_data?.trusted && ctx.client.config.apply_roles_to_trusted_users?.length) apply_roles.push(...ctx.client.config.apply_roles_to_trusted_users)
+    
+            apply_roles = apply_roles.filter(r => !member?.roles.cache.has(r))
+            if(apply_roles.length) await member?.roles.add(apply_roles).catch(console.error)
         }
+
 
         if(!user_data) return ctx.error({
             error: `Unable to find user for saved token.\nUpdate your token with ${await ctx.client.getSlashCommandTag("updatetoken")}`,

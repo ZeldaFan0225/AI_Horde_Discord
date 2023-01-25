@@ -4,6 +4,9 @@
     "apply_roles_to_worker_owners": [
 
     ],
+    "apply_roles_to_trusted_users": [
+
+    ],
     "advanced": {
         "dev": false,
         "encrypt_token": true,
@@ -19,7 +22,8 @@
         ],
         "apply_filter_to": {
             "react_to_transfer": true,
-            "apply_roles_to_worker_owners": true
+            "apply_roles_to_worker_owners": true,
+            "apply_roles_to_trusted_users": true
         }
     },
     "react_to_transfer": {
