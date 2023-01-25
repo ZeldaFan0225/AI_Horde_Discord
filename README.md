@@ -6,8 +6,6 @@ A basic Discord bot to generate images using the Stable Horde API.
 YOU DO NOT HAVE PERMISSION TO USE THIS BOT COMMERCIALLLY OR USE THIS CODE IN FORM OF A PUBLIC DISCORD BOT WHICH CAN BE INVITED BY ANY DISCORD USER
 YOU HAVE PERMISSION TO USE THIS BOT IN YOUR OWN DISCORD SERVER THROUGH A BOT ACCOUNT WHICH IS SET TO PRIVATE
 
-You can support me and my projects on [Ko-Fi](https://ko-fi.com/slashbot)
-
 ## Features
 
 This package includes the code for a discord bot which interacts with the stable horde api.
