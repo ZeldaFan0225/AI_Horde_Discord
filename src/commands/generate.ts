@@ -126,7 +126,7 @@ export default class extends Command {
         }
         
         prompt = style.prompt.slice().replace("{p}", prompt)
-        prompt = prompt.replace("{np}", prompt.includes("###") ? negative_prompt : `###${negative_prompt}`)
+        prompt = prompt.replace("{np}", !negative_prompt || prompt.includes("###") ? negative_prompt : `###${negative_prompt}`)
 
         const token = user_token || ctx.client.config.default_token || "0000000000"
 
