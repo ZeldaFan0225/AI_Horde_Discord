@@ -1,5 +1,9 @@
 # Changelog
 
+## V2.3.2
+
+- add ability to gift kudos on /generate and /advanced_generate result messages
+
 ## V2.3.1
 
 - rename /generate to /advanced_generate
