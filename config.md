@@ -44,8 +44,8 @@ Here you can see an explanation of what which option does
         "plain": Set to true if you want to have logs in the form of a .TXT file (BOOLEAN),
         "csv": Set to true if you want to have logs in the form of a .CSV file (BOOLEAN),
         "log_actions": {
-            "non_img2img": Set to true if you want to log generations without image to image (BOOLEAN),
-            "img2img": Set to true if you want to log generations with image to image (BOOLEAN)
+            "without_source_image": Set to true if you want to log generations without image to image (BOOLEAN),
+            "with_source_image": Set to true if you want to log generations with image to image (BOOLEAN)
         }
     },
     "interrogate": {
@@ -90,7 +90,7 @@ Here you can see an explanation of what which option does
             "karras:" The default for karras (BOOLEAN) *1,
             "share:" The default for sharing the result (BOOLEAN) *1,
         },
-        "img2img": {
+        "source_image": {
             "require_login": Whether the user has to be logged in to use image to image (BOOLEAN),
             "require_stable_horde_account_oauth_connection": Whether the user has to have a stable horde account with an oauth connection (e.g. Discord) (BOOLEAN),
             "allow_non_webp": Whether to allow other image formats other than webp (BOOLEAN),
@@ -137,7 +137,7 @@ Here you can see an explanation of what which option does
             "allow_steps": (BOOLEAN) *5,
             "allow_amount": (BOOLEAN) *5,
             "allow_models": (BOOLEAN) *5,
-            "allow_img2img": (BOOLEAN) *5,
+            "allow_source_image": (BOOLEAN) *5,
             "allow_denoise": (BOOLEAN) *5,
             "allow_karras": (BOOLEAN) * 5,
             "allow_nsfw": Set to true if you want to allow NSFW image generation for your users (BOOLEAN),

@@ -93,7 +93,7 @@ export default class extends Modal {
         }
         
         if (ctx.client.config.logs?.enabled) {
-            if (ctx.client.config.logs.log_actions?.img2img) {
+            if (ctx.client.config.logs.log_actions?.with_source_image) {
                 if (ctx.client.config.logs.plain) logGeneration("txt");
                 if (ctx.client.config.logs.csv) logGeneration("csv");
             }

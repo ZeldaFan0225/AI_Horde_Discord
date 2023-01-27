@@ -44,8 +44,8 @@
         "plain": true,
         "csv": true,
         "log_actions": {
-            "non_img2img": true,
-            "img2img": true
+            "without_source_image": true,
+            "with_source_image": true
         }
     },
     "interrogate": {
@@ -90,7 +90,7 @@
             "karras": false,
             "share": false
         },
-        "img2img": {
+        "source_image": {
             "require_login": true,
             "require_stable_horde_account_oauth_connection": false,
             "allow_non_webp": true,
@@ -137,7 +137,7 @@
             "allow_steps": true,
             "allow_amount": true,
             "allow_models": true,
-            "allow_img2img": true,
+            "allow_source_image": true,
             "allow_denoise": true,
             "allow_nsfw": true,
             "allow_karras": true,

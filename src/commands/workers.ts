@@ -50,7 +50,7 @@ Online since: <t:${Math.floor(Date.now()/1000) - (worker.uptime ?? 0)}:R>
 Performance: \`${worker.performance}\` Megapixelsteps per second
 
 **Config**
-Img2Img: \`${worker.img2img}\`
+Source Image: \`${worker.img2img}\`
 NSFW: \`${worker.nsfw}\`
 Painting: \`${worker.painting}\`
 

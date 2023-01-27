@@ -163,7 +163,7 @@ export default class extends Command {
 
 
         if (ctx.client.config.logs?.enabled) {
-            if(ctx.client.config.logs.log_actions?.non_img2img) {
+            if(ctx.client.config.logs.log_actions?.without_source_image) {
                 if (ctx.client.config.logs.plain) logGeneration("txt");
                 if (ctx.client.config.logs.csv) logGeneration("csv");
             }

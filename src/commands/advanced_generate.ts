@@ -22,15 +22,15 @@ const command_data = new SlashCommandBuilder()
             .setDescription("The prompt to generate an image with")
             .setRequired(true)
         )
-        if(config.advanced_generate?.user_restrictions?.allow_img2img) {
+        if(config.advanced_generate?.user_restrictions?.allow_source_image) {
             command_data
             .addAttachmentOption(
                 new SlashCommandAttachmentOption()
-                .setName("img2img")
-                .setDescription("The image to use for img2img; max: 3072px")
+                .setName("source_image")
+                .setDescription("The image to use as the source image; max: 3072px")
             )
         }
-        if(config.advanced_generate?.user_restrictions?.allow_img2img) {
+        if(config.advanced_generate?.user_restrictions?.allow_source_image) {
             command_data
             .addBooleanOption(
                 new SlashCommandBooleanOption()
@@ -228,11 +228,11 @@ export default class extends Command {
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? true
         const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.advanced_generate?.default?.karras ?? false
         const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.advanced_generate?.default?.share
-        let img = ctx.interaction.options.getAttachment("img2img")
+        let img = ctx.interaction.options.getAttachment("source_image")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
         const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
-        const can_bypass = ctx.client.config.advanced_generate?.img2img?.whitelist?.bypass_checks && ctx.client.config.advanced_generate?.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
+        const can_bypass = ctx.client.config.advanced_generate?.source_image?.whitelist?.bypass_checks && ctx.client.config.advanced_generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
         if(ctx.client.config.advanced_generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("advanced_generate")}`, codeblock: false})
         if(ctx.client.config.advanced_generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
@@ -240,13 +240,13 @@ export default class extends Command {
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})
         if(model && ctx.client.config.advanced_generate?.blacklisted_models?.includes(model)) return ctx.error({error: "This model is blacklisted"})
         if(model && model !== "YOLO" && !(await ctx.stable_horde_manager.getModels()).find(m => m.name === model)) return ctx.error({error: "Unable to find this model"})
-        if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use img2img`, codeblock: false})
-        if(img && ctx.client.config.advanced_generate?.img2img?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
-        if(img && !can_bypass && ctx.client.config.advanced_generate?.img2img?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use img2img"})
+        if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use a source image`, codeblock: false})
+        if(img && ctx.client.config.advanced_generate?.source_image?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
+        if(img && !can_bypass && ctx.client.config.advanced_generate?.source_image?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use a source image"})
         if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Image to Image input must be a image"})
         if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Image to Image input too large (max. 3072 x 3072)"})
-        if(img && !can_bypass && !ctx.client.config?.advanced_generate?.img2img?.allow_non_webp && img.contentType !== "image/webp") return ctx.error({error: "You can only upload webp for img2img"})
-        if(img && ctx.client.config.advanced_generate?.img2img?.whitelist?.only_allow_whitelist && !ctx.client.config.advanced_generate?.img2img?.whitelist?.user_ids?.includes(ctx.interaction.user.id)) return ctx.error({error: "You are not whitelisted to use img2img"})
+        if(img && !can_bypass && !ctx.client.config?.advanced_generate?.source_image?.allow_non_webp && img.contentType !== "image/webp") return ctx.error({error: "You can only upload webp as the source image"})
+        if(img && ctx.client.config.advanced_generate?.source_image?.whitelist?.only_allow_whitelist && !ctx.client.config.advanced_generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)) return ctx.error({error: "You are not whitelisted to use a source image"})
 
         if(keep_ratio && img?.width && img?.height) {
             const ratio = img?.width/img?.height
@@ -350,10 +350,10 @@ export default class extends Command {
 
 
         if (ctx.client.config.logs?.enabled) {
-            if (ctx.client.config.logs.log_actions?.img2img && img) {
+            if (ctx.client.config.logs.log_actions?.with_source_image && img) {
                 if (ctx.client.config.logs.plain) logGeneration("txt");
                 if (ctx.client.config.logs.csv) logGeneration("csv");
-            } else if(ctx.client.config.logs.log_actions?.non_img2img && !img) {
+            } else if(ctx.client.config.logs.log_actions?.without_source_image && !img) {
                 if (ctx.client.config.logs.plain) logGeneration("txt");
                 if (ctx.client.config.logs.csv) logGeneration("csv");
             }
@@ -365,7 +365,7 @@ export default class extends Command {
             }
         }
 
-        if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " img2img":""} with prompt "${prompt}" (${generation_start?.id})`)
+        if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " using a source image":""} with prompt "${prompt}" (${generation_start?.id})`)
 
         const start_status = await ctx.stable_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const start_horde_data = await ctx.stable_horde_manager.getPerformance()
