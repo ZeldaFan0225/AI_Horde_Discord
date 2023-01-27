@@ -13,7 +13,7 @@ export default class extends Component {
     }
 
     override async run(ctx: ComponentContext<ComponentType.SelectMenu>): Promise<any> {
-        if(ctx.interaction.customId.split("_")[1] !== ctx.interaction.user.id) return ctx.error({error: "Only the creator of this prompt can cancel the job"})
+        if(ctx.interaction.customId.split("_")[1] !== ctx.interaction.user.id) return ctx.error({error: "Only the user who created this message can delete it"})
         await ctx.interaction.deferUpdate()
         await ctx.interaction.deleteReply()
     }
