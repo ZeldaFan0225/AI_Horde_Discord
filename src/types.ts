@@ -254,5 +254,24 @@ export interface Config {
             allow_sharing?: boolean,
             allow_rating?: boolean
         }
+    },
+    remix?: {
+        enabled?: boolean,
+        require_login?: boolean,
+        trusted_workers?: boolean,
+        blacklisted_words?: string[],
+        convert_a1111_weight_to_horde_weight?: boolean,
+        generation_options?: {
+            sampler_name?: string,
+            width?: number,
+            height?: number,
+            allow_nsfw?: boolean,
+            censor_nsfw?: boolean,
+            model: string,
+            share_result?: boolean,
+            cfg?: number,
+            denoise?: number,
+            steps?: number
+        }
     }
 }

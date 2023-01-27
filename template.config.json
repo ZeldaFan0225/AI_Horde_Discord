@@ -174,5 +174,24 @@
             "allow_sharing": true,
             "allow_rating": true
         }
+    },
+    "remix": {
+        "enabled": true,
+        "require_login": true,
+        "trusted_workers": true,
+        "blacklisted_words": [],
+        "convert_a1111_weight_to_horde_weight": true,
+        "generation_options": {
+            "sampler_name": "k_euler",
+            "model": "stable_diffusion",
+            "width": 512,
+            "height": 512,
+            "allow_nsfw": false,
+            "censor_nsfw": true,
+            "share_result": false,
+            "cfg": 7,
+            "denoise": 60,
+            "steps": 50
+        }
     }
 }

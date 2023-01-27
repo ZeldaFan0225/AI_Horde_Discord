@@ -1,5 +1,9 @@
 # Changelog
 
+## V2.3.3
+
+- add remix context menu to remix users avatars with prompts
+
 ## V2.3.2
 
 - add ability to gift kudos on /generate and /advanced_generate result messages
