@@ -8,6 +8,8 @@ YOU HAVE PERMISSION TO USE THIS BOT IN YOUR OWN DISCORD SERVER THROUGH A BOT ACC
 
 ## Features
 
+View [the changelog](https://github.com/ZeldaFan0225/Stable_Horde_Discord/blob/main/changelog.md) to see what has been added
+
 This package includes the code for a discord bot which interacts with the stable horde api.
 The bot has the following features:
 
@@ -22,6 +24,7 @@ The bot has the following features:
 - /transferkudos (Transfer Kudos context command) to send somebody kudos
 - advanced configuration file which lets you change how the bot behaves and what actions the user can use (for limits refer to https://stablehorde.net/api)
 - logging prompts, user id and generation id to track generation of malicious, nsfw or illegal content
+- and even more...
 
 ## Version Requirements
 
@@ -38,10 +41,12 @@ Optional:
 4) remove the `template.` from the `template.config.json` file  
   
 If you want to have extra functionality do the following steps:  
+
 5) set up a postgres database  
 6) fill out the `template.env` and rename it to `.env`  
   
 If you just want to generate images with no token or the default token in the config.json file do the following steps:  
+
 5) modify the config file and set `use_database` to false  
 6) fill out the `template.env` and rename it to `.env` (you can leave the keys prefixed with `DB_` empty)  
   
