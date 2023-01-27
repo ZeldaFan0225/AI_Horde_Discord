@@ -181,6 +181,7 @@
         "trusted_workers": true,
         "blacklisted_words": [],
         "convert_a1111_weight_to_horde_weight": true,
+        "allow_custom_strength": true,
         "generation_options": {
             "sampler_name": "k_euler",
             "model": "stable_diffusion",

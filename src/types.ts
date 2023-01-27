@@ -261,6 +261,7 @@ export interface Config {
         trusted_workers?: boolean,
         blacklisted_words?: string[],
         convert_a1111_weight_to_horde_weight?: boolean,
+        allow_custom_strength: boolean,
         generation_options?: {
             sampler_name?: string,
             width?: number,

@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ContextMenuCommandBuilder } from "discord.js";
+import { APIModalInteractionResponseCallbackData, ApplicationCommandType, ContextMenuCommandBuilder } from "discord.js";
 import { Context } from "../classes/context";
 import { ContextContext } from "../classes/contextContext";
 
@@ -25,7 +25,7 @@ export default class extends Context {
 
         if(!user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use this action`, codeblock: false})
 
-        const modal = {
+        const modal: APIModalInteractionResponseCallbackData = {
             title: "Enter Prompt",
             custom_id: `remix_${target_user.id}`,
             components: [{
@@ -36,9 +36,14 @@ export default class extends Context {
                     label: "Prompt",
                     custom_id: "prompt",
                     required: true,
-                    placeholder: "Enter a prompt to remix the users avatar with"
+                    placeholder: "Enter a prompt to remix the users avatar with",
+                    value: target_user.username
                 }]
-            },{
+            }]
+        }
+
+        if(ctx.client.config.remix.allow_custom_strength) {
+            modal.components.push({
                 type: 1,
                 components: [{
                     type: 4,
@@ -49,7 +54,7 @@ export default class extends Context {
                     placeholder: "Number between 1 and 100",
                     max_length: 3
                 }]
-            }]
+            })
         }
 
         await ctx.interaction.showModal(modal)

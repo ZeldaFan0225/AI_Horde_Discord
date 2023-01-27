@@ -79,7 +79,7 @@ export default class extends Modal {
             console.log(generation_options)
         }
 
-        const message = await ctx.interaction.editReply({content: "Remixing..."})
+        const message = await ctx.interaction.editReply({content: `Remixing...`})
 
         const generation_start = await ctx.stable_horde_manager.postAsyncGenerate(generation_data, {token: user_token})
         .catch((e) => {
@@ -107,7 +107,12 @@ export default class extends Modal {
         
         const inter = setInterval(async () => {
             const status = await ctx.stable_horde_manager.getGenerationCheck(generation_start?.id!)
-            if(ctx.client.config.advanced?.dev) console.log(status)
+            if(ctx.client.config.advanced?.dev) {
+                console.log(status)
+                if(!status.done && !status.faulted) await message.edit({
+                    content: `Remixing...\n\n__**DEV**__\n**ID** ${generation_start.id}\n**Eta** ${status.wait_time}s\n**Kudos** ${status.kudos}\n**Possible** ${status.is_possible}`
+                })
+            }
             if(status.done) await displayResult()
             else if(status.faulted) displayError()
         }, 1000 * 5)

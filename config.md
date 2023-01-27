@@ -182,6 +182,7 @@ Here you can see an explanation of what which option does
         "trusted_workers": Whether to only use trusted workers (BOOLEAN) *1,
         "blacklisted_words": A list of blacklisted words which users are not allowed to use (ARRAY OF STRING),
         "convert_a1111_weight_to_horde_weight": Whether to convert a1111 to weighted prompt required by the api (BOOLEAN) *7 *8,
+        "allow_custom_strength": Set to true to allow the user to give a custom strength (BOOLEAN),
         "generation_options": {
             "sampler_name": The sampler to use for remixing (STRING) *1 *2,
             "model": The model to use for remixing (STRING) *1 *3,
