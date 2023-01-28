@@ -15,7 +15,7 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
     if(!target_user?.id) return await r.users.remove(u)
     if(target_user.bot && (r.message.interaction?.commandName === "generate" || r.message.interaction?.commandName === "advanced_generate")) {
         target_user = r.message.interaction.user
-    } else return await r.users.remove(u)
+    } else if (target_user.bot) return await r.users.remove(u)
     if(target_user?.id === u.id) return await r.users.remove(u)
     if(!usertoken) {
         await r.users.remove(u)
