@@ -108,6 +108,7 @@ export default class extends Command {
             content: `<@${ctx.interaction.user.id}> started the party "${name}" with the style "${style_raw}".\nYou will get ${award} kudos for ${recurring ? `every generation` : `your first generation`}.\nThe party ends <t:${Math.round((Date.now() + 1000 * 60 * 60 * 24 * duration)/1000)}:R>\n\n${ctx.client.config.party.mention_roles?.length ? ctx.client.config.party.mention_roles.map(r => `<@&${r}>`).join(" ") : ""}`
         }).catch(console.error)
 
+        await start?.pin().catch(console.error)
         await ctx.interaction.editReply({content: start?.id ? "Party started" : "Failed to announce party"})
     }
 
