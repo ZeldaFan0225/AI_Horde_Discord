@@ -73,16 +73,18 @@ export interface AutocompleteContextInitOptions extends BaseContextInitOptions {
     interaction: AutocompleteInteraction
 }
 
-export interface RateNewImageData {
-    dataset_id: string,
-    id: string,
-    url: string
-}
 
-export interface RateImageResponse {
-    message: string,
-    success: boolean,
-    transfered: number
+export interface Party {
+    index: number,
+    channel_id: string,
+    guild_id: string,
+    creator_id: string,
+    created_at: Date,
+    ends_at: Date,
+    style: string,
+    award: number,
+    recurring: boolean,
+    users: string[]
 }
 
 export interface Config {
@@ -273,6 +275,23 @@ export interface Config {
             cfg?: number,
             denoise?: number,
             steps?: number
+        }
+    },
+    party?: {
+        enabled?: boolean,
+        mention_roles?: string[],
+        default?: {
+            recurring?: boolean
+        },
+        user_restrictions?: {
+            award?: {
+                min?: number,
+                max?: number
+            },
+            duration?: {
+                min?: number,
+                max?: number
+            }
         }
     }
 }

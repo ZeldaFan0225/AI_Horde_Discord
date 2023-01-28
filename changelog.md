@@ -1,5 +1,14 @@
 # Changelog
 
+## V2.4.0
+
+Introducing party mode:  
+use /party to start a party and let users generate images with a given style
+users will automatically get rewards from you
+at the end of the party you will see a short summary
+only /generate can be used in parties
+
+
 ## V2.3.3
 
 - add remix context menu to remix users avatars with prompts

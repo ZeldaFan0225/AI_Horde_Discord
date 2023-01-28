@@ -1,8 +1,8 @@
 import SuperMap from "@thunder04/supermap";
-import { Client, ClientOptions, PermissionFlagsBits, PermissionsBitField } from "discord.js";
+import { ChannelType, Client, ClientOptions, PermissionFlagsBits, PermissionsBitField } from "discord.js";
 import { readFileSync } from "fs";
 import { Store } from "../stores/store";
-import { Config, StoreTypes } from "../types";
+import { Config, Party, StoreTypes } from "../types";
 import {existsSync, mkdirSync, writeFileSync} from "fs"
 import { Pool } from "pg";
 import crypto from "crypto"
@@ -129,5 +129,23 @@ export class StableHordeClient extends Client {
 			else return false
 		}
 		return false
+	}
+
+	async getParty(id: string, database?: Pool): Promise<Party | undefined> {
+		if(this.cache.has(`party-${id}`)) return this.cache.get(`party-${id}`)
+		const p = await database?.query("SELECT * FROM parties WHERE channel_id=$1", [id])
+		if(!p?.rowCount) return undefined
+		this.cache.set(`party-${id}`, 1000 * 60 * 20)
+		return p.rows[0]!
+	}
+
+	async cleanUpParties(database?: Pool) {
+		const expired_parties = await database?.query("DELETE FROM parties WHERE ends_at <= CURRENT_TIMESTAMP RETURNING *").catch(console.error)
+		if(!expired_parties?.rowCount) return;
+		for(let party of expired_parties.rows) {
+			const channel = await this.channels.fetch(party.channel_id).catch(console.error)
+			if(!channel?.id || channel?.type !== ChannelType.PublicThread) continue;
+			await channel?.send({content: `This party ended.\n${party.users?.length} users participated.\nThanks to <@${party.creator_id}> for hosting this party`})
+		}
 	}
 }

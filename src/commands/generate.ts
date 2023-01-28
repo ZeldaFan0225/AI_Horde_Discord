@@ -93,13 +93,13 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
-        //return ctx.interaction.reply({content: `Coming soon.\nUse ${await ctx.client.getSlashCommandTag("generate")} for now`, ephemeral: true})
         if(!ctx.client.config.generate?.enabled) return ctx.error({error: "Generation is disabled."})
 
         await ctx.interaction.deferReply({})
+        const party = await ctx.client.getParty(ctx.interaction.channelId, ctx.database)
         let prompt = ctx.interaction.options.getString("prompt", true)
         const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
-        const style_raw = ctx.interaction.options.getString("style") ?? ctx.client.config.generate?.default?.style ?? "raw"
+        const style_raw = ctx.interaction.options.getString("style") ?? party?.style ?? ctx.client.config.generate?.default?.style ?? "raw"
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.generate?.default?.tiling)
         const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.generate?.default?.share
@@ -113,6 +113,7 @@ export default class extends Command {
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
 
         if(!style?.prompt?.length) return ctx.error({error: "Unable to find style for input"})
+        if(party?.style && party.style !== style_raw.toLowerCase()) return ctx.error({error: `Please use the style '${party.style}' for this party`})
         if(ctx.client.config.generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
         if(ctx.client.config.generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(ctx.client.config.generate?.blacklisted_styles?.includes(style_raw.toLowerCase())) return ctx.error({error: "The chosen style is blacklisted"})
@@ -341,8 +342,29 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                     components = [...generateButtons(generation_start!.id!), ...components]
                 }
                 await message.edit({content: `Image generation finished`, components, embeds, files});
+                if(party) await handlePartySubmit()
                 return null
             } 
+        }
+
+        async function handlePartySubmit() {
+            if(ctx.client.config.advanced?.dev) console.log(party)
+            if(!party?.award || !message) return;
+            if(!party.recurring && party.users.includes(ctx.interaction.user.id)) return;
+            if(ctx.interaction.user.id === party.creator_id) return;
+            const creator_token = await ctx.client.getUserToken(party.creator_id, ctx.database)
+            const target_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
+            if(!target_token) return message.reply({content: "You need to be logged in to receive rewards for this party"})
+            const target_suser = await ctx.stable_horde_manager.findUser({token: target_token})
+            if(!target_suser?.username || target_suser.id === 0) return message.reply({content: "Your saved token is invalid, please renew it to claim rewards"})
+            if(!creator_token) return message.reply({content: "The creator of the party is logged out...\nLooks like you won't get any kudos"})
+            const transfer = await ctx.stable_horde_manager.postKudosTransfer({username: target_suser.username, amount: party.award}, {token: creator_token}).catch(console.error)
+            if(!transfer?.transferred) return message.reply({content: "Unable to send you the reward"})
+
+            await message.reply({allowedMentions: {parse: []}, content: `<@${ctx.interaction.user.id}>, the creator of the party <@${party.creator_id}> awarded you ${party.award} kudos for your ${party.recurring ? "" : "first "}generation.${party.recurring ? "\nIf you submit another generation you can claim the reward again" : "\nYou can not receive the reward again"}`})
+            const update = await ctx.database?.query("UPDATE parties SET users=array_append(array_remove(users, $2), $2) WHERE channel_id=$1 RETURNING *", [ctx.interaction.channelId, ctx.interaction.user.id])
+            if(update?.rowCount) ctx.client.cache.set(`party-${ctx.interaction.channelId}`, update.rows[0]!)
+            return;
         }
     }
 
@@ -350,6 +372,8 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
         const option = context.interaction.options.getFocused(true)
         switch(option.name) {
             case "style": {
+                const party = await context.client.getParty(context.interaction.channelId, context.database)
+                if(party) return context.interaction.respond([{name: party.style, value: party.style}])
                 const styles = Object.keys(context.client.horde_styles)
                 const available = styles.map(s => ({name: s, value: s}))
                 const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase())) : available

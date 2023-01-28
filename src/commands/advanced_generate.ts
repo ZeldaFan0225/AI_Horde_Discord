@@ -233,7 +233,9 @@ export default class extends Command {
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
         const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const can_bypass = ctx.client.config.advanced_generate?.source_image?.whitelist?.bypass_checks && ctx.client.config.advanced_generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
+        const party = await ctx.client.getParty(ctx.interaction.channelId, ctx.database)
 
+        if(party?.channel_id) return ctx.error({error: `You can only use ${ctx.client.getSlashCommandTag("generate")} in parties`, codeblock: false})
         if(ctx.client.config.advanced_generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("advanced_generate")}`, codeblock: false})
         if(ctx.client.config.advanced_generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})

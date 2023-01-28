@@ -195,6 +195,23 @@ Here you can see an explanation of what which option does
             "denoise": The denoise strength to use for remixing (INTEGER; between 0 and 100) *1,
             "steps": The steps to use for remixing (INTEGER)
         }
+    },
+    "party": {
+        "enabled": Whether the remix action is enabled (BOOLEAN),
+        "mention_roles": The roles to mention when a party is started (ARRAY OF ROLE IDS),
+        "default": {
+            "recurring": The default for recurring awards (BOOLEAN)
+        },
+        "user_restrictions": {
+            "award": {
+                "min": (BOOLEAN) *5,
+                "max": (BOOLEAN) *5,
+            },
+            "duration": {
+                "min": (BOOLEAN) *5,
+                "max": (BOOLEAN) *5,
+            }
+        }
     }
 }
 ```
@@ -203,7 +220,7 @@ Here you can see an explanation of what which option does
 `*2` Available Samplers: k_lms, k_heun, k_euler, k_euler_a, k_dpm_2, k_dpm_2_a, DDIM, PLMS, k_dpm_fast, k_dpm_adaptive, k_dpmpp_2s_a, k_dpmpp_2m, dpmsolver  
 `*3` Not all models are available at all times *1  
 `*4` Developer mode will enable logging and will also show the generations ID in the embed in Discord  
-`*5` This option changes how the command is created. If set to false the user will not have the option to modify this value when generating.  
+`*5` This option changes how the command is created. If set to false the user will not have the option to modify this value when generating or the input they can give is limited.  
 `*6` This option must be set to false, leaving it blank will default it to true  
 `*7` EXPERIMENTAL OPTION, ENABLE AT YOUR OWN RISK  
 `*8` For example (((test))) will be automatically converted to (test:1.3)  

@@ -194,5 +194,22 @@
             "denoise": 60,
             "steps": 50
         }
+    },
+    "party": {
+        "enabled": true,
+        "mention_roles": [],
+        "default": {
+            "recurring": false
+        },
+        "user_restrictions": {
+            "award": {
+                "min": 1,
+                "max": 1000000
+            },
+            "duration": {
+                "min": 1,
+                "max": 30
+            }
+        }
     }
 }

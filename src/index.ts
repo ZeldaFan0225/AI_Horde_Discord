@@ -41,8 +41,9 @@ if(client.config.use_database !== false) {
     
     connection.connect().then(async () => {
         await connection!.query("CREATE TABLE IF NOT EXISTS user_tokens (index SERIAL, id VARCHAR(100) PRIMARY KEY, token VARCHAR(100) NOT NULL)")
+        await connection!.query("CREATE TABLE IF NOT EXISTS parties (index SERIAL, channel_id VARCHAR(100) PRIMARY KEY, guild_id VARCHAR(100) NOT NULL, creator_id VARCHAR(100) NOT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, ends_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, style VARCHAR(1000) NOT NULL, award INT NOT NULL DEFAULT 1, recurring BOOLEAN NOT NULL DEFAULT false, users VARCHAR(100)[] NOT NULL DEFAULT '{}')")
         await connection!.query("CREATE TABLE IF NOT EXISTS pending_kudos (index SERIAL, unique_id VARCHAR(200) PRIMARY KEY, target_id VARCHAR(100) NOT NULL, from_id VARCHAR(100) NOT NULL, amount int NOT NULL, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)")
-    }).catch(() => null);
+    }).catch(console.error);
 
     setInterval(async () => {
         await connection?.query("DELETE FROM pending_kudos WHERE updated_at <= CURRENT_TIMESTAMP - interval '1 week'").catch(console.error)
@@ -83,6 +84,12 @@ client.on("ready", async () => {
     if((client.config.advanced_generate?.user_restrictions?.amount?.max ?? 4) > 10) throw new Error("More than 10 images are not supported in the bot")
     if(client.config.filter_actions?.guilds?.length && (client.config.filter_actions?.mode !== "whitelist" && client.config.filter_actions?.mode !== "blacklist")) throw new Error("The actions filter mode must be set to either whitelist, blacklist.")
     if(client.config.advanced?.pre_check_prompts_for_suspicion?.enabled && !process.env["OPERATOR_API_KEY"]) throw new Error("The OPERATOR_API_KEY in the .env is required when pre checking prompts for being suspicious")
+    if(client.config.party?.enabled && !client.config.generate?.enabled) throw new Error("When party is enabled the /generate command also needs to be enabled")
+
+    if(client.config.party?.enabled && connection) {
+        await client.cleanUpParties(connection)
+        setInterval(async () => await client.cleanUpParties(connection), 1000 * 60 * 5)
+    }
 })
 
 if(client.config.react_to_transfer?.enabled) client.on("messageReactionAdd", async (r, u) => await handleMessageReact(r as PartialMessageReaction, u as PartialUser, client, connection, stable_horde_manager).catch(console.error))
