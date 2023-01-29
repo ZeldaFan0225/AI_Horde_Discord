@@ -61,7 +61,7 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
-        if(!ctx.client.config.party?.enabled) return ctx.error({error: "Interrogation is disabled."})
+        if(!ctx.client.config.party?.enabled) return ctx.error({error: "Party is disabled."})
         if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
         if(ctx.interaction.channel?.type !== ChannelType.GuildText) return ctx.error({error: "This command can only be used in text channels"})
 
