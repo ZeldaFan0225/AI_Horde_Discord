@@ -18,7 +18,7 @@
     "filter_actions": {
         "mode": "whitelist",
         "guilds": [
-            "1007615132299448392"
+            "1234567890123456789"
         ],
         "apply_filter_to": {
             "react_to_transfer": true,
@@ -197,7 +197,9 @@
     },
     "party": {
         "enabled": true,
-        "mention_roles": [],
+        "mention_roles": [
+            "1234567890123456789"
+        ],
         "default": {
             "recurring": false
         },
