@@ -1,4 +1,4 @@
-import { ActionRowData, AttachmentBuilder, ButtonBuilder, Colors, EmbedBuilder, InteractionButtonComponentData, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
+import { ActionRowData, AttachmentBuilder, ButtonBuilder, ChannelType, Colors, EmbedBuilder, InteractionButtonComponentData, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 import { AutocompleteContext } from "../classes/autocompleteContext";
@@ -6,6 +6,7 @@ import { readFileSync, appendFileSync } from "fs";
 import { Config } from "../types";
 import StableHorde from "@zeldafan0225/stable_horde";
 import Centra from "centra";
+const {buffer2webpbuffer} = require("webp-converter")
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
@@ -35,6 +36,29 @@ const command_data = new SlashCommandBuilder()
                 .setDescription("The style for this image")
                 .setRequired(false)
                 .setAutocomplete(true)
+            )
+        }
+        if(config.advanced_generate?.user_restrictions?.allow_source_image) {
+            command_data
+            .addAttachmentOption(
+                new SlashCommandAttachmentOption()
+                .setName("source_image")
+                .setDescription("The image to use as the source image; max: 3072px")
+            )
+            .addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("keep_original_ratio")
+                .setDescription("Whether to keep the aspect ratio and image size of the original image")
+            )
+        }
+        if(config.generate?.user_restrictions?.allow_denoise) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("denoise")
+                .setDescription("How much to denoise in %")
+                .setMinValue(config.generate?.user_restrictions?.denoise?.min ?? 0)
+                .setMaxValue(config.generate?.user_restrictions?.denoise?.max ?? 100)
             )
         }
         if(config.generate?.user_restrictions?.allow_amount) {
@@ -100,23 +124,38 @@ export default class extends Command {
         let prompt = ctx.interaction.options.getString("prompt", true)
         const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
         const style_raw = ctx.interaction.options.getString("style") ?? party?.style ?? ctx.client.config.generate?.default?.style ?? "raw"
+        const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.generate?.default?.denoise ?? 50)/100
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.generate?.default?.tiling)
         const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.generate?.default?.share
+        const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? ctx.client.config.generate?.default?.keep_original_ratio ?? true
+        let img = ctx.interaction.options.getAttachment("source_image")
 
         const style = ctx.client.horde_styles[style_raw.toLowerCase()]
+
+        let height = style?.height
+        let width = style?.width
 
         if(ctx.client.config.advanced?.dev) {
             console.log(style)
         }
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
+        const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+        const can_bypass = ctx.client.config.generate?.source_image?.whitelist?.bypass_checks && ctx.client.config.generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
         if(!style?.prompt?.length) return ctx.error({error: "Unable to find style for input"})
         if(party?.style && party.style !== style_raw.toLowerCase()) return ctx.error({error: `Please use the style '${party.style}' for this party`})
         if(ctx.client.config.generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
         if(ctx.client.config.generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(ctx.client.config.generate?.blacklisted_styles?.includes(style_raw.toLowerCase())) return ctx.error({error: "The chosen style is blacklisted"})
+        if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use a source image`, codeblock: false})
+        if(img && ctx.client.config.generate?.source_image?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
+        if(img && !can_bypass && ctx.client.config.generate?.source_image?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use a source image"})
+        if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Source Image input must be a image"})
+        if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Source Image input too large (max. 3072 x 3072)"})
+        if(img && !can_bypass && !ctx.client.config?.generate?.source_image?.allow_non_webp && img.contentType !== "image/webp") return ctx.error({error: "You can only upload webp as the source image"})
+        if(img && ctx.client.config.generate?.source_image?.whitelist?.only_allow_whitelist && !ctx.client.config.generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)) return ctx.error({error: "You are not whitelisted to use a source image"})
 
         if(ctx.client.config.generate.convert_a1111_weight_to_horde_weight) {
             prompt = prompt.replace(/(\(+|\[+)|(\)+|\]+)/g, (w) => {
@@ -129,21 +168,65 @@ export default class extends Command {
         prompt = style.prompt.slice().replace("{p}", prompt)
         prompt = prompt.replace("{np}", !negative_prompt || prompt.includes("###") ? negative_prompt : `###${negative_prompt}`)
 
+        if(keep_ratio && img?.width && img?.height) {
+            const ratio = img?.width/img?.height
+            const largest = ratio >= 1 ? img.width : img.height
+            const m = largest > 3072 ? 3072/largest : 1
+            const mod_height = Math.round(img.height*m)
+            const mod_width = Math.round(img.width*m)
+            height = mod_height%64 <= 32 ? mod_height-(mod_height%64) : mod_height+(64-(mod_height%64))
+            width = mod_width%64 <= 32 ? mod_width-(mod_width%64) : mod_width+(64-(mod_width%64))
+        }
+        
+        if(ctx.client.config.advanced?.dev) {
+            console.log(img?.height)
+            console.log(img?.width)
+            console.log(height)
+            console.log(width)
+        }
+
         const token = user_token || ctx.client.config.default_token || "0000000000"
+        let img_data: Buffer | undefined
+        if(img) {
+            let img_data_res = await Centra(img.url, "GET")
+                .send()
+            
+            if(img.contentType === "image/webp") img_data = img_data_res.body
+            else {
+                img_data = await buffer2webpbuffer(img_data_res.body, img.contentType?.replace("image/",""),"-q 80").catch((e: Error) => ctx.client.config.advanced?.dev ? console.error(e) : null)
+                if(!img_data) return ctx.error({
+                    error: "Image format conversion to webp failed"
+                })
+            }
+        }
+
+        if(ctx.client.config.advanced?.pre_check_prompts_for_suspicion?.enabled) {
+            if(ctx.client.timeout_users.has(ctx.interaction.user.id)) return ctx.error({error: "Your previous prompt has been marked as suspicious.\nYou have been timed out, try again later."})
+            const filter_result = await ctx.stable_horde_manager.postFilters({
+                prompt
+            }, {token: process.env["OPERATOR_API_KEY"]}).catch(console.error)
+            if(filter_result && Number(filter_result.suspicion) >= 2) {
+                ctx.client.timeout_users.set(ctx.interaction.user.id, ctx.interaction.user.id, (ctx.client.config.advanced.pre_check_prompts_for_suspicion.timeout_duration ?? 1000 * 60 * 60))
+            }
+            if(ctx.client.timeout_users.has(ctx.interaction.user.id)) return ctx.error({error: "Your prompt has been marked as suspicious.\nTherefore you have been timed out!"})
+        }
+
 
         const generation_data: StableHorde.GenerationInput = {
             prompt,
             params: {
                 sampler_name: style.sampler_name as typeof StableHorde.ModelGenerationInputStableSamplers[keyof typeof StableHorde.ModelGenerationInputStableSamplers],
-                height: style.height,
-                width: style.width,
+                height: height,
+                width: width,
                 n: amount,
-                tiling
+                tiling,
+                denoising_strength: denoise
             },
             nsfw: ctx.client.config.generate?.user_restrictions?.allow_nsfw,
             censor_nsfw: ctx.client.config.generate?.censor_nsfw,
             trusted_workers: ctx.client.config.generate?.trusted_workers,
             models: style.model ? [style.model] : undefined,
+            source_image: img_data?.toString("base64"),
             r2: true,
             shared: share_result
         }
@@ -164,19 +247,22 @@ export default class extends Command {
 
 
         if (ctx.client.config.logs?.enabled) {
-            if(ctx.client.config.logs.log_actions?.without_source_image) {
+            if (ctx.client.config.logs.log_actions?.with_source_image && img) {
+                if (ctx.client.config.logs.plain) logGeneration("txt");
+                if (ctx.client.config.logs.csv) logGeneration("csv");
+            } else if(ctx.client.config.logs.log_actions?.without_source_image && !img) {
                 if (ctx.client.config.logs.plain) logGeneration("txt");
                 if (ctx.client.config.logs.csv) logGeneration("csv");
             }
             function logGeneration(type: "txt" | "csv") {
                 ctx.client.initLogDir();
                 const log_dir = ctx.client.config.logs?.directory ?? "/logs";
-                const content = type === "csv" ? `\n${new Date().toISOString()},${ctx.interaction.user.id},${generation_start?.id},${false},"${prompt}"` : `\n${new Date().toISOString()} | ${ctx.interaction.user.id}${" ".repeat(20 - ctx.interaction.user.id.length)} | ${generation_start?.id} | ${false}${" ".repeat(9)} | ${prompt}`;
+                const content = type === "csv" ? `\n${new Date().toISOString()},${ctx.interaction.user.id},${generation_start?.id},${!!img},"${prompt}"` : `\n${new Date().toISOString()} | ${ctx.interaction.user.id}${" ".repeat(20 - ctx.interaction.user.id.length)} | ${generation_start?.id} | ${!!img}${" ".repeat(img ? 10 : 9)} | ${prompt}`;
                 appendFileSync(`${process.cwd()}${log_dir}/logs_${new Date().getMonth() + 1}-${new Date().getFullYear()}.${type}`, content);
             }
         }
 
-        if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated with prompt "${prompt}" (${generation_start?.id})`)
+        if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " using a source image":""} with prompt "${prompt}" (${generation_start?.id})`)
 
         const start_status = await ctx.stable_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const start_horde_data = await ctx.stable_horde_manager.getPerformance()
@@ -329,6 +415,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                         color: Colors.Blue,
                         description: `${!i ? `**Raw Prompt:** ${ctx.interaction.options.getString("prompt", true)}\n**Processed Prompt:** ${prompt}\n**Style:** ${style_raw}\n**Total Kudos Cost:** \`${images.kudos}\`` : ""}${ctx.client.config.advanced?.dev ? `\n\n**Image ID** ${g.id}` : ""}` || undefined,
                     })
+                    if(img_data) embed.setThumbnail(`attachment://original.webp`)
                     return {attachment, embed}
                 }) || []
                 if(!precheck) clearInterval(inter)
@@ -337,6 +424,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const embeds = image_map.map(i => i.embed)
                 if(ctx.client.config.advanced?.dev) embeds.at(-1)?.setFooter({text: `Generation ID ${generation_start!.id}`})
                 const files = image_map.map(i => i.attachment)
+                if(img_data) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
                 let components = [{type: 1, components: [delete_btn]}]
                 if(ctx.client.config.generate?.user_restrictions?.allow_rating && (generation_data.shared ?? true) && files.length === 1) {
                     components = [...generateButtons(generation_start!.id!), ...components]

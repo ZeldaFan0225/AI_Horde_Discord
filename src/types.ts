@@ -170,7 +170,9 @@ export interface Config {
             gfpgan?: boolean,
             real_esrgan?: boolean,
             karras?: boolean,
-            share?: boolean
+            share?: boolean,
+            keep_original_ratio: boolean
+            style?: string
         },
         source_image?: {
             require_login?: boolean,
@@ -207,6 +209,8 @@ export interface Config {
                 min?: number,
                 max?: number
             },
+            allow_negative_prompt: boolean,
+            allow_style: boolean,
             allow_sampler?: boolean,
             allow_cfg?: boolean,
             allow_seed?: boolean,
@@ -242,11 +246,28 @@ export interface Config {
             tiling?: boolean,
             amount?: number,
             share?: boolean,
-            style?: string
+            style?: string,
+            keep_original_ratio?: boolean,
+            denoise?: number
+        },
+        source_image?: {
+            require_login?: boolean,
+            require_stable_horde_account_oauth_connection?: boolean,
+            allow_non_webp?: boolean,
+            require_nsfw_channel?: boolean,
+            whitelist?: {
+                only_allow_whitelist?: boolean,
+                user_ids?: string[],
+                bypass_checks?: boolean
+            }
         },
         user_restrictions?: {
             amount?: {
                 max?: number
+            },
+            denoise?: {
+                min?: 0,
+                max?: 100
             },
             allow_negative_prompt: boolean,
             allow_style: boolean,
@@ -254,7 +275,9 @@ export interface Config {
             allow_amount?: boolean,
             allow_nsfw?: boolean,
             allow_sharing?: boolean,
-            allow_rating?: boolean
+            allow_rating?: boolean,
+            allow_source_image?: boolean,
+            allow_denoise?: boolean
         }
     },
     remix?: {

@@ -29,13 +29,18 @@ const command_data = new SlashCommandBuilder()
                 .setName("source_image")
                 .setDescription("The image to use as the source image; max: 3072px")
             )
-        }
-        if(config.advanced_generate?.user_restrictions?.allow_source_image) {
-            command_data
             .addBooleanOption(
                 new SlashCommandBooleanOption()
                 .setName("keep_original_ratio")
                 .setDescription("Whether to keep the aspect ratio and image size of the original image")
+            )
+        }
+        if(config.advanced_generate?.user_restrictions?.allow_negative_prompt) {
+            command_data.addStringOption(
+                new SlashCommandStringOption()
+                .setName("negative_prompt")
+                .setDescription("The negative prompt to generate an image with")
+                .setRequired(false)
             )
         }
         if(config.advanced_generate?.user_restrictions?.allow_karras) {
@@ -161,6 +166,15 @@ const command_data = new SlashCommandBuilder()
                 .setMaxValue(config.advanced_generate?.user_restrictions?.amount?.max ?? 4)
             )
         }
+        if(config.advanced_generate?.user_restrictions?.allow_style) {
+            command_data.addStringOption(
+                new SlashCommandStringOption()
+                .setName("style")
+                .setDescription("The style for this image")
+                .setRequired(false)
+                .setAutocomplete(true)
+            )
+        }
         if(config.advanced_generate?.user_restrictions?.allow_models) {
             command_data
             .addStringOption(
@@ -212,20 +226,25 @@ export default class extends Command {
 
         await ctx.interaction.deferReply({})
         let prompt = ctx.interaction.options.getString("prompt", true)
+        const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
         const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.advanced_generate?.default?.sampler ?? StableHorde.ModelGenerationInputStableSamplers.k_euler) as any
         const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.advanced_generate?.default?.cfg ?? 5
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.advanced_generate?.default?.denoise ?? 50)/100
         const seed = ctx.interaction.options.getString("seed")
-        let height = ctx.interaction.options.getInteger("height") ?? ctx.client.config.advanced_generate?.default?.resolution?.height ?? 512
-        let width = ctx.interaction.options.getInteger("width") ?? ctx.client.config.advanced_generate?.default?.resolution?.width ?? 512
         const gfpgan = !!(ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.advanced_generate?.default?.gfpgan)
         const real_esrgan = !!(ctx.interaction.options.getBoolean("use_real_esrgan") ?? ctx.client.config.advanced_generate?.default?.real_esrgan)
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
         const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.advanced_generate?.default?.tiling)
         const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.advanced_generate?.default?.steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? ctx.client.config.advanced_generate?.default?.amount ?? 1
-        const model = ctx.interaction.options.getString("model") ?? ctx.client.config.advanced_generate?.default?.model
-        const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? true
+        const style_raw = ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style
+        
+        const style = ctx.client.horde_styles[style_raw?.toLowerCase() ?? ""] || {prompt: "{p}{np}"}
+
+        let height = ctx.interaction.options.getInteger("height") ?? style?.height ?? ctx.client.config.advanced_generate?.default?.resolution?.height ?? 512
+        let width = ctx.interaction.options.getInteger("width") ?? style?.width ?? ctx.client.config.advanced_generate?.default?.resolution?.width ?? 512
+        const model = ctx.interaction.options.getString("model") ?? style?.model ?? ctx.client.config.advanced_generate?.default?.model
+        const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? ctx.client.config.advanced_generate?.default?.keep_original_ratio ?? true
         const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.advanced_generate?.default?.karras ?? false
         const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.advanced_generate?.default?.share
         let img = ctx.interaction.options.getAttachment("source_image")
@@ -245,8 +264,8 @@ export default class extends Command {
         if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use a source image`, codeblock: false})
         if(img && ctx.client.config.advanced_generate?.source_image?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
         if(img && !can_bypass && ctx.client.config.advanced_generate?.source_image?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use a source image"})
-        if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Image to Image input must be a image"})
-        if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Image to Image input too large (max. 3072 x 3072)"})
+        if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Source Image input must be a image"})
+        if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Source Image input too large (max. 3072 x 3072)"})
         if(img && !can_bypass && !ctx.client.config?.advanced_generate?.source_image?.allow_non_webp && img.contentType !== "image/webp") return ctx.error({error: "You can only upload webp as the source image"})
         if(img && ctx.client.config.advanced_generate?.source_image?.whitelist?.only_allow_whitelist && !ctx.client.config.advanced_generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)) return ctx.error({error: "You are not whitelisted to use a source image"})
 
@@ -271,6 +290,9 @@ export default class extends Command {
                 return `:${weight.toFixed(1)})`
             })
         }
+        
+        prompt = style.prompt.slice().replace("{p}", prompt)
+        prompt = prompt.replace("{np}", !negative_prompt || prompt.includes("###") ? negative_prompt : `###${negative_prompt}`)
         
         if(ctx.client.config.advanced?.dev) {
             console.log(img?.height)
@@ -554,6 +576,12 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const steps = Array.from({length: 3072/64}).map((_, i) => ({name: `${(i+1)*64}px${(i+1)*64 > 1024 ? " (Requires Kudos upfront)" : ""}`, value: (i+1)*64})).filter(v => v.value >= (context.client.config.advanced_generate?.user_restrictions?.height?.min ?? 64) && v.value <= (context.client.config.advanced_generate?.user_restrictions?.height?.max ?? 3072))
                 const inp = context.interaction.options.getFocused(true)
                 return await context.interaction.respond(steps.filter((v) => !inp.value || v.name.includes(inp.value)).slice(0,25))
+            }
+            case "style": {
+                const styles = Object.keys(context.client.horde_styles)
+                const available = styles.map(s => ({name: s, value: s}))
+                const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase())) : available
+                return await context.interaction.respond(ret.slice(0,25))
             }
         }
     }
