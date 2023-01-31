@@ -7,7 +7,7 @@ export default class extends Component {
         super({
             name: "followuprate",
             staff_only: false,
-            regex: /followuprate_\d_[0-9a-z-]+/
+            regex: /^followuprate_\d_[0-9a-z-]+$/
         })
     }
 

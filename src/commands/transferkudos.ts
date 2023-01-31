@@ -43,6 +43,8 @@ export default class extends Command {
             ephemeral: true
         })
 
+        await ctx.interaction.deferReply()
+
         const username = ctx.interaction.options.getString("user",true)
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         if(!username.includes("#")) return ctx.error({
@@ -58,7 +60,7 @@ export default class extends Command {
         }, {token}).catch(e => e)
 
         if(typeof transfer.name === "string") return ctx.error({error: transfer.name})
-        ctx.interaction.reply({
+        ctx.interaction.editReply({
             content: `Transferred ${amount} kudos to ${username}`
         })
     }
