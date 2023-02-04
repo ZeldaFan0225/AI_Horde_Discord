@@ -17,7 +17,6 @@ export class StableHordeClient extends Client {
 	cache: SuperMap<string, any>
 	timeout_users: SuperMap<string, any>
 	security_key?: Buffer
-	required_permissions: PermissionsBitField
 	bot_version: string
 	horde_styles: Record<string, {
 		prompt: string,
@@ -43,18 +42,23 @@ export class StableHordeClient extends Client {
         this.loadConfig()
 		this.security_key = this.config.advanced?.encrypt_token ? Buffer.from(process.env["ENCRYPTION_KEY"] || "", "hex") : undefined
 
-		this.required_permissions = new PermissionsBitField(
+		this.bot_version = JSON.parse(readFileSync("./package.json", "utf-8")).version
+
+		this.horde_styles = {}
+	}
+
+	getNeededPermissions(guild_id: string) {
+		const permission = this.checkGuildPermissions(guild_id, "apply_roles_to_trusted_users") || this.checkGuildPermissions(guild_id, "apply_roles_to_worker_owners")
+		const bitfield = new PermissionsBitField(
 			PermissionFlagsBits.ViewChannel |
 			PermissionFlagsBits.SendMessages |
 			PermissionFlagsBits.AttachFiles |
 			PermissionFlagsBits.EmbedLinks |
-			PermissionFlagsBits.ManageRoles |
 			PermissionFlagsBits.UseExternalEmojis
 		)
-
-		this.bot_version = JSON.parse(readFileSync("./package.json", "utf-8")).version
-
-		this.horde_styles = {}
+		if(this.config.party?.enabled) bitfield.add(PermissionFlagsBits.CreatePublicThreads | PermissionFlagsBits.ManageMessages)
+		if(permission) bitfield.add(PermissionFlagsBits.ManageRoles)
+		return bitfield
 	}
 
     loadConfig() {

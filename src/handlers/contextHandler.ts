@@ -22,9 +22,9 @@ export async function handleContexts(interaction: UserContextMenuCommandInteract
             error: "Please add me to the private thread (by mentioning me) to use commands",
             ephemeral: true
         })
-    if(interaction.appPermissions?.missing(client.required_permissions).length)
+    if(interaction.appPermissions?.missing(client.getNeededPermissions(interaction.guildId)).length)
         return await context.error({
-            error: `I require the following permissions to work:\n${interaction.appPermissions?.missing(client.required_permissions).join(", ")}`,
+            error: `I require the following permissions to work:\n${interaction.appPermissions.missing(client.getNeededPermissions(interaction.guildId)).join(", ")}`,
             codeblock: false,
             ephemeral: true
         })

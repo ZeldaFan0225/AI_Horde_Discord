@@ -1,5 +1,5 @@
 import StableHorde from "@zeldafan0225/stable_horde";
-import { AnySelectMenuInteraction, ButtonInteraction, ComponentType } from "discord.js";
+import { AnySelectMenuInteraction, ButtonInteraction, ComponentType, PermissionsBitField } from "discord.js";
 import { Pool } from "pg";
 import { StableHordeClient } from "../classes/client";
 import { ComponentContext } from "../classes/componentContext";
@@ -21,9 +21,9 @@ export async function handleComponents(interaction: ButtonInteraction | AnySelec
         }
     }
     
-    if(interaction.appPermissions?.missing(client.required_permissions).length)
+    if(interaction.appPermissions?.missing(client.getNeededPermissions(interaction.guildId)).length)
         return await context.error({
-            error: `I require the following permissions to work:\n${interaction.appPermissions?.missing(client.required_permissions).join(", ")}`,
+            error: `I require the following permissions to work:\n${(interaction.appPermissions || new PermissionsBitField).missing(client.getNeededPermissions(interaction.guildId)).join(", ")}`,
             codeblock: false,
             ephemeral: true
         })
