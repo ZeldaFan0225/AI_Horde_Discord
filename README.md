@@ -22,6 +22,10 @@ The bot has the following features:
 - /team which lets you see information on a team
 - /news which shows latest news about the horde
 - /transferkudos (Transfer Kudos context command) to send somebody kudos
+- /interrogate to interrogate any image
+- /party to start a generation party with a given style
+- "Remix" to edit another discord users avatar 
+- "Caption" to caption anozher discord users avatar
 - advanced configuration file which lets you change how the bot behaves and what actions the user can use (for limits refer to https://stablehorde.net/api)
 - logging prompts, user id and generation id to track generation of malicious, nsfw or illegal content
 - and even more...
