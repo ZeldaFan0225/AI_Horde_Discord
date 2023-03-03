@@ -24,7 +24,7 @@ export default class extends Modal {
             error: "The username must follow the scheme: Name#1234"
         })
 
-        const transfer = await ctx.stable_horde_manager.postKudosTransfer({
+        const transfer = await ctx.ai_horde_manager.postKudosTransfer({
             username,
             amount
         }, {token}).catch(e => e)

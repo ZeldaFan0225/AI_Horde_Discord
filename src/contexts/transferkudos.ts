@@ -25,14 +25,14 @@ export default class extends Context {
             style: 1
         })
         if(!token) return ctx.interaction.reply({
-            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://aihorde.net/register`,
+            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n\n\nDon't know what the token is?\nCreate an ai horde account here: https://aihorde.net/register`,
             components: [{type: 1, components: [add_token_button.toJSON()]}],
             ephemeral: true
         })
 
         const target_token = await ctx.client.getUserToken(ctx.interaction.targetId, ctx.database)
-        const target_user = await ctx.stable_horde_manager.findUser({token: target_token})
-        const own_user = await ctx.stable_horde_manager.findUser({token})
+        const target_user = await ctx.ai_horde_manager.findUser({token: target_token})
+        const own_user = await ctx.ai_horde_manager.findUser({token})
         const modal = new ModalBuilder({
             title: "Transfer Kudos",
             custom_id: "transfer_kudos",

@@ -1,16 +1,16 @@
-import StableHorde from "@zeldafan0225/stable_horde";
+import AIHorde from "@zeldafan0225/ai_horde";
 import { ApplicationCommandType, MessageContextMenuCommandInteraction, UserContextMenuCommandInteraction } from "discord.js";
 import { Pool } from "pg";
-import { StableHordeClient } from "../classes/client";
+import { AIHordeClient } from "../classes/client";
 import { ContextContext } from "../classes/contextContext";
 
-export async function handleContexts(interaction: UserContextMenuCommandInteraction | MessageContextMenuCommandInteraction, client: StableHordeClient, database: Pool | undefined, stable_horde_manager: StableHorde) {
+export async function handleContexts(interaction: UserContextMenuCommandInteraction | MessageContextMenuCommandInteraction, client: AIHordeClient, database: Pool | undefined, ai_horde_manager: AIHorde) {
     const command = await client.contexts.getContext(interaction).catch(() => null)
     if(!command) return;
 
     let context
-    if(interaction.commandType === ApplicationCommandType.User) context = new ContextContext<ApplicationCommandType.User>({interaction, client, database, stable_horde_manager})
-    else context = new ContextContext<ApplicationCommandType.Message>({interaction, client, database, stable_horde_manager})
+    if(interaction.commandType === ApplicationCommandType.User) context = new ContextContext<ApplicationCommandType.User>({interaction, client, database, ai_horde_manager})
+    else context = new ContextContext<ApplicationCommandType.Message>({interaction, client, database, ai_horde_manager})
 
     if(!interaction.inGuild())
         return await context.error({

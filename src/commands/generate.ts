@@ -4,7 +4,7 @@ import { CommandContext } from "../classes/commandContext";
 import { AutocompleteContext } from "../classes/autocompleteContext";
 import { readFileSync, appendFileSync } from "fs";
 import { Config } from "../types";
-import StableHorde from "@zeldafan0225/stable_horde";
+import AIHorde from "@zeldafan0225/ai_horde";
 import Centra from "centra";
 const {buffer2webpbuffer} = require("webp-converter")
 
@@ -13,7 +13,7 @@ const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 const command_data = new SlashCommandBuilder()
     .setName("generate")
     .setDMPermission(false)
-    .setDescription(`Generates an image with stable horde`)
+    .setDescription(`Generates an image with ai horde`)
     if(config.generate?.enabled) {
         command_data.addStringOption(
             new SlashCommandStringOption()
@@ -141,7 +141,7 @@ export default class extends Command {
         }
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
-        const stable_horde_user = await ctx.stable_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+        const ai_horde_user = await ctx.ai_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const can_bypass = ctx.client.config.generate?.source_image?.whitelist?.bypass_checks && ctx.client.config.generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
 
         if(!style?.prompt?.length) return ctx.error({error: "Unable to find style for input"})
@@ -150,7 +150,7 @@ export default class extends Command {
         if(ctx.client.config.generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(ctx.client.config.generate?.blacklisted_styles?.includes(style_raw.toLowerCase())) return ctx.error({error: "The chosen style is blacklisted"})
         if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use a source image`, codeblock: false})
-        if(img && ctx.client.config.generate?.source_image?.require_stable_horde_account_oauth_connection && (!stable_horde_user || stable_horde_user.pseudonymous)) return ctx.error({error: "Your stable horde account needs to be created with a oauth connection"})
+        if(img && ctx.client.config.generate?.source_image?.require_ai_horde_account_oauth_connection && (!ai_horde_user || ai_horde_user.pseudonymous)) return ctx.error({error: "Your ai horde account needs to be created with a oauth connection"})
         if(img && !can_bypass && ctx.client.config.generate?.source_image?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use a source image"})
         if(img && !img.contentType?.startsWith("image/")) return ctx.error({error: "Source Image input must be a image"})
         if(img && ((img.height ?? 0) > 3072 || (img.width ?? 0) > 3072)) return ctx.error({error: "Source Image input too large (max. 3072 x 3072)"})
@@ -202,7 +202,7 @@ export default class extends Command {
 
         if(ctx.client.config.advanced?.pre_check_prompts_for_suspicion?.enabled) {
             if(ctx.client.timeout_users.has(ctx.interaction.user.id)) return ctx.error({error: "Your previous prompt has been marked as suspicious.\nYou have been timed out, try again later."})
-            const filter_result = await ctx.stable_horde_manager.postFilters({
+            const filter_result = await ctx.ai_horde_manager.postFilters({
                 prompt
             }, {token: process.env["OPERATOR_API_KEY"]}).catch(console.error)
             if(filter_result && Number(filter_result.suspicion) >= 2) {
@@ -212,10 +212,10 @@ export default class extends Command {
         }
 
 
-        const generation_data: StableHorde.GenerationInput = {
+        const generation_data: AIHorde.GenerationInput = {
             prompt,
             params: {
-                sampler_name: style.sampler_name as typeof StableHorde.ModelGenerationInputStableSamplers[keyof typeof StableHorde.ModelGenerationInputStableSamplers],
+                sampler_name: style.sampler_name as typeof AIHorde.ModelGenerationInputStableSamplers[keyof typeof AIHorde.ModelGenerationInputStableSamplers],
                 height: height,
                 width: width,
                 n: amount,
@@ -238,7 +238,7 @@ export default class extends Command {
             console.log(generation_data)
         }
 
-        const generation_start = await ctx.stable_horde_manager.postAsyncGenerate(generation_data, {token})
+        const generation_start = await ctx.ai_horde_manager.postAsyncGenerate(generation_data, {token})
         .catch((e) => {
             if(ctx.client.config.advanced?.dev) console.error(e)
             return e;
@@ -264,8 +264,8 @@ export default class extends Command {
 
         if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " using a source image":""} with prompt "${prompt}" (${generation_start?.id})`)
 
-        const start_status = await ctx.stable_horde_manager.getImageGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
-        const start_horde_data = await ctx.stable_horde_manager.getPerformance()
+        const start_status = await ctx.ai_horde_manager.getImageGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+        const start_horde_data = await ctx.ai_horde_manager.getPerformance()
 
         if(ctx.client.config.advanced?.dev) {
             console.log(start_status)
@@ -289,7 +289,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
         const login_embed = new EmbedBuilder({
             color: Colors.Red,
             title: "You are not logged in",
-            description: `This will make your requests appear anonymous.\nThis can result in low generation speed due to low priority.\nLog in now with ${await ctx.client.getSlashCommandTag("login")}\n\nDon't know what the token is?\nCreate a stable horde account here: https://aihorde.net/register`
+            description: `This will make your requests appear anonymous.\nThis can result in low generation speed due to low priority.\nLog in now with ${await ctx.client.getSlashCommandTag("login")}\n\nDon't know what the token is?\nCreate an ai horde account here: https://aihorde.net/register`
         })
 
         if(ctx.client.config.advanced?.dev) embed.setFooter({text: generation_start.id})
@@ -340,7 +340,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
 
             if(error_timeout < (Date.now()-1000*60*2) || start_status?.faulted) {
                 if(!done) {
-                    await ctx.stable_horde_manager.deleteImageGenerationRequest(generation_start.id!)
+                    await ctx.ai_horde_manager.deleteImageGenerationRequest(generation_start.id!)
                     message.edit({
                         components: [],
                         content: "Generation cancelled due to errors",
@@ -373,7 +373,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             if((status?.wait_time ?? 0) > 60 * 2) {
                 embeds.push(new EmbedBuilder({
                     color: Colors.Yellow,
-                    title: "Stable Horde currently is under high load",
+                    title: "AI Horde currently is under high load",
                     description: "You can contribute your GPUs processing power to the project.\nRead more: https://aihorde.net/"
                 }).toJSON())
             }
@@ -387,9 +387,9 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
             if(done) return;
-            const status = await ctx.stable_horde_manager.getImageGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+            const status = await ctx.ai_horde_manager.getImageGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
             done = !!status?.done
-            const horde_data = await ctx.stable_horde_manager.getPerformance()
+            const horde_data = await ctx.ai_horde_manager.getPerformance()
             if(!status || (status as any).faulted) {
                 if(!done) await message.edit({content: "Image generation has been cancelled", embeds: []});
                 if(!precheck) clearInterval(inter)
@@ -403,7 +403,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             if(!status.done) return {status, horde_data}
             else {
                 done = true
-                const images = await ctx.stable_horde_manager.getImageGenerationStatus(generation_start!.id!)
+                const images = await ctx.ai_horde_manager.getImageGenerationStatus(generation_start!.id!)
 
                 const image_map_r = images.generations?.map(async (g, i) => {
                     const req = await Centra(g.img!, "get").send();
@@ -443,10 +443,10 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             const creator_token = await ctx.client.getUserToken(party.creator_id, ctx.database)
             const target_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
             if(!target_token) return message.reply({content: "You need to be logged in to receive rewards for this party"})
-            const target_suser = await ctx.stable_horde_manager.findUser({token: target_token})
+            const target_suser = await ctx.ai_horde_manager.findUser({token: target_token})
             if(!target_suser?.username || target_suser.id === 0) return message.reply({content: "Your saved token is invalid, please renew it to claim rewards"})
             if(!creator_token) return message.reply({content: "The creator of the party is logged out...\nLooks like you won't get any kudos"})
-            const transfer = await ctx.stable_horde_manager.postKudosTransfer({username: target_suser.username, amount: party.award}, {token: creator_token}).catch(console.error)
+            const transfer = await ctx.ai_horde_manager.postKudosTransfer({username: target_suser.username, amount: party.award}, {token: creator_token}).catch(console.error)
             if(!transfer?.transferred) return message.reply({content: "Unable to send you the reward"})
 
             await message.reply({allowedMentions: {parse: []}, content: `<@${ctx.interaction.user.id}>, the creator of the party <@${party.creator_id}> awarded you ${party.award} kudos for your ${party.recurring ? "" : "first "}generation.${party.recurring ? "\nIf you submit another generation you can claim the reward again" : "\nYou can not receive the reward again"}`})

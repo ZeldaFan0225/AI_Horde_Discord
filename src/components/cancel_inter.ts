@@ -15,7 +15,7 @@ export default class extends Component {
     override async run(ctx: ComponentContext<ComponentType.SelectMenu>): Promise<any> {
         if(ctx.interaction.message.interaction?.user.id !== ctx.interaction.user.id) return ctx.error({error: "Only the author of this command can cancel the job"})
         const id = ctx.interaction.customId.slice(13)
-        await ctx.stable_horde_manager.deleteInterrogationRequest(id)
+        await ctx.ai_horde_manager.deleteInterrogationRequest(id)
         ctx.interaction.deferUpdate()
     }
 }

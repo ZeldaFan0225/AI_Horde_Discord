@@ -23,7 +23,7 @@ export default class extends Command {
             style: 1
         })
         return ctx.interaction.reply({
-            content: `By entering your token you agree to the terms below:\n- we save only your token until you use ${await ctx.client.getSlashCommandTag("logout")} which will permanently delete your token from our database\n- we make requests using your token to provide the service. We ensure nobody can perform actions using your token\n\n**ALL PROMPTS CAN BE LOGGED AND YOU WILL BE REPORTED TO AUTHORITIES IF YOU GENERATE OR UPLOAD ANY KIND OF ILLEGAL CONTENT**\nCurrently logs are ${ctx.client.config.logs?.enabled ? "en":"dis"}abled\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://aihorde.net/register`,
+            content: `By entering your token you agree to the terms below:\n- we save only your token until you use ${await ctx.client.getSlashCommandTag("logout")} which will permanently delete your token from our database\n- we make requests using your token to provide the service. We ensure nobody can perform actions using your token\n\n**ALL PROMPTS CAN BE LOGGED AND YOU WILL BE REPORTED TO AUTHORITIES IF YOU GENERATE OR UPLOAD ANY KIND OF ILLEGAL CONTENT**\nCurrently logs are ${ctx.client.config.logs?.enabled ? "en":"dis"}abled\n\n\nDon't know what the token is?\nCreate an ai horde account here: https://aihorde.net/register`,
             components: [{type: 1, components: [add_token_button.toJSON()]}],
             ephemeral: true
         })

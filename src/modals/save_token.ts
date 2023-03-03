@@ -22,7 +22,7 @@ export default class extends Modal {
                 ephemeral: true
             })
         }
-        const user_data = await ctx.stable_horde_manager.findUser({token: raw_token}).catch(() => null)
+        const user_data = await ctx.ai_horde_manager.findUser({token: raw_token}).catch(() => null)
         if(ctx.interaction.inCachedGuild()) {
             const member = ctx.interaction.member
             let apply_roles = []
@@ -45,7 +45,7 @@ export default class extends Modal {
             const res_promise = pending_kudos.rows.map(async transaction => {
                 const from_token = await ctx.client.getUserToken(transaction.from_id, ctx.database)
                 if(!from_token) return {success: false, unique_id: transaction.unique_id, from: transaction.from_id, amount: transaction.amount}
-                const res = await ctx.stable_horde_manager.postKudosTransfer({username: user_data.username!, amount: transaction.amount}, {token: from_token}).catch(console.error)
+                const res = await ctx.ai_horde_manager.postKudosTransfer({username: user_data.username!, amount: transaction.amount}, {token: from_token}).catch(console.error)
                 if(!res?.transferred) return {success: false, unique_id: transaction.unique_id, from: transaction.from_id, amount: transaction.amount}
                 else return {success: true, unique_id: transaction.unique_id, from: transaction.from_id, amount: res.transferred}
             })

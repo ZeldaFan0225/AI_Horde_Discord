@@ -34,14 +34,14 @@ export default class extends Component {
         const [rate, id] = ctx.interaction.customId.split("_").slice(1)
         const token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
 
-        const res = await ctx.stable_horde_manager.ratings.postRating(id!, {rating: Number(rate)}, {token}).catch(console.error)
+        const res = await ctx.ai_horde_manager.ratings.postRating(id!, {rating: Number(rate)}, {token}).catch(console.error)
         if(!res?.message) ctx.error({
             error: "Unable to rate image"
         })
 
         if(ctx.client.config.advanced?.dev) console.log(res)
 
-        const img = await ctx.stable_horde_manager.ratings.getNewRating(undefined, {token}).catch(console.error)
+        const img = await ctx.ai_horde_manager.ratings.getNewRating(undefined, {token}).catch(console.error)
         if(!img?.url) return ctx.error({error: "Unable to request Image"})
 
         if(ctx.client.config.advanced?.dev) console.log(img)

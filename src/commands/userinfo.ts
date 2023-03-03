@@ -5,7 +5,7 @@ import { CommandContext } from "../classes/commandContext";
 const command_data = new SlashCommandBuilder()
     .setName("userinfo")
     .setDMPermission(false)
-    .setDescription(`Shows information on your stable horde account`)
+    .setDescription(`Shows information on your ai horde account`)
     .addUserOption(
         new SlashCommandUserOption()
         .setName("user")
@@ -38,14 +38,14 @@ export default class extends Command {
             style: 4
         })
         if(!token) return ctx.interaction.reply({
-            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n**You agree to not upload or generate any illegal content**${!ctx.client.config.advanced?.encrypt_token ? "\n\n**The bot is configured not to save your token in an encrypted form!**" : ""}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://aihorde.net/register`,
+            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n**You agree to not upload or generate any illegal content**${!ctx.client.config.advanced?.encrypt_token ? "\n\n**The bot is configured not to save your token in an encrypted form!**" : ""}\n\n\nDon't know what the token is?\nCreate an ai horde account here: https://aihorde.net/register`,
             components: [{type: 1, components: [add_token_button.toJSON()]}],
             ephemeral: true
         })
 
         await ctx.interaction.deferReply()
 
-        const user_data = await ctx.stable_horde_manager.findUser({token}).catch(() => null)
+        const user_data = await ctx.ai_horde_manager.findUser({token}).catch(() => null)
         
 
         const member = await ctx.interaction.guild?.members.fetch(user).catch(console.error)

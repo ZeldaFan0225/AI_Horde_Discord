@@ -1,4 +1,4 @@
-import StableHorde from "@zeldafan0225/stable_horde";
+import AIHorde from "@zeldafan0225/ai_horde";
 import {
     AnySelectMenuInteraction,
     ApplicationCommandData, AutocompleteInteraction,
@@ -10,7 +10,7 @@ import {
     UserContextMenuCommandInteraction
 } from "discord.js";
 import { Pool } from "pg";
-import { StableHordeClient } from "./classes/client";
+import { AIHordeClient } from "./classes/client";
 
 export enum StoreTypes {
     COMMANDS,
@@ -40,9 +40,9 @@ export interface CustomIDInitOptions {
 
 export interface BaseContextInitOptions {
     interaction: Interaction,
-    client: StableHordeClient,
+    client: AIHordeClient,
     database: Pool | undefined,
-    stable_horde_manager: StableHorde
+    ai_horde_manager: AIHorde
 }
 
 export interface CommandContextInitOptions extends BaseContextInitOptions {
@@ -164,7 +164,7 @@ export interface Config {
             },
             cfg?: number,
             amount?: number,
-            sampler?: typeof StableHorde.ModelGenerationInputStableSamplers,
+            sampler?: typeof AIHorde.ModelGenerationInputStableSamplers,
             model?: string,
             denoise?: number,
             gfpgan?: boolean,
@@ -176,7 +176,7 @@ export interface Config {
         },
         source_image?: {
             require_login?: boolean,
-            require_stable_horde_account_oauth_connection?: boolean,
+            require_ai_horde_account_oauth_connection?: boolean,
             allow_non_webp?: boolean,
             require_nsfw_channel?: boolean,
             whitelist?: {
@@ -252,7 +252,7 @@ export interface Config {
         },
         source_image?: {
             require_login?: boolean,
-            require_stable_horde_account_oauth_connection?: boolean,
+            require_ai_horde_account_oauth_connection?: boolean,
             allow_non_webp?: boolean,
             require_nsfw_channel?: boolean,
             whitelist?: {

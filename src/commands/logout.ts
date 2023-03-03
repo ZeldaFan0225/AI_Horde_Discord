@@ -20,7 +20,7 @@ export default class extends Command {
         if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
         const token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
         if(!token) return ctx.interaction.reply({
-            content: "You don't have your stable horde token saved in our database",
+            content: "You don't have your ai horde token saved in our database",
             ephemeral: true
         })
         await ctx.database.query("DELETE FROM user_tokens WHERE id=$1", [ctx.interaction.user.id])

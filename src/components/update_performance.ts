@@ -13,7 +13,7 @@ export default class extends Component {
     }
 
     override async run(ctx: ComponentContext<ComponentType.SelectMenu>): Promise<any> {
-        const performance = await ctx.stable_horde_manager.getPerformance()
+        const performance = await ctx.ai_horde_manager.getPerformance()
         const btn = new ButtonBuilder({
             label: "Refresh",
             style: 2,
@@ -21,7 +21,7 @@ export default class extends Component {
         })
         const embed = new EmbedBuilder({
             color: Colors.Blue,
-            title: "Stable Horde Performance",
+            title: "AI Horde Performance",
             description: `Queued Requests \`${performance.queued_requests}\`
 Queued Interrogation Requests \`${performance.queued_forms}\`
 Queued Megapixelsteps \`${performance.queued_megapixelsteps}\`

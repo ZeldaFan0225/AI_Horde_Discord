@@ -17,7 +17,7 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
-        const models = await ctx.stable_horde_manager.getModels({force: true})
+        const models = await ctx.ai_horde_manager.getModels({force: true})
 
         let files = []
 

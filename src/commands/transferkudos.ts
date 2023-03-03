@@ -38,7 +38,7 @@ export default class extends Command {
             style: 1
         })
         if(!token) return ctx.interaction.reply({
-            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://aihorde.net/register`,
+            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n\n\nDon't know what the token is?\nCreate an ai horde account here: https://aihorde.net/register`,
             components: [{type: 1, components: [add_token_button.toJSON()]}],
             ephemeral: true
         })
@@ -54,7 +54,7 @@ export default class extends Command {
             error: "You can only send one or mode kudos"
         })
 
-        const transfer = await ctx.stable_horde_manager.postKudosTransfer({
+        const transfer = await ctx.ai_horde_manager.postKudosTransfer({
             username,
             amount
         }, {token}).catch(e => e)

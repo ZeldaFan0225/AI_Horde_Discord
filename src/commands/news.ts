@@ -5,7 +5,7 @@ import { CommandContext } from "../classes/commandContext";
 const command_data = new SlashCommandBuilder()
     .setName("news")
     .setDMPermission(false)
-    .setDescription(`Shows ours news of stable horde`)
+    .setDescription(`Shows ours news of ai horde`)
 
 export default class extends Command {
     constructor() {
@@ -17,7 +17,7 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
-        const news = await ctx.stable_horde_manager.getNews()
+        const news = await ctx.ai_horde_manager.getNews()
         const embeds = news.slice(0, 3).map(n => new EmbedBuilder({
             title: n.importance,
             description: n.newspiece,
@@ -25,7 +25,7 @@ export default class extends Command {
             color: Colors.Red
         }).toJSON())
         ctx.interaction.reply({
-            content: `Stable Horde News (3/${news.length})`,
+            content: `AI Horde News (3/${news.length})`,
             embeds,
             ephemeral: true
         })

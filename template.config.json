@@ -94,7 +94,7 @@
         },
         "source_image": {
             "require_login": true,
-            "require_stable_horde_account_oauth_connection": false,
+            "require_ai_horde_account_oauth_connection": false,
             "allow_non_webp": true,
             "require_nsfw_channel": false,
             "whitelist": {
@@ -170,7 +170,7 @@
         },
         "source_image": {
             "require_login": true,
-            "require_stable_horde_account_oauth_connection": false,
+            "require_ai_horde_account_oauth_connection": false,
             "allow_non_webp": true,
             "require_nsfw_channel": false,
             "whitelist": {

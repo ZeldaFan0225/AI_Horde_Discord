@@ -1,9 +1,9 @@
-import StableHorde from "@zeldafan0225/stable_horde";
+import AIHorde from "@zeldafan0225/ai_horde";
 import { Colors, MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js";
 import { Pool } from "pg";
-import { StableHordeClient } from "../classes/client";
+import { AIHordeClient } from "../classes/client";
 
-export async function handleMessageReact(reaction: PartialMessageReaction | MessageReaction, user: User | PartialUser, client: StableHordeClient, database: Pool | undefined, stable_horde_manager: StableHorde): Promise<any> {
+export async function handleMessageReact(reaction: PartialMessageReaction | MessageReaction, user: User | PartialUser, client: AIHordeClient, database: Pool | undefined, ai_horde_manager: AIHorde): Promise<any> {
     if(!client.config.use_database || !database || !client.config.react_to_transfer?.enabled) return;
     if(!client.checkGuildPermissions(reaction.message.guildId, "react_to_transfer")) return;
     const emoji = client.config.react_to_transfer?.emojis?.find(e => e.id === reaction.emoji.id)
@@ -37,7 +37,7 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
                 await target_user.send({
                     embeds: [{
                         title: emoji.title ?? "Surprise",
-                        description: `**${u.tag}** tried to gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}\n\nSince you are not logged in you **did not** receive them. Log in with your [stable horde account](https://aihorde.net/register) within a week to claim your Kudos.`,
+                        description: `**${u.tag}** tried to gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}\n\nSince you are not logged in you **did not** receive them. Log in with your [ai horde account](https://aihorde.net/register) within a week to claim your Kudos.`,
                         color: Colors.Red
                     }]
                 })
@@ -53,9 +53,9 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
         }
         return await r.users.remove(u);
     }
-    const target_shuser = await stable_horde_manager.findUser({token: target_usertoken})
+    const target_shuser = await ai_horde_manager.findUser({token: target_usertoken})
     if(!target_shuser) return await r.users.remove(u);
-    const transfer = await stable_horde_manager.postKudosTransfer({username: target_shuser.username!, amount: emoji.amount ?? 1}, {token: usertoken}).catch(console.error)
+    const transfer = await ai_horde_manager.postKudosTransfer({username: target_shuser.username!, amount: emoji.amount ?? 1}, {token: usertoken}).catch(console.error)
 
     if(!transfer?.transferred) {
         await r.users.remove(u);

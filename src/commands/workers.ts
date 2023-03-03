@@ -6,7 +6,7 @@ import { CommandContext } from "../classes/commandContext";
 const command_data = new SlashCommandBuilder()
     .setName("worker")
     .setDMPermission(false)
-    .setDescription(`Shows information on your stable horde workers`)
+    .setDescription(`Shows information on your ai horde workers`)
     .addStringOption(
         new SlashCommandStringOption()
         .setName("query")
@@ -26,7 +26,7 @@ export default class extends Command {
 
     override async run(ctx: CommandContext): Promise<any> {
         const query = ctx.interaction.options.getString("query")
-        const workers = await ctx.stable_horde_manager.getWorkers()
+        const workers = await ctx.ai_horde_manager.getWorkers()
         const worker = workers.find(t => t.id?.toLowerCase() === query?.toLowerCase() || t.name?.toLowerCase() === query?.toLowerCase())
         
         if(query && worker) {
@@ -81,7 +81,7 @@ Maintenance: \`${worker.maintenance_mode}\``,
         const option = context.interaction.options.getFocused(true)
         switch(option.name) {
             case "query": {
-                const workers = await context.stable_horde_manager.getWorkers()
+                const workers = await context.ai_horde_manager.getWorkers()
                 if(context.client.config.advanced?.dev) console.log(workers)
                 const available = workers.filter(t => t.name?.toLowerCase().includes(option.value.toLowerCase()) || t.id?.toLowerCase().includes(option.value.toLowerCase())).map(t => ({name: `${t.name} | ${t.id}`, value: t.id!}))
                 return await context.interaction.respond(available.slice(0, 25))

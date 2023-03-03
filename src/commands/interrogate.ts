@@ -3,14 +3,14 @@ import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 import { Config } from "../types";
 import {readFileSync} from "fs"
-import StableHorde from "@zeldafan0225/stable_horde";
+import AIHorde from "@zeldafan0225/ai_horde";
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
 const command_data = new SlashCommandBuilder()
     .setName("interrogate")
     .setDMPermission(false)
-    .setDescription(`Interrogates an image with stable horde`)
+    .setDescription(`Interrogates an image with ai horde`)
     if(config.interrogate?.enabled) {
         command_data.addAttachmentOption(
             new SlashCommandAttachmentOption()
@@ -70,16 +70,16 @@ export default class extends Command {
 
         const forms = []
 
-        if(nsfw) forms.push({name: StableHorde.ModelInterrogationFormTypes.nsfw})
-        if(caption) forms.push({name: StableHorde.ModelInterrogationFormTypes.caption})
-        if(detailed) forms.push({name: StableHorde.ModelInterrogationFormTypes.interrogation})
+        if(nsfw) forms.push({name: AIHorde.ModelInterrogationFormTypes.nsfw})
+        if(caption) forms.push({name: AIHorde.ModelInterrogationFormTypes.caption})
+        if(detailed) forms.push({name: AIHorde.ModelInterrogationFormTypes.interrogation})
 
-        const interrogation_data: StableHorde.ModelInterrogationInputStable = {
+        const interrogation_data: AIHorde.ModelInterrogationInputStable = {
             source_image: attachment.url,
             forms
         }
 
-        const interrogation_start = await ctx.stable_horde_manager.postAsyncInterrogate(interrogation_data, {token})
+        const interrogation_start = await ctx.ai_horde_manager.postAsyncInterrogate(interrogation_data, {token})
         .catch((e) => {
             if(ctx.client.config.advanced?.dev) console.error(e)
             ctx.error({error: `Unable to start interrogation: ${e.message}`})
@@ -89,8 +89,8 @@ export default class extends Command {
 
         if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} interrogated ${attachment.url} (${interrogation_start?.id})`)
 
-        const start_status = await ctx.stable_horde_manager.getInterrogationStatus(interrogation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
-        const start_horde_data = await ctx.stable_horde_manager.getPerformance()
+        const start_status = await ctx.ai_horde_manager.getInterrogationStatus(interrogation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+        const start_horde_data = await ctx.ai_horde_manager.getPerformance()
 
         if(ctx.client.config.advanced?.dev) {
             console.log(start_status)
@@ -103,7 +103,7 @@ export default class extends Command {
 
 Interrogation workers: \`${start_horde_data.interrogator_count}\`
 Interrogations queued: \`${start_horde_data.queued_forms}\`
-${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.nsfw)?.state}\`` : ""}${caption ? `\n**Caption** \`${start_status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.caption)?.state}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${start_status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.interrogation)?.state}\`` : ""}`,
+${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.nsfw)?.state}\`` : ""}${caption ? `\n**Caption** \`${start_status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.caption)?.state}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${start_status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.interrogation)?.state}\`` : ""}`,
             image: {
                 url: attachment.url
             }
@@ -139,9 +139,9 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.M
             const {status, horde_data} = d
 
 
-            if(start_status?.state === StableHorde.HordeAsyncRequestStates.faulted) {
+            if(start_status?.state === AIHorde.HordeAsyncRequestStates.faulted) {
                 if(!done) {
-                    await ctx.stable_horde_manager.deleteInterrogationRequest(interrogation_start.id!)
+                    await ctx.ai_horde_manager.deleteInterrogationRequest(interrogation_start.id!)
                     message.edit({
                         components: [],
                         content: "Interrogation cancelled due to errors",
@@ -159,7 +159,7 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.M
 
                 Interrogation workers: \`${horde_data.interrogator_count}\`
                 Interrogations queued: \`${horde_data.queued_forms}\`
-                ${nsfw ? `\n**NSFW** \`${status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.nsfw)?.state}\`` : ""}${caption ? `\n**Caption** \`${status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.caption)?.state}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.interrogation)?.state}\`` : ""}`,
+                ${nsfw ? `\n**NSFW** \`${status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.nsfw)?.state}\`` : ""}${caption ? `\n**Caption** \`${status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.caption)?.state}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.interrogation)?.state}\`` : ""}`,
                 image: {
                     url: attachment.url
                 }
@@ -177,10 +177,10 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.M
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
             if(done) return;
-            const status = await ctx.stable_horde_manager.getInterrogationStatus(interrogation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
-            done = status?.state === StableHorde.HordeAsyncRequestStates.done
-            const horde_data = await ctx.stable_horde_manager.getPerformance()
-            if(!status || status.state === StableHorde.HordeAsyncRequestStates.faulted) {
+            const status = await ctx.ai_horde_manager.getInterrogationStatus(interrogation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+            done = status?.state === AIHorde.HordeAsyncRequestStates.done
+            const horde_data = await ctx.ai_horde_manager.getPerformance()
+            if(!status || status.state === AIHorde.HordeAsyncRequestStates.faulted) {
                 if(!done) await message.edit({content: "Interrogation has been cancelled", embeds: []});
                 if(!precheck) clearInterval(inter)
                 return null;
@@ -190,18 +190,18 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.M
                 console.log(status)
             }
 
-            if(status.state !== StableHorde.HordeAsyncRequestStates.done && status.state !== StableHorde.HordeAsyncRequestStates.partial) return {status, horde_data}
+            if(status.state !== AIHorde.HordeAsyncRequestStates.done && status.state !== AIHorde.HordeAsyncRequestStates.partial) return {status, horde_data}
             else {
                 done = true
 
-                const nsfw_res = status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.nsfw)
-                const caption_res = status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.caption)
-                const detailed_res = status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.interrogation)
+                const nsfw_res = status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.nsfw)
+                const caption_res = status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.caption)
+                const detailed_res = status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.interrogation)
                 
                 const embed = new EmbedBuilder({
                     color: Colors.Blue,
                     title: "Interrogation finished",
-                    description: `${nsfw ? `**NSFW** \`${nsfw_res?.state !== StableHorde.HordeAsyncRequestStates.done ? nsfw_res?.state : nsfw_res?.result?.nsfw}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${detailed_res?.state !== StableHorde.HordeAsyncRequestStates.done ? detailed_res?.state : "Result attached"}\`` : ""}${caption ? `\n**Caption**\n${caption_res?.state !== StableHorde.HordeAsyncRequestStates.done ? caption_res?.state : caption_res?.result?.caption}` : ""}`,
+                    description: `${nsfw ? `**NSFW** \`${nsfw_res?.state !== AIHorde.HordeAsyncRequestStates.done ? nsfw_res?.state : nsfw_res?.result?.nsfw}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${detailed_res?.state !== AIHorde.HordeAsyncRequestStates.done ? detailed_res?.state : "Result attached"}\`` : ""}${caption ? `\n**Caption**\n${caption_res?.state !== AIHorde.HordeAsyncRequestStates.done ? caption_res?.state : caption_res?.result?.caption}` : ""}`,
                     image: {
                         url: attachment.url
                     }
@@ -210,7 +210,7 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === StableHorde.M
                 if(!precheck) clearInterval(inter)
 
                 const files = []
-                if(detailed && detailed_res?.state === StableHorde.HordeAsyncRequestStates.done) files.push(new AttachmentBuilder(Buffer.from(JSON.stringify((status?.forms?.find(f => f.form === StableHorde.ModelInterrogationFormTypes.interrogation)?.result?.interrogation || {}), null, 2)), {name: "detailed.json"}))
+                if(detailed && detailed_res?.state === AIHorde.HordeAsyncRequestStates.done) files.push(new AttachmentBuilder(Buffer.from(JSON.stringify((status?.forms?.find(f => f.form === AIHorde.ModelInterrogationFormTypes.interrogation)?.result?.interrogation || {}), null, 2)), {name: "detailed.json"}))
                 await message.edit({components: [{type: 1, components: [delete_btn.toJSON()]}], embeds: [embed], files});
                 return null
             } 
