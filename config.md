@@ -216,7 +216,7 @@ Here you can see an explanation of what which option does
 }
 ```
 
-`*1` See API Documentation for reference (https://stablehorde.net/api)  
+`*1` See API Documentation for reference (https://https://aihorde.net//api)  
 `*2` Available Samplers: k_lms, k_heun, k_euler, k_euler_a, k_dpm_2, k_dpm_2_a, DDIM, PLMS, k_dpm_fast, k_dpm_adaptive, k_dpmpp_2s_a, k_dpmpp_2m, dpmsolver  
 `*3` Not all models are available at all times *1  
 `*4` Developer mode will enable logging and will also show the generations ID in the embed in Discord  

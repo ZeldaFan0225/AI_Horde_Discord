@@ -264,7 +264,7 @@ export default class extends Command {
 
         if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " using a source image":""} with prompt "${prompt}" (${generation_start?.id})`)
 
-        const start_status = await ctx.stable_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+        const start_status = await ctx.stable_horde_manager.getImageGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const start_horde_data = await ctx.stable_horde_manager.getPerformance()
 
         if(ctx.client.config.advanced?.dev) {
@@ -289,7 +289,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
         const login_embed = new EmbedBuilder({
             color: Colors.Red,
             title: "You are not logged in",
-            description: `This will make your requests appear anonymous.\nThis can result in low generation speed due to low priority.\nLog in now with ${await ctx.client.getSlashCommandTag("login")}\n\nDon't know what the token is?\nCreate a stable horde account here: https://stablehorde.net/register`
+            description: `This will make your requests appear anonymous.\nThis can result in low generation speed due to low priority.\nLog in now with ${await ctx.client.getSlashCommandTag("login")}\n\nDon't know what the token is?\nCreate a stable horde account here: https://https://aihorde.net//register`
         })
 
         if(ctx.client.config.advanced?.dev) embed.setFooter({text: generation_start.id})
@@ -340,7 +340,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
 
             if(error_timeout < (Date.now()-1000*60*2) || start_status?.faulted) {
                 if(!done) {
-                    await ctx.stable_horde_manager.deleteGenerationRequest(generation_start.id!)
+                    await ctx.stable_horde_manager.deleteImageGenerationRequest(generation_start.id!)
                     message.edit({
                         components: [],
                         content: "Generation cancelled due to errors",
@@ -374,7 +374,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 embeds.push(new EmbedBuilder({
                     color: Colors.Yellow,
                     title: "Stable Horde currently is under high load",
-                    description: "You can contribute your GPUs processing power to the project.\nRead more: https://stablehorde.net/"
+                    description: "You can contribute your GPUs processing power to the project.\nRead more: https://https://aihorde.net//"
                 }).toJSON())
             }
 
@@ -387,7 +387,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
             if(done) return;
-            const status = await ctx.stable_horde_manager.getGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+            const status = await ctx.stable_horde_manager.getImageGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
             done = !!status?.done
             const horde_data = await ctx.stable_horde_manager.getPerformance()
             if(!status || (status as any).faulted) {
@@ -403,7 +403,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             if(!status.done) return {status, horde_data}
             else {
                 done = true
-                const images = await ctx.stable_horde_manager.getGenerationStatus(generation_start!.id!)
+                const images = await ctx.stable_horde_manager.getImageGenerationStatus(generation_start!.id!)
 
                 const image_map_r = images.generations?.map(async (g, i) => {
                     const req = await Centra(g.img!, "get").send();

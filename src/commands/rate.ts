@@ -44,7 +44,7 @@ export default class extends Command {
             style: 1
         })
         if(!token) return ctx.interaction.editReply({
-            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://stablehorde.net/register`,
+            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n\n\nDon't know what the token is?\nCreate a stable horde account here: https://https://aihorde.net//register`,
             components: [{type: 1, components: [add_token_button.toJSON()]}]
         })
 
