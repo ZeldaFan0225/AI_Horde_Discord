@@ -1,4 +1,4 @@
-# Stable_Horde_Discord
+# AI_Horde_Discord
 
 A basic Discord bot to generate images using the Stable Horde API.
 
