@@ -289,7 +289,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
         const login_embed = new EmbedBuilder({
             color: Colors.Red,
             title: "You are not logged in",
-            description: `This will make your requests appear anonymous.\nThis can result in low generation speed due to low priority.\nLog in now with ${await ctx.client.getSlashCommandTag("login")}\n\nDon't know what the token is?\nCreate a stable horde account here: https://https://aihorde.net//register`
+            description: `This will make your requests appear anonymous.\nThis can result in low generation speed due to low priority.\nLog in now with ${await ctx.client.getSlashCommandTag("login")}\n\nDon't know what the token is?\nCreate a stable horde account here: https://aihorde.net/register`
         })
 
         if(ctx.client.config.advanced?.dev) embed.setFooter({text: generation_start.id})
@@ -374,7 +374,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 embeds.push(new EmbedBuilder({
                     color: Colors.Yellow,
                     title: "Stable Horde currently is under high load",
-                    description: "You can contribute your GPUs processing power to the project.\nRead more: https://https://aihorde.net//"
+                    description: "You can contribute your GPUs processing power to the project.\nRead more: https://aihorde.net/"
                 }).toJSON())
             }
 
