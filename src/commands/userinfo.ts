@@ -71,10 +71,12 @@ export default class extends Command {
             color: Colors.Blue,
             footer: {text: `${props.join(" | ")}`},
             title: `${user_data.username}`,
-            description: `Images Requested \`${user_data.usage?.requests}\` (\`${user_data.usage?.megapixelsteps}\` Megapixelsteps)
-Images Generated \`${user_data.contributions?.fulfillments}\` (\`${user_data.contributions?.megapixelsteps}\` Megapixelsteps)
-Allowed Concurrency \`${user_data.concurrency}\`
-Pseudonymous User \`${user_data.pseudonymous}\`
+            description: `Images Requested \`${user_data.records?.request?.image}\` (\`${user_data.records?.usage?.megapixelsteps}\` Megapixelsteps)
+Images Generated \`${user_data.records?.fulfillment?.image}\` (\`${user_data.records?.contribution?.megapixelsteps}\` Megapixelsteps)
+Interrogation Requested \`${user_data.records?.request?.interrogation}\`
+Interrogation Generated \`${user_data.records?.fulfillment?.interrogation}\`
+Text Requested \`${user_data.records?.request?.text}\`
+Text Generated \`${user_data.records?.fulfillment?.text}\`
 
 **Kudos**
 Total \`${user_data.kudos}\`
