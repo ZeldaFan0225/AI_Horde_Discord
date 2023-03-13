@@ -1,10 +1,10 @@
-import { ApplicationCommandData, ApplicationCommandType } from "discord.js"
+import { ApplicationCommandType, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody } from "discord.js"
 import { CommandInitOptions } from "../types"
 import { ContextContext } from "./contextContext"
 
 export class Context {
     name: string
-    commandData?: ApplicationCommandData
+    commandData?: RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody
     constructor(options: CommandInitOptions) {
         this.name = options.name
         this.commandData = options.command_data

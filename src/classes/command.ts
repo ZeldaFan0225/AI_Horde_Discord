@@ -1,11 +1,11 @@
-import { ApplicationCommandData } from "discord.js"
+import { RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody } from "discord.js"
 import {CommandInitOptions} from "../types";
 import { AutocompleteContext } from "./autocompleteContext";
 import {CommandContext} from "./commandContext";
 
 export class Command {
     name: string
-    commandData?: ApplicationCommandData
+    commandData?: RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody
     constructor(options: CommandInitOptions) {
         this.name = options.name
         this.commandData = options.command_data

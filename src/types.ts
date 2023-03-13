@@ -1,12 +1,14 @@
 import AIHorde from "@zeldafan0225/ai_horde";
 import {
     AnySelectMenuInteraction,
-    ApplicationCommandData, AutocompleteInteraction,
+    AutocompleteInteraction,
     ButtonInteraction,
     ChatInputCommandInteraction,
     Interaction,
     MessageContextMenuCommandInteraction,
     ModalSubmitInteraction,
+    RESTPostAPIChatInputApplicationCommandsJSONBody,
+    RESTPostAPIContextMenuApplicationCommandsJSONBody,
     UserContextMenuCommandInteraction
 } from "discord.js";
 import { Pool } from "pg";
@@ -27,7 +29,7 @@ export interface StoreInitOptions {
 
 export interface CommandInitOptions {
     name: string,
-    command_data: ApplicationCommandData,
+    command_data: RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody,
     staff_only: boolean,
 }
 
