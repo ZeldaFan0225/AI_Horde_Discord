@@ -238,7 +238,7 @@ export default class extends Command {
             console.log(generation_data)
         }
 
-        const generation_start = await ctx.ai_horde_manager.postAsyncGenerate(generation_data, {token})
+        const generation_start = await ctx.ai_horde_manager.postAsyncImageGenerate(generation_data, {token})
         .catch((e) => {
             if(ctx.client.config.advanced?.dev) console.error(e)
             return e;

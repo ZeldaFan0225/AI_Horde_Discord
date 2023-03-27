@@ -16,7 +16,7 @@ export default class extends Component {
         await ctx.interaction.deferUpdate()
         const [rate, id] = ctx.interaction.customId.split("_").slice(1)
 
-        const generation = await ctx.ai_horde_manager.getGenerationStatus(id!).catch(console.error)
+        const generation = await ctx.ai_horde_manager.getImageGenerationStatus(id!).catch(console.error)
         if(!generation?.generations?.length) return ctx.error({error: "Unable to find generation"})
 
         const res = await ctx.ai_horde_manager.postRating(id!, {

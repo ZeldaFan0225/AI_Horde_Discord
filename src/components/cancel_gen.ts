@@ -15,7 +15,7 @@ export default class extends Component {
     override async run(ctx: ComponentContext<ComponentType.SelectMenu>): Promise<any> {
         if(ctx.interaction.message.interaction?.user.id !== ctx.interaction.user.id) return ctx.error({error: "Only the creator of this prompt can cancel the job"})
         const id = ctx.interaction.customId.slice(11)
-        await ctx.ai_horde_manager.deleteGenerationRequest(id)
+        await ctx.ai_horde_manager.deleteImageGenerationRequest(id)
         ctx.interaction.update({
             components: [],
             content: "Generation cancelled",

@@ -81,7 +81,7 @@ export default class extends Modal {
 
         const message = await ctx.interaction.editReply({content: `Remixing...`})
 
-        const generation_start = await ctx.ai_horde_manager.postAsyncGenerate(generation_data, {token: user_token})
+        const generation_start = await ctx.ai_horde_manager.postAsyncImageGenerate(generation_data, {token: user_token})
         .catch((e) => {
             if(ctx.client.config.advanced?.dev) console.error(e)
             return e;
@@ -106,7 +106,7 @@ export default class extends Modal {
         }
         
         const inter = setInterval(async () => {
-            const status = await ctx.ai_horde_manager.getGenerationCheck(generation_start?.id!)
+            const status = await ctx.ai_horde_manager.getImageGenerationCheck(generation_start?.id!)
             if(ctx.client.config.advanced?.dev) {
                 console.log(status)
                 if(!status.done && !status.faulted) await message.edit({
@@ -120,7 +120,7 @@ export default class extends Modal {
         async function displayResult() {
             clearInterval(inter)
             if(!target_user?.id) return displayError();
-            const result = await ctx.ai_horde_manager.getGenerationStatus(generation_start.id)
+            const result = await ctx.ai_horde_manager.getImageGenerationStatus(generation_start.id)
             const generation = result.generations?.[0]
             if(!generation?.id) return displayError();
             if(ctx.client.config.advanced?.dev) console.log(generation)

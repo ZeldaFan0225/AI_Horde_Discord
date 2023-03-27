@@ -365,7 +365,7 @@ export default class extends Command {
             console.log(generation_data)
         }
 
-        const generation_start = await ctx.ai_horde_manager.postAsyncGenerate(generation_data, {token})
+        const generation_start = await ctx.ai_horde_manager.postAsyncImageGenerate(generation_data, {token})
         .catch((e) => {
             if(ctx.client.config.advanced?.dev) console.error(e)
             return e;
@@ -391,7 +391,7 @@ export default class extends Command {
 
         if(ctx.client.config.advanced?.dev) console.log(`${ctx.interaction.user.id} generated${!!img ? " using a source image":""} with prompt "${prompt}" (${generation_start?.id})`)
 
-        const start_status = await ctx.ai_horde_manager.getGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+        const start_status = await ctx.ai_horde_manager.getImageGenerationCheck(generation_start.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const start_horde_data = await ctx.ai_horde_manager.getPerformance()
 
         if(ctx.client.config.advanced?.dev) {
@@ -467,7 +467,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
 
             if(error_timeout < (Date.now()-1000*60*2) || start_status?.faulted) {
                 if(!done) {
-                    await ctx.ai_horde_manager.deleteGenerationRequest(generation_start.id!)
+                    await ctx.ai_horde_manager.deleteImageGenerationRequest(generation_start.id!)
                     message.edit({
                         components: [],
                         content: "Generation cancelled due to errors",
@@ -514,7 +514,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
             if(done) return;
-            const status = await ctx.ai_horde_manager.getGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+            const status = await ctx.ai_horde_manager.getImageGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
             done = !!status?.done
             const horde_data = await ctx.ai_horde_manager.getPerformance()
             if(!status || (status as any).faulted) {
@@ -530,7 +530,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             if(!status.done) return {status, horde_data}
             else {
                 done = true
-                const images = await ctx.ai_horde_manager.getGenerationStatus(generation_start!.id!)
+                const images = await ctx.ai_horde_manager.getImageGenerationStatus(generation_start!.id!)
 
                 const image_map_r = images.generations?.map(async (g, i) => {
                     const req = await Centra(g.img!, "get").send();
