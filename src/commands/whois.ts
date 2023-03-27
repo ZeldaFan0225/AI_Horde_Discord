@@ -29,8 +29,6 @@ export default class extends Command {
 
         if(!user_data) return ctx.error({error: "Unable to find horde user"})
         await ctx.interaction.deferReply()
-        
-        console.log(user_data)
 
         const props = []
         if(user_data.moderator) props.push("⚔️ Moderator")
