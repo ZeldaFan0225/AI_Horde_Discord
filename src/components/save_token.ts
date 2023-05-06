@@ -23,7 +23,7 @@ export default class extends Component {
                 components: [{
                     type: 4,
                     label: "Token",
-                    value: token || ctx.client.config.default_token || "0000000000",
+                    value: token || "0000000000",
                     custom_id: "token",
                     style: 1,
                     required: false
