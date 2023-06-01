@@ -9,8 +9,14 @@ const command_data = new SlashCommandBuilder()
     .addStringOption(
         new SlashCommandStringOption()
         .setName("user")
-        .setRequired(true)
-        .setDescription("The use to send the kudos to")
+        .setRequired(false)
+        .setDescription("The user to send the kudos to")
+    )
+    .addStringOption(
+        new SlashCommandStringOption()
+        .setName("discord user")
+        .setRequired(false)
+        .setDescription("If you aren't using horde usernames, pick a discord user to send to.")
     )
     .addIntegerOption(
         new SlashCommandIntegerOption()
@@ -30,6 +36,28 @@ export default class extends Command {
     }
 
     override async run(ctx: CommandContext): Promise<any> {
+
+        let username;
+       
+        if (ctx.interaction.options.getUser("discord user") != undefined) {
+            const user = ctx.interaction.options.getUser("discord user")?.id
+            let token = await ctx.client.getUserToken(user!, ctx.database)
+            if(!token && ctx.interaction.options.getUser("discord user")?.id) {
+                return ctx.error({error: "The user has not added their token"})
+            }
+            const user_data = await ctx.ai_horde_manager.findUser({token}).catch(() => null)
+            if(!user_data) return ctx.error({
+                error: `Unable to find user for saved token.\nUpdate your token with ${await ctx.client.getSlashCommandTag("updatetoken")}`,
+                codeblock: false
+            })
+            username = user_data.username
+        } else if (ctx.interaction.options.getString("user")) {
+            username = ctx.interaction.options.getString("user",true)
+        } else {
+            return ctx.error({error: "You did not specify a discord user or a horde user."})
+        }
+        
+
         if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
         let token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
         const add_token_button = new ButtonBuilder({
@@ -43,11 +71,10 @@ export default class extends Command {
             ephemeral: true
         })
 
-        await ctx.interaction.deferReply()
 
-        const username = ctx.interaction.options.getString("user",true)
+        await ctx.interaction.deferReply()
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
-        if(!username.includes("#")) return ctx.error({
+        if(!username?.includes("#")) return ctx.error({
             error: "The username must follow the scheme: Name#1234"
         })
         if(amount <= 0) return ctx.error({
