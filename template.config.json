@@ -1,0 +1,240 @@
+{
+    "use_database": true,
+    "default_token": "0000000000",
+    "apply_roles_to_worker_owners": [
+
+    ],
+    "apply_roles_to_trusted_users": [
+
+    ],
+    "advanced": {
+        "dev": false,
+        "encrypt_token": true,
+        "pre_check_prompts_for_suspicion": {
+            "enabled": false,
+            "timeout_duration": 3600000
+        }
+    },
+    "filter_actions": {
+        "mode": "whitelist",
+        "guilds": [
+            "1234567890123456789"
+        ],
+        "apply_filter_to": {
+            "react_to_transfer": true,
+            "apply_roles_to_worker_owners": true,
+            "apply_roles_to_trusted_users": true
+        }
+    },
+    "react_to_transfer": {
+        "enabled": true,
+        "emojis": [
+            {
+                "id": "1234567890123456789",
+                "amount": 69,
+                "title": "Marvelous!",
+                "message": "They thought your message was nice"
+            }
+        ],
+        "allow_delayed_claim": true
+    },
+    "logs": {
+        "enabled": true,
+        "directory": "/logs",
+        "plain": true,
+        "csv": true,
+        "log_actions": {
+            "without_source_image": true,
+            "with_source_image": true
+        }
+    },
+    "interrogate": {
+        "enabled": true,
+        "update_interrogation_status_interval_seconds": 5,
+        "enable_user_captioning": true,
+        "default": {
+            "nsfw": false,
+            "caption": false,
+            "interrogation": false
+        },
+        "user_restrictions": {
+            "allow_nsfw": true,
+            "allow_caption": true,
+            "allow_interrogation": true
+        }
+    },
+    "advanced_generate": {
+        "enabled": true,
+        "require_login": true,
+        "trusted_workers": true,
+        "censor_nsfw": true,
+        "blacklisted_models": [],
+        "blacklisted_words": [],
+        "update_generation_status_interval_seconds": 5,
+        "convert_a1111_weight_to_horde_weight": false,
+        "improve_loading_time": false,
+        "default": {
+            "tiling": false,
+            "steps": 30,
+            "resolution": {
+                "width": 512,
+                "height": 512
+            },
+            "cfg": 7,
+            "amount": 1,
+            "sampler": "k_euler",
+            "model": "stable_diffusion",
+            "denoise": 50,
+            "gfpgan": false,
+            "real_esrgan": false,
+            "karras": false,
+            "share": false,
+            "keep_original_ratio": true,
+            "style": "raw"
+        },
+        "source_image": {
+            "require_login": true,
+            "require_ai_horde_account_oauth_connection": false,
+            "allow_non_webp": true,
+            "require_nsfw_channel": false,
+            "whitelist": {
+                "only_allow_whitelist": false,
+                "user_ids": [],
+                "bypass_checks": true
+            }
+        },
+        "user_restrictions": {
+            "width": {
+                "min": 64,
+                "max": 3072
+            },
+            "height": {
+                "min": 64,
+                "max": 3072
+            },
+            "amount": {
+                "max": 4
+            },
+            "steps": {
+                "min": 1,
+                "max": 500
+            },
+            "cfg": {
+                "min": -40,
+                "max": 30
+            },
+            "denoise": {
+                "min": 0,
+                "max": 100
+            },
+            "allow_negative_prompt": true,
+            "allow_style": true,
+            "allow_sampler": true,
+            "allow_cfg": true,
+            "allow_seed": true,
+            "allow_height": true,
+            "allow_width": true,
+            "allow_gfpgan": true,
+            "allow_real_esrgan": true,
+            "allow_seed_variation": true,
+            "allow_tiling": true,
+            "allow_steps": true,
+            "allow_amount": true,
+            "allow_models": true,
+            "allow_source_image": true,
+            "allow_denoise": true,
+            "allow_nsfw": true,
+            "allow_karras": true,
+            "allow_sharing": true,
+            "allow_rating": true
+        }
+    },
+    "generate": {
+        "enabled": true,
+        "require_login": true,
+        "trusted_workers": true,
+        "censor_nsfw": true,
+        "blacklisted_styles": [],
+        "blacklisted_words": [],
+        "update_generation_status_interval_seconds": 5,
+        "convert_a1111_weight_to_horde_weight": true,
+        "improve_loading_time": false,
+        "styles_source": "https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/styles.json",
+        "default": {
+            "tiling": false,
+            "amount": 1,
+            "share": false,
+            "style": "raw",
+            "keep_original_ratio": true,
+            "denoise": 50
+        },
+        "source_image": {
+            "require_login": true,
+            "require_ai_horde_account_oauth_connection": false,
+            "allow_non_webp": true,
+            "require_nsfw_channel": false,
+            "whitelist": {
+                "only_allow_whitelist": false,
+                "user_ids": [],
+                "bypass_checks": true
+            }
+        },
+        "user_restrictions": {
+            "amount": {
+                "max": 4
+            },
+            "denoise": {
+                "min": 0,
+                "max": 100
+            },
+            "allow_negative_prompt": true,
+            "allow_style": true,
+            "allow_tiling": true,
+            "allow_amount": true,
+            "allow_nsfw": false,
+            "allow_sharing": true,
+            "allow_rating": true,
+            "allow_source_image": true,
+            "allow_denoise": true
+        }
+    },
+    "remix": {
+        "enabled": true,
+        "require_login": true,
+        "trusted_workers": true,
+        "blacklisted_words": [],
+        "convert_a1111_weight_to_horde_weight": true,
+        "allow_custom_strength": true,
+        "generation_options": {
+            "sampler_name": "k_euler",
+            "model": "pix2pix",
+            "width": 512,
+            "height": 512,
+            "allow_nsfw": false,
+            "censor_nsfw": true,
+            "share_result": false,
+            "cfg": 7.5,
+            "denoise": 75,
+            "steps": 100
+        }
+    },
+    "party": {
+        "enabled": true,
+        "mention_roles": [
+            "1234567890123456789"
+        ],
+        "default": {
+            "recurring": false
+        },
+        "user_restrictions": {
+            "award": {
+                "min": 1,
+                "max": 1000000
+            },
+            "duration": {
+                "min": 1,
+                "max": 30
+            }
+        }
+    }
+}
