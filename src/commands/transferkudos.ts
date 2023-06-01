@@ -12,9 +12,8 @@ const command_data = new SlashCommandBuilder()
         .setRequired(false)
         .setDescription("The user to send the kudos to")
     )
-    .addStringOption(
-        new SlashCommandStringOption()
-        .setName("discord user")
+    .addUserOption(option =>
+        option.setName("discord user")
         .setRequired(false)
         .setDescription("If you aren't using horde usernames, pick a discord user to send to.")
     )
