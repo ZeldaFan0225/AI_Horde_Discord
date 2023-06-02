@@ -1,4 +1,4 @@
-import { ButtonBuilder, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
+import { ButtonBuilder, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption, SlashCommandUserOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 
@@ -8,9 +8,15 @@ const command_data = new SlashCommandBuilder()
     .setDescription(`Sends somebody Kudos`)
     .addStringOption(
         new SlashCommandStringOption()
-        .setName("user")
-        .setRequired(true)
-        .setDescription("The use to send the kudos to")
+        .setName("horde_user")
+        .setRequired(false)
+        .setDescription("The horde user to send the kudos to")
+    )
+    .addUserOption(
+        new SlashCommandUserOption()
+        .setName("discord_user")
+        .setRequired(false)
+        .setDescription("The discord user to send the kudos to")
     )
     .addIntegerOption(
         new SlashCommandIntegerOption()
@@ -45,7 +51,16 @@ export default class extends Command {
 
         await ctx.interaction.deferReply()
 
-        const username = ctx.interaction.options.getString("user",true)
+        let username = ctx.interaction.options.getString("horde_user")
+        if(!username) {
+            const discord_user = ctx.interaction.options.getUser("discord_user")
+            if(!discord_user) return ctx.error({error: "Either discord_user or horde_user is required"})
+            const token = await ctx.client.getUserToken(discord_user.id, ctx.database)
+            if(!token) return ctx.error({error: "The target user never added their horde token to the database. Please use their horde username"})
+            const horde_user = await ctx.ai_horde_manager.findUser({token}).catch(console.error)
+            if(!horde_user?.username) return ctx.error({error: "The token saved by the target discord user is invalid. Please use their horde username"})
+            username = horde_user.username
+        }
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         if(!username.includes("#")) return ctx.error({
             error: "The username must follow the scheme: Name#1234"
@@ -61,7 +76,7 @@ export default class extends Command {
 
         if(typeof transfer.name === "string") return ctx.error({error: transfer.name})
         ctx.interaction.editReply({
-            content: `Transferred ${amount} kudos to ${username}`
+            content: `Transferred ${amount} kudos to ${ctx.interaction.options.getUser("discord_user")?.toString() || username}`
         })
     }
 }
