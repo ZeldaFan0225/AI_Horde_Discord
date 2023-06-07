@@ -2,7 +2,7 @@ import Centra from "centra";
 import { Modal } from "../classes/modal";
 import { ModalContext } from "../classes/modalContext";
 import { appendFileSync } from "fs";
-import AIHorde from "@zeldafan0225/ai_horde";
+import {SourceImageProcessingTypes, ImageGenerationInput, ModelGenerationInputStableSamplers} from "@zeldafan0225/ai_horde";
 import { EmbedBuilder } from "@discordjs/builders";
 import { AttachmentBuilder, ButtonBuilder, Colors } from "discord.js";
 
@@ -54,10 +54,10 @@ export default class extends Modal {
         if(strength > 100) strength = 100
         if(strength < 1) strength = 1
 
-        const generation_data: AIHorde.GenerationInput = {
+        const generation_data: ImageGenerationInput = {
             prompt,
             params: {
-                sampler_name: generation_options?.sampler_name as typeof AIHorde.ModelGenerationInputStableSamplers[keyof typeof AIHorde.ModelGenerationInputStableSamplers] | undefined,
+                sampler_name: generation_options?.sampler_name as typeof ModelGenerationInputStableSamplers[keyof typeof ModelGenerationInputStableSamplers] | undefined,
                 height: generation_options?.height,
                 width: generation_options?.width,
                 cfg_scale: generation_options?.cfg,
@@ -71,7 +71,7 @@ export default class extends Modal {
             r2: true,
             shared: generation_options?.share_result,
             source_image: image,
-            source_processing: AIHorde.SourceImageProcessingTypes.img2img
+            source_processing: SourceImageProcessingTypes.img2img
         }
 
         if(ctx.client.config.advanced?.dev) {

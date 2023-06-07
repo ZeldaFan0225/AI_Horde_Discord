@@ -1,4 +1,4 @@
-import AIHorde from "@zeldafan0225/ai_horde";
+import {AIHorde} from "@zeldafan0225/ai_horde";
 import { ChatInputCommandInteraction } from "discord.js";
 import { Pool } from "pg";
 import { AIHordeClient } from "../classes/client";

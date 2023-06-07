@@ -6,7 +6,7 @@ import { handleComponents } from "./handlers/componentHandler";
 import { handleModals } from "./handlers/modalHandler";
 import { Pool } from "pg"
 import { handleAutocomplete } from "./handlers/autocompleteHandler";
-import AIHorde from "@zeldafan0225/ai_horde";
+import {AIHorde} from "@zeldafan0225/ai_horde";
 import { handleContexts } from "./handlers/contextHandler";
 import {existsSync, mkdirSync} from "fs"
 import { handleMessageReact } from "./handlers/messageReact";

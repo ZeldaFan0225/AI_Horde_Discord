@@ -1,4 +1,4 @@
-import AIHorde from "@zeldafan0225/ai_horde";
+import {ModelGenerationInputStableSamplers, AIHorde} from "@zeldafan0225/ai_horde";
 import {
     AnySelectMenuInteraction,
     AutocompleteInteraction,
@@ -166,7 +166,7 @@ export interface Config {
             },
             cfg?: number,
             amount?: number,
-            sampler?: typeof AIHorde.ModelGenerationInputStableSamplers,
+            sampler?: typeof ModelGenerationInputStableSamplers,
             model?: string,
             denoise?: number,
             gfpgan?: boolean,

@@ -62,7 +62,7 @@ export default class extends Command {
             username = horde_user.username
         }
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
-        if(!username.includes("#")) return ctx.error({
+        if(!username?.includes("#")) return ctx.error({
             error: "The username must follow the scheme: Name#1234"
         })
         if(amount <= 0) return ctx.error({

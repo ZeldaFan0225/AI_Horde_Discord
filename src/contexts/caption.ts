@@ -1,4 +1,4 @@
-import AIHorde from "@zeldafan0225/ai_horde";
+import {ModelInterrogationInputStable, InterrogationStatus, ModelInterrogationFormTypes, HordeAsyncRequestStates} from "@zeldafan0225/ai_horde";
 import { ApplicationCommandType, ButtonBuilder, Colors, ContextMenuCommandBuilder, EmbedBuilder } from "discord.js";
 import { Context } from "../classes/context";
 import { ContextContext } from "../classes/contextContext";
@@ -26,13 +26,13 @@ export default class extends Context {
         const token = user_token || ctx.client.config.default_token || "0000000000"
 
 
-        const forms = [{name: AIHorde.ModelInterrogationFormTypes.caption}]
+        const forms = [{name: ModelInterrogationFormTypes.caption}]
 
         if(target_user.defaultAvatarURL === target_user.displayAvatarURL()) return ctx.error({error: "This user does not have an avatar"})
 
         await ctx.interaction.deferReply()
 
-        const interrogation_data: AIHorde.ModelInterrogationInputStable = {
+        const interrogation_data: ModelInterrogationInputStable = {
             source_image: target_user.displayAvatarURL({forceStatic: true}),
             forms
         }
@@ -50,10 +50,10 @@ export default class extends Context {
         const inter = setInterval(async () => {
             const status = await ctx.ai_horde_manager.getInterrogationStatus(interrogation_start?.id!)
             if(ctx.client.config.advanced?.dev) console.log(status)
-            if(status.state !== AIHorde.HordeAsyncRequestStates.waiting && status.state !== AIHorde.HordeAsyncRequestStates.processing) displayResult(status)
+            if(status.state !== HordeAsyncRequestStates.waiting && status.state !== HordeAsyncRequestStates.processing) displayResult(status)
         }, 1000 * (ctx.client.config.interrogate?.update_interrogation_status_interval_seconds ?? 5))
 
-        function displayResult(status: AIHorde.InterrogationStatus) {
+        function displayResult(status: InterrogationStatus) {
             clearInterval(inter)
             const embed = new EmbedBuilder({
                 color: Colors.Blue,

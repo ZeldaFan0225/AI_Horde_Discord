@@ -4,7 +4,7 @@ import { CommandContext } from "../classes/commandContext";
 import { AutocompleteContext } from "../classes/autocompleteContext";
 import { readFileSync, appendFileSync } from "fs";
 import { Config } from "../types";
-import AIHorde from "@zeldafan0225/ai_horde";
+import {ModelGenerationInputStableSamplers, ImageGenerationInput} from "@zeldafan0225/ai_horde";
 import Centra from "centra";
 const {buffer2webpbuffer} = require("webp-converter")
 
@@ -212,10 +212,10 @@ export default class extends Command {
         }
 
 
-        const generation_data: AIHorde.GenerationInput = {
+        const generation_data: ImageGenerationInput = {
             prompt,
             params: {
-                sampler_name: style.sampler_name as typeof AIHorde.ModelGenerationInputStableSamplers[keyof typeof AIHorde.ModelGenerationInputStableSamplers],
+                sampler_name: style.sampler_name as typeof ModelGenerationInputStableSamplers[keyof typeof ModelGenerationInputStableSamplers],
                 height: height,
                 width: width,
                 n: amount,

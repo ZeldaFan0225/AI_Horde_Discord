@@ -7,7 +7,7 @@ import { AutocompleteContext } from "../classes/autocompleteContext";
 import Centra from "centra";
 const {buffer2webpbuffer} = require("webp-converter")
 import { appendFileSync } from "fs"
-import AIHorde from "@zeldafan0225/ai_horde";
+import { ImageGenerationInput, ModelGenerationInputStableSamplers, ModelGenerationInputPostProcessingTypes } from "@zeldafan0225/ai_horde";
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
@@ -58,7 +58,7 @@ const command_data = new SlashCommandBuilder()
                 .setName("sampler")
                 .setDescription("The sampler to use")
                 .setChoices(
-                    ...Object.keys(AIHorde.ModelGenerationInputStableSamplers).map(k => ({name: k, value: k}))
+                    ...Object.keys(ModelGenerationInputStableSamplers).map(k => ({name: k, value: k}))
                 )
             )
         }
@@ -227,7 +227,7 @@ export default class extends Command {
         await ctx.interaction.deferReply({})
         let prompt = ctx.interaction.options.getString("prompt", true)
         const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
-        const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.advanced_generate?.default?.sampler ?? AIHorde.ModelGenerationInputStableSamplers.k_euler) as any
+        const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.advanced_generate?.default?.sampler ?? ModelGenerationInputStableSamplers.k_euler) as any
         const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.advanced_generate?.default?.cfg ?? 5
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.advanced_generate?.default?.denoise ?? 50)/100
         const seed = ctx.interaction.options.getString("seed")
@@ -327,12 +327,12 @@ export default class extends Command {
             if(ctx.client.timeout_users.has(ctx.interaction.user.id)) return ctx.error({error: "Your prompt has been marked as suspicious.\nTherefore you have been timed out!"})
         }
 
-        const post_processing = []
+        const post_processing = [] as (typeof ModelGenerationInputPostProcessingTypes[keyof typeof ModelGenerationInputPostProcessingTypes])[]
 
-        if(gfpgan) post_processing.push(AIHorde.ModelGenerationInputPostProcessingTypes.GFPGAN)
-        if(real_esrgan) post_processing.push(AIHorde.ModelGenerationInputPostProcessingTypes.RealESRGAN_x4plus)
+        if(gfpgan) post_processing.push(ModelGenerationInputPostProcessingTypes.GFPGAN)
+        if(real_esrgan) post_processing.push(ModelGenerationInputPostProcessingTypes.RealESRGAN_x4plus)
 
-        const generation_data: AIHorde.GenerationInput = {
+        const generation_data: ImageGenerationInput = {
             prompt,
             params: {
                 sampler_name: sampler,
