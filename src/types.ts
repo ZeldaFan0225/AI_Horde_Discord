@@ -181,10 +181,6 @@ export interface Config {
     advanced?: {
         dev?: boolean,
         encrypt_token?: boolean
-        pre_check_prompts_for_suspicion?: {
-            enabled: boolean,
-            timeout_duration?: number
-        }
     },
     filter_actions?: {
         mode?: "whitelist" | "blacklist",
@@ -235,6 +231,7 @@ export interface Config {
         require_login?: boolean,
         trusted_workers?: boolean,
         censor_nsfw?: boolean,
+        replacement_filter?: boolean,
         workers?: string[],
         blacklisted_words?: string[],
         blacklisted_models?: string[],
@@ -323,6 +320,7 @@ export interface Config {
         require_login?: boolean,
         trusted_workers?: boolean,
         censor_nsfw?: boolean,
+        replacement_filter?: boolean,
         blacklisted_words?: string[],
         blacklisted_styles?: string[],
         update_generation_status_interval_seconds?: number,

@@ -9,11 +9,7 @@
     ],
     "advanced": {
         "dev": false,
-        "encrypt_token": true,
-        "pre_check_prompts_for_suspicion": {
-            "enabled": false,
-            "timeout_duration": 3600000
-        }
+        "encrypt_token": true
     },
     "filter_actions": {
         "mode": "whitelist",
@@ -68,6 +64,7 @@
         "require_login": true,
         "trusted_workers": true,
         "censor_nsfw": true,
+        "replacement_filter": true,
         "blacklisted_models": [],
         "blacklisted_words": [],
         "update_generation_status_interval_seconds": 5,
@@ -155,6 +152,7 @@
         "require_login": true,
         "trusted_workers": true,
         "censor_nsfw": true,
+        "replacement_filter": true,
         "blacklisted_styles": [],
         "blacklisted_words": [],
         "update_generation_status_interval_seconds": 5,

@@ -1,5 +1,15 @@
 # Changelog
 
+## V3.0.1
+
+- add loras to generate and advanced_generate
+- implement replacement filter
+- add userinfo for horde ids
+
+## V3.0.0
+
+- update dependencies and require node 18 or above
+
 ## V2.4.1
 
 - fixes to the kudos transfer by reacting
