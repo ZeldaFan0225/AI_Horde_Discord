@@ -146,7 +146,8 @@
             "allow_nsfw": true,
             "allow_karras": true,
             "allow_sharing": true,
-            "allow_rating": true
+            "allow_rating": true,
+            "allow_lora": true
         }
     },
     "generate": {

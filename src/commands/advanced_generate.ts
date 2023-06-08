@@ -192,6 +192,15 @@ const command_data = new SlashCommandBuilder()
                 .setDescription("Whether to share your generation result for research")
             )
         }
+        if(config.advanced_generate?.user_restrictions?.allow_lora) {
+            command_data
+            .addStringOption(
+                new SlashCommandStringOption()
+                .setName("lora")
+                .setDescription("The LORA to use for this request")
+                .setAutocomplete(true)
+            )
+        }
     }
 
 function generateButtons(id: string) {
@@ -226,33 +235,41 @@ export default class extends Command {
 
         await ctx.interaction.deferReply({})
         let prompt = ctx.interaction.options.getString("prompt", true)
+        
+        const style_raw = ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style
+        const style = ctx.client.horde_styles[style_raw?.toLowerCase() ?? ""] || {prompt: "{p}{np}"}
+
         const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
         const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.advanced_generate?.default?.sampler ?? ModelGenerationInputStableSamplers.k_euler) as any
-        const cfg = ctx.interaction.options.getInteger("cfg") ?? ctx.client.config.advanced_generate?.default?.cfg ?? 5
+        const cfg = ctx.interaction.options.getInteger("cfg") ?? style.cfg_scale ?? ctx.client.config.advanced_generate?.default?.cfg ?? 5
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.advanced_generate?.default?.denoise ?? 50)/100
         const seed = ctx.interaction.options.getString("seed")
         const gfpgan = !!(ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.advanced_generate?.default?.gfpgan)
         const real_esrgan = !!(ctx.interaction.options.getBoolean("use_real_esrgan") ?? ctx.client.config.advanced_generate?.default?.real_esrgan)
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
         const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.advanced_generate?.default?.tiling)
-        const steps = ctx.interaction.options.getInteger("steps") ?? ctx.client.config.advanced_generate?.default?.steps ?? 30
+        const steps = ctx.interaction.options.getInteger("steps") ?? style.steps ?? ctx.client.config.advanced_generate?.default?.steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? ctx.client.config.advanced_generate?.default?.amount ?? 1
-        const style_raw = ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style
-        
-        const style = ctx.client.horde_styles[style_raw?.toLowerCase() ?? ""] || {prompt: "{p}{np}"}
-
         let height = ctx.interaction.options.getInteger("height") ?? style?.height ?? ctx.client.config.advanced_generate?.default?.resolution?.height ?? 512
         let width = ctx.interaction.options.getInteger("width") ?? style?.width ?? ctx.client.config.advanced_generate?.default?.resolution?.width ?? 512
         const model = ctx.interaction.options.getString("model") ?? style?.model ?? ctx.client.config.advanced_generate?.default?.model
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? ctx.client.config.advanced_generate?.default?.keep_original_ratio ?? true
         const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.advanced_generate?.default?.karras ?? false
         const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.advanced_generate?.default?.share
+        const lora_id = ctx.interaction.options.getString("lora")
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
         const ai_horde_user = await ctx.ai_horde_manager.findUser({token: user_token  || ctx.client.config?.default_token || "0000000000"}).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
         const can_bypass = ctx.client.config.advanced_generate?.source_image?.whitelist?.bypass_checks && ctx.client.config.advanced_generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
         const party = await ctx.client.getParty(ctx.interaction.channelId, ctx.database)
+
+        if(lora_id) {
+            const lora = await ctx.client.fetchLORAByID(lora_id, ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
+            if(ctx.client.config.advanced?.dev) console.log(lora)
+            if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given", codeblock: false})
+            if(lora.type !== "LORA") return ctx.error({error: "The given ID is not a LORA"})
+        }
 
         if(party?.channel_id) return ctx.error({error: `You can only use ${await ctx.client.getSlashCommandTag("generate")} in parties`, codeblock: false})
         if(ctx.client.config.advanced_generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("advanced_generate")}`, codeblock: false})
@@ -346,7 +363,8 @@ export default class extends Command {
                 steps,
                 n: amount,
                 denoising_strength: denoise,
-                karras
+                karras,
+                loras: lora_id ? [{name: lora_id}] : undefined
             },
             nsfw: ctx.client.config.advanced_generate?.user_restrictions?.allow_nsfw,
             censor_nsfw: ctx.client.config.advanced_generate?.censor_nsfw,
@@ -514,7 +532,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
 
         async function getCheckAndDisplayResult(precheck?: boolean) {
             if(done) return;
-            const status = await ctx.ai_horde_manager.getImageGenerationCheck(generation_start!.id!).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
+            const status = await ctx.ai_horde_manager.getImageGenerationCheck(generation_start!.id!, {force: true}).catch((e) => ctx.client.config.advanced?.dev ? console.error(e) : null);
             done = !!status?.done
             const horde_data = await ctx.ai_horde_manager.getPerformance()
             if(!status || (status as any).faulted) {
@@ -582,6 +600,30 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const available = styles.map(s => ({name: s, value: s}))
                 const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase())) : available
                 return await context.interaction.respond(ret.slice(0,25))
+            }
+            case "lora": {
+                const ret = []
+
+                if(!isNaN(Number(option.value)) && option.value) {
+                    const lora_by_id = await context.client.fetchLORAByID(option.value, context.client.config.advanced_generate?.user_restrictions?.allow_nsfw)
+
+                    if(lora_by_id?.name) ret.push({
+                        name: lora_by_id.name,
+                        value: lora_by_id.id.toString()
+                    })
+                } else {
+                    const loras = await context.client.fetchLORAs(option.value, 5, context.client.config.advanced_generate?.user_restrictions?.allow_nsfw)
+    
+                    ret.push(
+                        ...loras.items.filter(l => l?.name && l?.id.toString()).map(l => ({
+                            name: l!.name,
+                            value: l!.id.toString()
+                        }))
+                    )
+                }
+
+                // the api isn't particularly fast so sometimes it might send the result too late
+                return await context.interaction.respond(ret.slice(0,25)).catch(() => null)
             }
         }
     }
