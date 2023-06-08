@@ -220,7 +220,10 @@ export default class extends Command {
                 width: width,
                 n: amount,
                 tiling,
-                denoising_strength: denoise
+                denoising_strength: denoise,
+                cfg_scale: style.cfg_scale,
+                loras: style.loras,
+                steps: style.steps
             },
             nsfw: ctx.client.config.generate?.user_restrictions?.allow_nsfw,
             censor_nsfw: ctx.client.config.generate?.censor_nsfw,

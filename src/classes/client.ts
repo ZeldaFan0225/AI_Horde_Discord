@@ -23,7 +23,12 @@ export class AIHordeClient extends Client {
 		model?: string,
 		sampler_name?: string,
 		width?: number,
-		height?: number
+		height?: number,
+		steps?: number,
+		cfg_scale?: number
+		loras?: {
+			name: string
+		}[]
 	}>
 
 	constructor(options: ClientOptions) {
