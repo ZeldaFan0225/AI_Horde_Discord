@@ -32,7 +32,7 @@ The bot has the following features:
 
 ## Version Requirements
 
-- NodeJS >= 16.16
+- NodeJS >= 18.0.0
 
 Optional:  
 - PostgreSQL >= 14.6
