@@ -540,6 +540,36 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 done = true
                 const images = await ctx.ai_horde_manager.getImageGenerationStatus(generation_start!.id!)
 
+                if(ctx.client.config.advanced?.result_structure_v2_enabled) {
+                    const image_map_r = images.generations?.map(async g => {
+                        const req = await Centra(g.img!, "GET").send();
+                        if(g.censored) return {attachment: null, generation: g}
+                        const attachment = new AttachmentBuilder(req.body, {name: `${g.id}.webp`})
+                        return {attachment, generation: g}
+                    }) || []
+                    if(!precheck) clearInterval(inter)
+
+                    const image_map = await Promise.all(image_map_r)
+                    const files = image_map.filter(i => i.attachment).map(i => i.attachment) as  AttachmentBuilder[]
+                    if(img_data && image_map.length < 10) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
+                    let components = [{type: 1, components: [delete_btn]}]
+                    const embeds = [
+                        new EmbedBuilder({
+                            title: "Generation Finished",
+                            description: `**Prompt** ${prompt}\n**Style** ${style_raw}\n**Kudos Consumed** \`${images.kudos}\`${image_map.length !== amount ? "\nCensored Images are not displayed" : ""}`,
+                            color: Colors.Blue,
+                            footer: {text: `Generation ID ${generation_start!.id}`},
+                            thumbnail: img_data && image_map.length < 10 ? {url: "attachment://original.webp"} : img_data ? {url: img!.url} : undefined
+                        })
+                    ]
+
+                    if(ctx.client.config.generate?.user_restrictions?.allow_rating && (generation_data.shared ?? true) && files.length === 1) {
+                        components = [...generateButtons(generation_start!.id!), ...components]
+                    }
+                    await message.edit({content: null, components, embeds, files});
+                    return null
+                }
+
                 const image_map_r = images.generations?.map(async (g, i) => {
                     const req = await Centra(g.img!, "get").send();
                     if(ctx.client.config.advanced?.dev) console.log(req)

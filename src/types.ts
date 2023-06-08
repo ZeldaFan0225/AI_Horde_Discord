@@ -180,7 +180,8 @@ export interface Config {
     apply_roles_to_trusted_users?: string[],
     advanced?: {
         dev?: boolean,
-        encrypt_token?: boolean
+        encrypt_token?: boolean,
+        result_structure_v2_enabled: boolean
     },
     filter_actions?: {
         mode?: "whitelist" | "blacklist",
