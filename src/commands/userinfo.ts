@@ -1,6 +1,7 @@
-import { ButtonBuilder, Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandUserOption } from "discord.js";
+import { ButtonBuilder, Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandUserOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
+import { UserDetails } from "@zeldafan0225/ai_horde";
 
 const command_data = new SlashCommandBuilder()
     .setName("userinfo")
@@ -8,8 +9,14 @@ const command_data = new SlashCommandBuilder()
     .setDescription(`Shows information on your ai horde account`)
     .addUserOption(
         new SlashCommandUserOption()
-        .setName("user")
-        .setDescription("The user to view")
+        .setName("discord_user")
+        .setDescription("The discord user to view")
+        .setRequired(false)
+    )
+    .addIntegerOption(
+        new SlashCommandIntegerOption()
+        .setName("horde_user_id")
+        .setDescription("The ID of the horde user to view")
         .setRequired(false)
     )
 
@@ -24,9 +31,7 @@ export default class extends Command {
 
     override async run(ctx: CommandContext): Promise<any> {
         if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
-        const user = ctx.interaction.options.getUser("user")?.id ?? ctx.interaction.user.id
-        let token = await ctx.client.getUserToken(user, ctx.database)
-        if(!token && ctx.interaction.options.getUser("user")?.id) return ctx.error({error: "The user has not added their token"})
+
         const add_token_button = new ButtonBuilder({
             custom_id: "save_token",
             label: "Save Token",
@@ -37,25 +42,39 @@ export default class extends Command {
             custom_id: `delete_${ctx.interaction.user.id}`,
             style: 4
         })
-        if(!token) return ctx.interaction.reply({
-            content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n**You agree to not upload or generate any illegal content**${!ctx.client.config.advanced?.encrypt_token ? "\n\n**The bot is configured not to save your token in an encrypted form!**" : ""}\n\n\nDon't know what the token is?\nCreate an ai horde account here: https://aihorde.net/register`,
-            components: [{type: 1, components: [add_token_button.toJSON()]}],
-            ephemeral: true
-        })
 
+        const horde_user_id = ctx.interaction.options.getInteger("horde_user_id")
+
+        let user_data: UserDetails | null
         await ctx.interaction.deferReply()
 
-        const user_data = await ctx.ai_horde_manager.findUser({token}).catch(() => null)
-        
+        if(horde_user_id !== null) {
+            user_data = await ctx.ai_horde_manager.getUserDetails(horde_user_id).catch(() => null)
 
-        const member = await ctx.interaction.guild?.members.fetch(user).catch(console.error)
-        if(member) {
-            let apply_roles = []
-            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_worker_owners") && user_data?.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length) apply_roles.push(...ctx.client.config.apply_roles_to_worker_owners)
-            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_trusted_users") && user_data?.trusted && ctx.client.config.apply_roles_to_trusted_users?.length) apply_roles.push(...ctx.client.config.apply_roles_to_trusted_users)
+            if(!user_data) return ctx.error({error: "Unable to find user"})
+        } else {
+            const user = ctx.interaction.options.getUser("discord_user")?.id ?? ctx.interaction.user.id
+            let token = await ctx.client.getUserToken(user, ctx.database)
+            if(!token && ctx.interaction.options.getUser("user")?.id) return ctx.error({error: "The user has not added their token"})
+            if(!token) return ctx.interaction.reply({
+                content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n**You agree to not upload or generate any illegal content**${!ctx.client.config.advanced?.encrypt_token ? "\n\n**The bot is configured not to save your token in an encrypted form!**" : ""}\n\n\nDon't know what the token is?\nCreate an ai horde account here: https://aihorde.net/register`,
+                components: [{type: 1, components: [add_token_button.toJSON()]}],
+                ephemeral: true
+            })
     
-            apply_roles = apply_roles.filter(r => !member?.roles.cache.has(r))
-            if(apply_roles.length) await member?.roles.add(apply_roles).catch(console.error)
+            user_data = await ctx.ai_horde_manager.findUser({token}).catch(() => null)
+
+            if(!user_data) return ctx.error({error: "Unable to find user"})
+
+            const member = await ctx.interaction.guild?.members.fetch(user).catch(console.error)
+            if(member) {
+                let apply_roles = []
+                if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_worker_owners") && user_data?.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length) apply_roles.push(...ctx.client.config.apply_roles_to_worker_owners)
+                if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_trusted_users") && user_data?.trusted && ctx.client.config.apply_roles_to_trusted_users?.length) apply_roles.push(...ctx.client.config.apply_roles_to_trusted_users)
+        
+                apply_roles = apply_roles.filter(r => !member?.roles.cache.has(r))
+                if(apply_roles.length) await member?.roles.add(apply_roles).catch(console.error)
+            }
         }
 
 
@@ -66,7 +85,6 @@ export default class extends Command {
         const props = []
         if(user_data.moderator) props.push("⚔️ Moderator")
         if(user_data.trusted) props.push("🤝 Trusted")
-        if(user_data.suspicious) props.push(`Suspicious ${user_data.suspicious}`)
         const embed = new EmbedBuilder({
             color: Colors.Blue,
             footer: {text: `${props.join(" | ")}`},
