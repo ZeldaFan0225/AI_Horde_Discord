@@ -1,4 +1,4 @@
-import { ButtonBuilder, Colors, EmbedBuilder, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandUserOption } from "discord.js";
+import { ButtonBuilder, Colors, EmbedBuilder, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandUserOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 import { UserDetails } from "@zeldafan0225/ai_horde";
@@ -17,6 +17,12 @@ const command_data = new SlashCommandBuilder()
         new SlashCommandIntegerOption()
         .setName("horde_user_id")
         .setDescription("The ID of the horde user to view")
+        .setRequired(false)
+    )
+    .addBooleanOption(
+        new SlashCommandBooleanOption()
+        .setName("ephemeral")
+        .setDescription("When set to true this message will only be visible to you")
         .setRequired(false)
     )
 
@@ -46,7 +52,7 @@ export default class extends Command {
         const horde_user_id = ctx.interaction.options.getInteger("horde_user_id")
 
         let user_data: UserDetails | null
-        await ctx.interaction.deferReply()
+        await ctx.interaction.deferReply({ephemeral: !!ctx.interaction.options.getBoolean("ephemeral")})
 
         if(horde_user_id !== null) {
             user_data = await ctx.ai_horde_manager.getUserDetails(horde_user_id).catch(() => null)
