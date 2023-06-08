@@ -1,5 +1,13 @@
 # Changelog
 
+## V3.1.0
+
+- save horde user id for easy lookup
+
+**Migrating**
+
+- run `ALTER TABLE user_tokens ADD COLUMN horde_id int NOT NULL DEFAULT 0` on your postgres database before deploying this or any future version when using a database
+
 ## V3.0.1
 
 - add loras to generate and advanced_generate

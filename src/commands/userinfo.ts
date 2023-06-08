@@ -77,6 +77,8 @@ export default class extends Command {
             }
         }
 
+        const db_entry = await ctx.database.query("SELECT * FROM user_tokens WHERE horde_id=$1 LIMIT 1", [Number(user_data.id)]).then(res => res.rows[0]).catch(console.error)
+
 
         if(!user_data) return ctx.error({
             error: `Unable to find user for saved token.\nUpdate your token with ${await ctx.client.getSlashCommandTag("updatetoken")}`,
@@ -89,7 +91,8 @@ export default class extends Command {
             color: Colors.Blue,
             footer: {text: `${props.join(" | ")}`},
             title: `${user_data.username}`,
-            description: `Images Requested \`${user_data.records?.request?.image}\` (\`${user_data.records?.usage?.megapixelsteps}\` Megapixelsteps)
+            description: `${db_entry?.id ? `Associated Discord User <@${db_entry.id}>\n\n` : ""}**Usage Stats**
+Images Requested \`${user_data.records?.request?.image}\` (\`${user_data.records?.usage?.megapixelsteps}\` Megapixelsteps)
 Images Generated \`${user_data.records?.fulfillment?.image}\` (\`${user_data.records?.contribution?.megapixelsteps}\` Megapixelsteps)
 Interrogation Requested \`${user_data.records?.request?.interrogation}\`
 Interrogation Generated \`${user_data.records?.fulfillment?.interrogation}\`

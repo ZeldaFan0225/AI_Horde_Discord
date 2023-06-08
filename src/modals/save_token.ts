@@ -34,7 +34,7 @@ export default class extends Modal {
         }
         if(!user_data) return ctx.error({error: "Unable to find user with this token!"})
         const token = ctx.client.config.advanced?.encrypt_token ? ctx.client.encryptString(raw_token) : raw_token
-        const res = await ctx.database.query("INSERT INTO user_tokens VALUES (DEFAULT, $1, $2) ON CONFLICT (id) DO UPDATE SET token=$2 RETURNING *", [ctx.interaction.user.id, token])
+        const res = await ctx.database.query("INSERT INTO user_tokens VALUES (DEFAULT, $1, $2, $3) ON CONFLICT (id) DO UPDATE SET token=$2, horde_id=$3 RETURNING *", [ctx.interaction.user.id, token, user_data.id])
         if(!res.rowCount) return ctx.error({error: "Unable to save token"})
         await ctx.interaction.reply({
             content: `S${ctx.client.config.advanced?.encrypt_token ? "ecurely s" : ""}aved your token in the database.`,
