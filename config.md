@@ -10,7 +10,8 @@ Here you can see an explanation of what which option does
     "apply_roles_to_trusted_users": Roles to apply if the useris trusted (ARRAY OF ROLE IDS),
     "advanced": {
         "dev": Whether this instance is for development or not (BOOLEAN) *4,
-        "encrypt_token": Encrypt the users token before saving in the database (BOOLEAN) *9
+        "encrypt_token": Encrypt the users token before saving in the database (BOOLEAN) *9,
+        "result_structure_v2_enabled": Shows a new message as the result for generate and advanced generate (BOOLEAN)
     },
     "filter_actions": {
         "mode": The mode on how the guilds list should act ('whitelist' or 'blacklist'),

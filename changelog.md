@@ -3,6 +3,7 @@
 ## V3.1.0
 
 - save horde user id for easy lookup
+- update new result message for generations
 
 **Migrating**
 
