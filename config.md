@@ -116,8 +116,8 @@ Here you can see an explanation of what which option does
                 "max": The maximum steps the user can input into the /generate command (INTEGER; DEFAULT: 100)
             },
             "cfg": {
-                "min": The minimum cfg the user can input into the /generate command (INTEGER; DEFAULT: -40),
-                "max": The maximum cfg the user can input into the /generate command (INTEGER; DEFAULT: 30)
+                "min": The minimum cfg the user can input into the /generate command (INTEGER; DEFAULT: 1),
+                "max": The maximum cfg the user can input into the /generate command (INTEGER; DEFAULT: 100)
             },
             "denoise": {
                 "min": The minimum denoising strength the user can input into the /generate command (INTEGER; DEFAULT: 0),

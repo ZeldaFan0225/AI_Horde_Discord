@@ -68,8 +68,8 @@ const command_data = new SlashCommandBuilder()
                 new SlashCommandIntegerOption()
                 .setName("cfg")
                 .setDescription("How strictly to follow the given prompt")
-                .setMinValue(config.advanced_generate?.user_restrictions.cfg?.min ?? -40)
-                .setMaxValue(config.advanced_generate?.user_restrictions.cfg?.max ?? 30)
+                .setMinValue(config.advanced_generate?.user_restrictions.cfg?.min ?? 1)
+                .setMaxValue(config.advanced_generate?.user_restrictions.cfg?.max ?? 100)
             )
         }
         if(config.advanced_generate?.user_restrictions?.allow_denoise) {
@@ -241,7 +241,7 @@ export default class extends Command {
 
         const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
         const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.advanced_generate?.default?.sampler ?? ModelGenerationInputStableSamplers.k_euler) as any
-        const cfg = ctx.interaction.options.getInteger("cfg") ?? style.cfg_scale ?? ctx.client.config.advanced_generate?.default?.cfg ?? 5
+        const cfg = ctx.interaction.options.getInteger("cfg") ?? style.cfg_scale ?? ctx.client.config.advanced_generate?.default?.cfg ?? 7.5
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.advanced_generate?.default?.denoise ?? 50)/100
         const seed = ctx.interaction.options.getString("seed")
         const gfpgan = !!(ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.advanced_generate?.default?.gfpgan)

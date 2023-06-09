@@ -78,7 +78,7 @@
                 "width": 512,
                 "height": 512
             },
-            "cfg": 7,
+            "cfg": 7.5,
             "amount": 1,
             "sampler": "k_euler",
             "model": "stable_diffusion",
@@ -118,8 +118,8 @@
                 "max": 500
             },
             "cfg": {
-                "min": -40,
-                "max": 30
+                "min": 1,
+                "max": 100
             },
             "denoise": {
                 "min": 0,
