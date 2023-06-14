@@ -62,10 +62,9 @@ export default class extends Command {
             const user = ctx.interaction.options.getUser("discord_user")?.id ?? ctx.interaction.user.id
             let token = await ctx.client.getUserToken(user, ctx.database)
             if(!token && ctx.interaction.options.getUser("user")?.id) return ctx.error({error: "The user has not added their token"})
-            if(!token) return ctx.interaction.reply({
+            if(!token) return ctx.interaction.editReply({
                 content: `Please add your token before your user details can be shown.\nThis is needed to perform actions on your behalf\n\nBy entering your token you agree to the ${await ctx.client.getSlashCommandTag("terms")}\n**You agree to not upload or generate any illegal content**${!ctx.client.config.advanced?.encrypt_token ? "\n\n**The bot is configured not to save your token in an encrypted form!**" : ""}\n\n\nDon't know what the token is?\nCreate an ai horde account here: https://aihorde.net/register`,
-                components: [{type: 1, components: [add_token_button.toJSON()]}],
-                ephemeral: true
+                components: [{type: 1, components: [add_token_button.toJSON()]}]
             })
     
             user_data = await ctx.ai_horde_manager.findUser({token}).catch(() => null)
