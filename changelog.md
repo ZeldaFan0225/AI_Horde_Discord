@@ -1,5 +1,17 @@
 # Changelog
 
+## V3.2.0
+
+- pay for every generation in a party, let the bot create a shared key which everybody will automatically when creating an image in the party!
+- create a list of required words for generations in your party
+
+**Migrating** 
+
+MAKE SURE THE FOLLOWING STEPS ARE DONE IN ORDER
+- run `ALTER TABLE parties ADD COLUMN shared_key VARCHAR(100)` on your postgres database before deploying this or any future version when using a database
+- run `ALTER TABLE parties ADD COLUMN wordlist text[] NOT NULL DEFAULT '{}'` on your postgres database
+
+
 ## V3.1.0
 
 - save horde user id for easy lookup

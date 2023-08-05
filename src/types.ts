@@ -86,7 +86,9 @@ export interface Party {
     style: string,
     award: number,
     recurring: boolean,
-    users: string[]
+    shared_key?: string,
+    users: string[],
+    wordlist: string[]
 }
 
 export interface LORAFetchResponse {
@@ -391,6 +393,7 @@ export interface Config {
         mention_roles?: string[],
         default?: {
             recurring?: boolean
+            pay_for_generations?: boolean
         },
         user_restrictions?: {
             award?: {
@@ -398,6 +401,10 @@ export interface Config {
                 max?: number
             },
             duration?: {
+                min?: number,
+                max?: number
+            },
+            wordlist?: {
                 min?: number,
                 max?: number
             }

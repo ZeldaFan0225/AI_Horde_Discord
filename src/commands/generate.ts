@@ -167,6 +167,13 @@ export default class extends Command {
         
         prompt = style.prompt.slice().replace("{p}", prompt)
         prompt = prompt.replace("{np}", !negative_prompt || prompt.includes("###") ? negative_prompt : `###${negative_prompt}`)
+        
+        if(party && party.wordlist.length) {
+            if(ctx.client.config.advanced?.dev) {
+                console.log(party.wordlist)
+            }
+            if(!party.wordlist.every(w => prompt.toLowerCase().includes(w))) return ctx.error({error: "Your prompt does not include all required words"})
+        }
 
         if(keep_ratio && img?.width && img?.height) {
             const ratio = img?.width/img?.height
@@ -185,7 +192,7 @@ export default class extends Command {
             console.log(width)
         }
 
-        const token = user_token || ctx.client.config.default_token || "0000000000"
+        const token = party?.shared_key || user_token || ctx.client.config.default_token || "0000000000"
         let img_data: Buffer | undefined
         if(img) {
             let img_data_res = await Centra(img.url, "GET")
@@ -234,9 +241,9 @@ export default class extends Command {
         const generation_start = await ctx.ai_horde_manager.postAsyncImageGenerate(generation_data, {token})
         .catch((e) => {
             if(ctx.client.config.advanced?.dev) console.error(e)
-            return e;
+            return e.message;
         })
-        if(!generation_start || !generation_start.id) return ctx.error({error: `Unable to start generation: ${generation_start.message}`});
+        if(!generation_start || !generation_start.id) return ctx.error({error: `Unable to start generation: ${generation_start}`});
 
 
         if (ctx.client.config.logs?.enabled) {

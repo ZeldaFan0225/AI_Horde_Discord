@@ -224,7 +224,8 @@
             "1234567890123456789"
         ],
         "default": {
-            "recurring": false
+            "recurring": false,
+            "pay_for_generations": false
         },
         "user_restrictions": {
             "award": {
@@ -234,6 +235,10 @@
             "duration": {
                 "min": 1,
                 "max": 30
+            },
+            "wordlist": {
+                "min": 0,
+                "max": 100
             }
         }
     }

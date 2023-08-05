@@ -7,6 +7,7 @@ import {existsSync, mkdirSync, writeFileSync} from "fs"
 import { Pool } from "pg";
 import crypto from "crypto"
 import Centra from "centra";
+import { AIHorde, SharedKeyDetails } from "@zeldafan0225/ai_horde";
 
 export class AIHordeClient extends Client {
 	commands: Store<StoreTypes.COMMANDS>;
@@ -148,13 +149,21 @@ export class AIHordeClient extends Client {
 		return p.rows[0]!
 	}
 
-	async cleanUpParties(database?: Pool) {
+	async cleanUpParties(ai_horde_manager: AIHorde, database?: Pool) {
 		const expired_parties = await database?.query("DELETE FROM parties WHERE ends_at <= CURRENT_TIMESTAMP RETURNING *").catch(console.error)
 		if(!expired_parties?.rowCount) return;
 		for(let party of expired_parties.rows) {
 			const channel = await this.channels.fetch(party.channel_id).catch(console.error)
 			if(!channel?.id || channel?.type !== ChannelType.PublicThread) continue;
-			await channel?.send({content: `This party ended.\n${party.users?.length} users participated.\nThanks to <@${party.creator_id}> for hosting this party`})
+			let usagestats: SharedKeyDetails = {}
+			if(party.shared_key) {
+				const usertoken = await this.getUserToken(party.creator_id, database)
+				usagestats = await ai_horde_manager.getSharedKey(party.shared_key, {token: usertoken}).catch(console.error) || {}
+	
+				await ai_horde_manager.deleteSharedKey(party.shared_key, {token: usertoken}).catch(console.error)
+			}
+			await channel?.send({content: `This party ended.\n${party.users?.length} users participated.${usagestats ? `\n${usagestats.utilized} kudos have been spent by <@${party.creator_id}> only for generations in this party` : ""}\nThanks to <@${party.creator_id}> for hosting this party`})
+			
 		}
 	}
 

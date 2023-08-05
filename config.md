@@ -199,7 +199,8 @@ Here you can see an explanation of what which option does
         "enabled": Whether the remix action is enabled (BOOLEAN),
         "mention_roles": The roles to mention when a party is started (ARRAY OF ROLE IDS),
         "default": {
-            "recurring": The default for recurring awards (BOOLEAN)
+            "recurring": The default for recurring awards (BOOLEAN),
+            "pay_for_generations": The default for paying for generations (BOOLEAN)
         },
         "user_restrictions": {
             "award": {
@@ -209,6 +210,10 @@ Here you can see an explanation of what which option does
             "duration": {
                 "min": (BOOLEAN) *5,
                 "max": (BOOLEAN) *5,
+            },
+            "wordlist": {
+                "min": (BOOLEAN),
+                "max": (BOOLEAN),
             }
         }
     }
