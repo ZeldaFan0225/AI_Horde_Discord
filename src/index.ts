@@ -78,7 +78,10 @@ client.on("ready", async () => {
     client.contexts.loadClasses().catch(console.error)
     client.modals.loadClasses().catch(console.error)
     client.user?.setPresence({activities: [{type: ActivityType.Listening, name: "to your generation requests | https://https://aihorde.net/"}], status: PresenceUpdateStatus.DoNotDisturb, })
-    if(client.config.generate?.enabled) await client.loadHordeStyles()
+    if(client.config.generate?.enabled) {
+        await client.loadHordeStyles()
+        setInterval(async () => await client.loadHordeStyles(), 1000 * 60 * 60 * 24)
+    }
     console.log(`Ready`)
     await client.application?.commands.set([...client.commands.createPostBody(), ...client.contexts.createPostBody()]).catch(console.error)
     if((client.config.advanced_generate?.user_restrictions?.amount?.max ?? 4) > 10) throw new Error("More than 10 images are not supported in the bot")
