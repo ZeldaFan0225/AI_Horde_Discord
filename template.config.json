@@ -49,6 +49,7 @@
         "enabled": true,
         "update_interrogation_status_interval_seconds": 5,
         "enable_user_captioning": true,
+        "enable_image_description_context": true,
         "default": {
             "nsfw": false,
             "caption": false,

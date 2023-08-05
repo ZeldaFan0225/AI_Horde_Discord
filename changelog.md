@@ -1,5 +1,9 @@
 # Changelog
 
+## V3.2.1
+
+- describing images: create a description for an image another user sent to the chat
+
 ## V3.2.0
 
 - pay for every generation in a party, let the bot create a shared key which everybody will automatically when creating an image in the party!

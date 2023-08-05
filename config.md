@@ -49,6 +49,7 @@ Here you can see an explanation of what which option does
         "enabled": Whether the interrogate command is enabled (BOOLEAN),
         "update_interrogation_status_interval_seconds": The interval at which the embed in Discord gets updated (INTEGER),
         "enable_user_captioning" Whether users can use the context command to caption other users profile pictures (BOOLEAN),
+        "enable_image_description_context": Whether users can use the context command to create descriptions for images other users sent (BOOLEAN),
         "default": {
             "nsfw": If no choice is given interrogate if image is nsfw (BOOLEAN) *1,
             "caption": If no choice is given create a caption for the image (BOOLEAN) *1,

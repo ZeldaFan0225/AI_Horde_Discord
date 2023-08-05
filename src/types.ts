@@ -218,6 +218,7 @@ export interface Config {
         enabled?: boolean,
         update_interrogation_status_interval_seconds?: number,
         enable_user_captioning?: boolean,
+        enable_image_description_context?: boolean,
         default?: {
             nsfw?: boolean,
             caption?: boolean,
