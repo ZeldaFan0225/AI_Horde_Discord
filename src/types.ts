@@ -175,6 +175,19 @@ export interface LORAData {
     }[]
 }
 
+export interface HordeStyleData {
+    prompt: string,
+    model?: string,
+    sampler_name?: string,
+    width?: number,
+    height?: number,
+    steps?: number,
+    cfg_scale?: number
+    loras?: {
+        name: string
+    }[]
+}
+
 export interface Config {
     use_database?: boolean,
     default_token?: string,
@@ -330,7 +343,6 @@ export interface Config {
         update_generation_status_interval_seconds?: number,
         improve_loading_time?: boolean,
         convert_a1111_weight_to_horde_weight?: boolean,
-        styles_source?: string
         default?: {
             tiling?: boolean,
             amount?: number,
@@ -410,5 +422,9 @@ export interface Config {
                 max?: number
             }
         }
+    },
+    data_sources?: {
+        styles_source?: string
+        style_categories_source?: string,
     }
 }

@@ -2,11 +2,10 @@ import SuperMap from "@thunder04/supermap";
 import { ChannelType, Client, ClientOptions, PermissionFlagsBits, PermissionsBitField } from "discord.js";
 import { readFileSync } from "fs";
 import { Store } from "../stores/store";
-import { Config, LORAData, LORAFetchResponse, Party, StoreTypes } from "../types";
+import { Config, HordeStyleData, LORAData, LORAFetchResponse, Party, StoreTypes } from "../types";
 import {existsSync, mkdirSync, writeFileSync} from "fs"
 import { Pool } from "pg";
 import crypto from "crypto"
-import Centra from "centra";
 import { AIHorde, SharedKeyDetails } from "@zeldafan0225/ai_horde";
 
 export class AIHordeClient extends Client {
@@ -19,18 +18,8 @@ export class AIHordeClient extends Client {
 	timeout_users: SuperMap<string, any>
 	security_key?: Buffer
 	bot_version: string
-	horde_styles: Record<string, {
-		prompt: string,
-		model?: string,
-		sampler_name?: string,
-		width?: number,
-		height?: number,
-		steps?: number,
-		cfg_scale?: number
-		loras?: {
-			name: string
-		}[]
-	}>
+	horde_styles: Record<string, HordeStyleData>
+	horde_style_categories: Record<string, string[]>
 
 	constructor(options: ClientOptions) {
 		super(options);
@@ -51,6 +40,7 @@ export class AIHordeClient extends Client {
 		this.bot_version = JSON.parse(readFileSync("./package.json", "utf-8")).version
 
 		this.horde_styles = {}
+		this.horde_style_categories = {}
 	}
 
 	getNeededPermissions(guild_id: string) {
@@ -86,12 +76,41 @@ export class AIHordeClient extends Client {
 	}
 
 	async loadHordeStyles() {
-		const source = this.config.generate?.styles_source ?? `https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/styles.json`
-		const req = Centra(source, "GET")
-		const raw = await req.send()
-		if(!raw.statusCode?.toString().startsWith("2")) throw new Error("Unable to fetch styles");
-		const res = await raw.json()
+		const source = this.config.data_sources?.styles_source ?? `https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/styles.json`
+		const req = await fetch(source)
+		if(!req.status?.toString().startsWith("2")) throw new Error("Unable to fetch styles");
+		const res = await req.json()
 		this.horde_styles = res
+	}
+
+	async loadHordeStyleCategories() {
+		const source = this.config.data_sources?.style_categories_source ?? `https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/categories.json`
+		const req = await fetch(source)
+		if(!req.status?.toString().startsWith("2")) throw new Error("Unable to fetch style categories");
+		const res = await req.json()
+		this.horde_style_categories = res
+	}
+
+	getHordeStyle(input: string, search_order: ("style" | "category")[] = ["style", "category"]): HordeStyleData & {name: string, type: "style" | "category-style"} | null {
+		let result: HordeStyleData & {name: string, type: "style" | "category-style"} | null = null;
+		for(let search of search_order) {
+			if(search === "style") {
+				const temp = this.horde_styles[input.toLowerCase()]
+				if(temp) {
+					result = {...temp, name: input.toLowerCase(), type: "style"}
+				}
+			} else if(search === "category") {
+				const category_styles = this.horde_style_categories[input.toLowerCase()] || []
+				const randomstyle = randomizeArray(category_styles)[0]
+				const temp = this.horde_styles[randomstyle.toLowerCase()]
+				if(temp) {
+					result = {...temp, name: randomstyle.toLowerCase(), type: "category-style"}
+				}
+			}
+			if(result) break;
+		}
+
+		return result || null
 	}
 
 	async getSlashCommandTag(name: string) {
@@ -197,4 +216,14 @@ export class AIHordeClient extends Client {
 
 		return data
 	}
+}
+
+function randomizeArray(array: any[]) {
+    let currentIndex = array.length,  randomIndex;
+    while (currentIndex != 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
 }

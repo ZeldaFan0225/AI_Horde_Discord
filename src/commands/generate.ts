@@ -131,7 +131,7 @@ export default class extends Command {
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? ctx.client.config.generate?.default?.keep_original_ratio ?? true
         let img = ctx.interaction.options.getAttachment("source_image")
 
-        const style = ctx.client.horde_styles[style_raw.toLowerCase()]
+        const style = ctx.client.getHordeStyle(style_raw)
 
         let height = style?.height
         let width = style?.width
@@ -148,7 +148,8 @@ export default class extends Command {
         if(party?.style && party.style !== style_raw.toLowerCase()) return ctx.error({error: `Please use the style '${party.style}' for this party`})
         if(ctx.client.config.generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
         if(ctx.client.config.generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
-        if(ctx.client.config.generate?.blacklisted_styles?.includes(style_raw.toLowerCase())) return ctx.error({error: "The chosen style is blacklisted"})
+        if(ctx.client.config.generate?.blacklisted_styles?.includes(style_raw.toLowerCase())) return ctx.error({error: "The chosen style or category is blacklisted"})
+        if(ctx.client.config.generate?.blacklisted_styles?.includes(style.name)) return ctx.error({error: "The randomly chosen style from the category is blacklisted"})
         if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use a source image`, codeblock: false})
         if(img && ctx.client.config.generate?.source_image?.require_ai_horde_account_oauth_connection && (!ai_horde_user || ai_horde_user.pseudonymous)) return ctx.error({error: "Your ai horde account needs to be created with a oauth connection"})
         if(img && !can_bypass && ctx.client.config.generate?.source_image?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use a source image"})
@@ -422,7 +423,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                     const embeds = [
                         new EmbedBuilder({
                             title: "Generation Finished",
-                            description: `**Prompt** ${ctx.interaction.options.getString("prompt", true)}\n**Style** ${style_raw}\n**Kudos Consumed** \`${images.kudos}\`${image_map.length !== amount ? "\nCensored Images are not displayed" : ""}`,
+                            description: `**Prompt** ${ctx.interaction.options.getString("prompt", true)}\n**Style** \`${style?.name ?? style_raw}\`${style?.type === "category-style" ? ` from category \`${style_raw}\`` : ""}\n**Kudos Consumed** \`${images.kudos}\`${image_map.length !== amount ? "\nCensored Images are not displayed" : ""}`,
                             color: Colors.Blue,
                             footer: {text: `Generation ID ${generation_start!.id}`},
                             thumbnail: img_data && image_map.length < 10 ? {url: "attachment://original.webp"} : img_data ? {url: img!.url} : undefined
@@ -447,7 +448,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                         title: `Image ${i+1}`,
                         image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
                         color: Colors.Blue,
-                        description: `${!i ? `**Raw Prompt:** ${ctx.interaction.options.getString("prompt", true)}\n**Processed Prompt:** ${prompt}\n**Style:** ${style_raw}\n**Total Kudos Cost:** \`${images.kudos}\`` : ""}${ctx.client.config.advanced?.dev ? `\n\n**Image ID** ${g.id}` : ""}` || undefined,
+                        description: `${!i ? `**Raw Prompt:** ${ctx.interaction.options.getString("prompt", true)}\n**Processed Prompt:** ${prompt}\n**Style:** \`${style?.name ?? style_raw}\`${style?.type === "category-style" ? ` from category \`${style_raw}\`` : ""}\n**Total Kudos Cost:** \`${images.kudos}\`` : ""}${ctx.client.config.advanced?.dev ? `\n\n**Image ID** ${g.id}` : ""}` || undefined,
                     })
                     if(img_data) embed.setThumbnail(`attachment://original.webp`)
                     return {attachment, embed}
@@ -497,8 +498,9 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const party = await context.client.getParty(context.interaction.channelId, context.database)
                 if(party) return context.interaction.respond([{name: party.style, value: party.style}])
                 const styles = Object.keys(context.client.horde_styles)
-                const available = styles.map(s => ({name: s, value: s}))
-                const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase())) : available
+                const categories = Object.keys(context.client.horde_style_categories)
+                const available = [...styles.map(s => ({name: `Style: ${s}`, value: s})), ...categories.map(s => ({name: `Category: ${s}`, value: s}))]
+                const ret = option.value ? available.filter(s => s.value.toLowerCase().includes(option.value.toLowerCase())) : available
                 return await context.interaction.respond(ret.slice(0,25))
             }
         }

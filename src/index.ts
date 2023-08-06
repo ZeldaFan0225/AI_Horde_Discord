@@ -80,7 +80,11 @@ client.on("ready", async () => {
     client.user?.setPresence({activities: [{type: ActivityType.Listening, name: "to your generation requests | https://https://aihorde.net/"}], status: PresenceUpdateStatus.DoNotDisturb, })
     if(client.config.generate?.enabled) {
         await client.loadHordeStyles()
-        setInterval(async () => await client.loadHordeStyles(), 1000 * 60 * 60 * 24)
+        await client.loadHordeStyleCategories()
+        setInterval(async () => {
+            await client.loadHordeStyles()
+            await client.loadHordeStyleCategories()
+        }, 1000 * 60 * 60 * 24)
     }
     console.log(`Ready`)
     await client.application?.commands.set([...client.commands.createPostBody(), ...client.contexts.createPostBody()]).catch(console.error)

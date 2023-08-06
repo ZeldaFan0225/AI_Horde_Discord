@@ -160,7 +160,6 @@
         "update_generation_status_interval_seconds": 5,
         "convert_a1111_weight_to_horde_weight": true,
         "improve_loading_time": false,
-        "styles_source": "https://raw.githubusercontent.com/Haidra-Org/AI-Horde-Styles/main/styles.json",
         "default": {
             "tiling": false,
             "amount": 1,
@@ -242,5 +241,9 @@
                 "max": 100
             }
         }
+    },
+    "data_sources": {
+        "styles_source": "https://raw.githubusercontent.com/Haidra-Org/AI-Horde-Styles/main/styles.json",
+        "style_categories_source": "https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/categories.json"
     }
 }

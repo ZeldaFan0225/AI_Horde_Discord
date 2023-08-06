@@ -1,5 +1,9 @@
 # Changelog
 
+## V3.2.2
+
+- support for categories in parties and /generate, when a party is selected a random style will be chosen
+
 ## V3.2.1
 
 - describing images: create a description for an image another user sent to the chat
