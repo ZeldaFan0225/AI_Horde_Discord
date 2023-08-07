@@ -40,7 +40,7 @@ export default class extends Command {
 
         await ctx.interaction.reply({content: "Party ended.", ephemeral: true})
         ctx.interaction.channel?.send({
-            content: `The party police showed up and broke down this party.\n${party_data.rows[0].users?.length} users participated.${usagestats ? `\n${usagestats.utilized} kudos have been spent by <@${party.creator_id}> only for generations in this party` : ""}\nThanks to <@${party.creator_id}> for hosting this party`
+            content: `The party police showed up and broke down this party.\n${party_data.rows[0].users?.length} users participated.${usagestats?.utilized ? `\n${usagestats.utilized} kudos have been spent by <@${party.creator_id}> only for generations in this party` : ""}\nThanks to <@${party.creator_id}> for hosting this party`
         })
     }
 }

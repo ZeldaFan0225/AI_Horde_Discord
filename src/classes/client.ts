@@ -181,7 +181,7 @@ export class AIHordeClient extends Client {
 	
 				await ai_horde_manager.deleteSharedKey(party.shared_key, {token: usertoken}).catch(console.error)
 			}
-			await channel?.send({content: `This party ended.\n${party.users?.length} users participated.${usagestats ? `\n${usagestats.utilized} kudos have been spent by <@${party.creator_id}> only for generations in this party` : ""}\nThanks to <@${party.creator_id}> for hosting this party`})
+			await channel?.send({content: `This party ended.\n${party.users?.length} users participated.${usagestats?.utilized ? `\n${usagestats.utilized} kudos have been spent by <@${party.creator_id}> only for generations in this party` : ""}\nThanks to <@${party.creator_id}> for hosting this party`})
 			
 		}
 	}
