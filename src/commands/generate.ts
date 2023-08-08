@@ -242,7 +242,7 @@ export default class extends Command {
         const generation_start = await ctx.ai_horde_manager.postAsyncImageGenerate(generation_data, {token})
         .catch((e) => {
             if(ctx.client.config.advanced?.dev) console.error(e)
-            return e.message;
+            return e.rawError.message;
         })
         if(!generation_start || !generation_start.id) return ctx.error({error: `Unable to start generation: ${generation_start}`});
 
