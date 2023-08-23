@@ -300,7 +300,7 @@ export default class extends Command {
         width = ctx.interaction.options.getInteger("width") ?? width
 
         if(ctx.client.config.advanced_generate.convert_a1111_weight_to_horde_weight) {
-            prompt = prompt.replace(/(\(+|\[+)|(\)+|\]+)|\:\d\.\d(\)+|\]+)/g, (w) => {
+            prompt = prompt.replace(/(\(+|\[+)|(?<!\:\d(\.\d+)?)(\)+|\]+)/g, (w) => {
                 if(w.startsWith("(") || w.startsWith("[")) return "("
                 if(w.startsWith(":")) return w;
                 const weight = 1 + (0.1 * (w.startsWith(")") ? 1 : -1) * w.length)

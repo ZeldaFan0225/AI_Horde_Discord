@@ -40,7 +40,7 @@ export default class extends Modal {
         if(ctx.client.config.remix?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         
         if(ctx.client.config.remix?.convert_a1111_weight_to_horde_weight) {
-            prompt = prompt.replace(/(\(+|\[+)|(\)+|\]+)|\:\d\.\d(\)+|\]+)/g, (w) => {
+            prompt = prompt.replace(/(\(+|\[+)|(?<!\:\d(\.\d+)?)(\)+|\]+)/g, (w) => {
                 if(w.startsWith("(") || w.startsWith("[")) return "("
                 if(w.startsWith(":")) return w;
                 const weight = 1 + (0.1 * (w.startsWith(")") ? 1 : -1) * w.length)

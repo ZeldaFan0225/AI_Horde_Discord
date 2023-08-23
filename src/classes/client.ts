@@ -102,6 +102,7 @@ export class AIHordeClient extends Client {
 			} else if(search === "category") {
 				const category_styles = this.horde_style_categories[input.toLowerCase()] || []
 				const randomstyle = randomizeArray(category_styles)[0]
+				if(!randomstyle) return null;
 				const temp = this.horde_styles[randomstyle.toLowerCase()]
 				if(temp) {
 					result = {...temp, name: randomstyle.toLowerCase(), type: "category-style"}
@@ -218,12 +219,12 @@ export class AIHordeClient extends Client {
 	}
 }
 
-function randomizeArray(array: any[]) {
+function randomizeArray<T>(array: T[]): T[] {
     let currentIndex = array.length,  randomIndex;
     while (currentIndex != 0) {
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex]!, array[currentIndex]!];
     }
     return array;
 }

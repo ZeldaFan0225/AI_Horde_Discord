@@ -159,7 +159,7 @@ export default class extends Command {
         if(img && ctx.client.config.generate?.source_image?.whitelist?.only_allow_whitelist && !ctx.client.config.generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)) return ctx.error({error: "You are not whitelisted to use a source image"})
 
         if(ctx.client.config.generate.convert_a1111_weight_to_horde_weight) {
-            prompt = prompt.replace(/(\(+|\[+)|(\)+|\]+)/g, (w) => {
+            prompt = prompt.replace(/(\(+|\[+)|(?<!\:\d(\.\d+)?)(\)+|\]+)/g, (w) => {
                 if(w.startsWith("(") || w.startsWith("[")) return "("
                 const weight = 1 + (0.1 * (w.startsWith(")") ? 1 : -1) * w.length)
                 return `:${weight.toFixed(1)})`
