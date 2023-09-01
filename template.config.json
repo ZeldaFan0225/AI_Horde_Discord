@@ -69,6 +69,7 @@
         "replacement_filter": true,
         "blacklisted_models": [],
         "blacklisted_words": [],
+        "backlist_regex": "",
         "update_generation_status_interval_seconds": 5,
         "convert_a1111_weight_to_horde_weight": false,
         "improve_loading_time": false,
@@ -157,6 +158,7 @@
         "replacement_filter": true,
         "blacklisted_styles": [],
         "blacklisted_words": [],
+        "backlist_regex": "",
         "update_generation_status_interval_seconds": 5,
         "convert_a1111_weight_to_horde_weight": true,
         "improve_loading_time": false,
@@ -203,6 +205,7 @@
         "require_login": true,
         "trusted_workers": true,
         "blacklisted_words": [],
+        "backlist_regex": "",
         "convert_a1111_weight_to_horde_weight": true,
         "allow_custom_strength": true,
         "generation_options": {

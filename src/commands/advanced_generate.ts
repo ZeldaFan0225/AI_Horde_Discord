@@ -273,6 +273,7 @@ export default class extends Command {
 
         if(party?.channel_id) return ctx.error({error: `You can only use ${await ctx.client.getSlashCommandTag("generate")} in parties`, codeblock: false})
         if(ctx.client.config.advanced_generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("advanced_generate")}`, codeblock: false})
+        if(ctx.client.config.advanced_generate?.backlist_regex && new RegExp(ctx.client.config.advanced_generate.backlist_regex, "i").test(prompt.replace(/[\u0300-\u036f]/g, ""))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(ctx.client.config.advanced_generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(height % 64 !== 0) return ctx.error({error: "Height must be a multiple of 64"})
         if(width % 64 !== 0) return ctx.error({error: "Width must be a multiple of 64"})

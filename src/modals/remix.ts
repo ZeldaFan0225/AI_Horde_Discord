@@ -37,6 +37,7 @@ export default class extends Modal {
         const image = image_req.body.toString("base64")
 
         
+        if(ctx.client.config.remix?.backlist_regex && new RegExp(ctx.client.config.remix.backlist_regex, "i").test(prompt.replace(/[\u0300-\u036f]/g, ""))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(ctx.client.config.remix?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         
         if(ctx.client.config.remix?.convert_a1111_weight_to_horde_weight) {
