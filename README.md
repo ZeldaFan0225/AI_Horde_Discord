@@ -39,6 +39,8 @@ Optional:
 
 ## How to set up
 
+### A detailed Linux setup can be found [here](https://github.com/ZeldaFan0225/AI_Horde_Discord/blob/main/DB_SETUP.md)
+
 1) download the code from this repository  
 2) get the token of your discord bot (https://discord.com/developers/docs/reference#authentication)  
 3) Install the node modules using `npm i` (make sure the dev dependencies are also installed for typescript to work)  

@@ -1,5 +1,10 @@
 # Changelog
 
+## V3.2.3
+
+- fix a1111 weight conversion
+- fix style processing, when style is not found return an error
+
 ## V3.2.2
 
 - support for categories in parties and /generate, when a party is selected a random style will be chosen
