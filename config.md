@@ -69,6 +69,7 @@ Here you can see an explanation of what which option does
         "replacement_filter": If enabled, suspicious prompts are sanitized through a string replacement filter instead. *1,
         "blacklisted_models": A list of blacklisted models which users are not allowed to use (ARRAY OF STRING),
         "blacklisted_words": A list of blacklisted words which users are not allowed to use (ARRAY OF STRING),
+        "blacklist_regex": A regex version of blacklisted_words, allows blacklisting negative and positive prompt (check for ###) and multiple words together (STRING),
         "update_generation_status_interval_seconds": The interval at which the embed in Discord gets updated (INTEGER),
         "convert_a1111_weight_to_horde_weight": Whether to convert a1111 to weighted prompt required by the api (BOOLEAN) *7 *8,
         "improve_loading_time": Try to improve the displaying time between generation finished and generation displayed in discord (BOOLEAN) *7
@@ -152,6 +153,7 @@ Here you can see an explanation of what which option does
         "replacement_filter": If enabled, suspicious prompts are sanitized through a string replacement filter instead. *1,
         "blacklisted_styles": A list of blacklisted styles or categories which users are not allowed to use (ARRAY OF STRING),
         "blacklisted_words": A list of blacklisted words which users are not allowed to use (ARRAY OF STRING),
+        "blacklist_regex": A regex version of blacklisted_words, allows blacklisting negative and positive prompt (check for ###) and multiple words together (STRING),
         "update_generation_status_interval_seconds": The interval at which the embed in Discord gets updated (INTEGER),
         "convert_a1111_weight_to_horde_weight": Whether to convert a1111 to weighted prompt required by the api (BOOLEAN) *7 *8,
         "improve_loading_time": Try to improve the displaying time between generation finished and generation displayed in discord (BOOLEAN) *7
@@ -180,6 +182,7 @@ Here you can see an explanation of what which option does
         "require_login": Set to true if you want the user to log in with their ai horde token (BOOLEAN),
         "trusted_workers": Whether to only use trusted workers (BOOLEAN) *1,
         "blacklisted_words": A list of blacklisted words which users are not allowed to use (ARRAY OF STRING),
+        "blacklist_regex": A regex version of blacklisted_words, allows blacklisting negative and positive prompt (check for ###) and multiple words together (STRING),
         "convert_a1111_weight_to_horde_weight": Whether to convert a1111 to weighted prompt required by the api (BOOLEAN) *7 *8,
         "allow_custom_strength": Set to true to allow the user to give a custom strength (BOOLEAN),
         "generation_options": {

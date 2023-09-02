@@ -147,7 +147,7 @@ export default class extends Command {
         if(!style?.prompt?.length) return ctx.error({error: "Unable to find style for input"})
         if(party?.style && party.style !== style_raw.toLowerCase()) return ctx.error({error: `Please use the style '${party.style}' for this party`})
         if(ctx.client.config.generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
-        if(ctx.client.config.generate.backlist_regex && new RegExp(ctx.client.config.generate.backlist_regex, "i").test(prompt.replace(/[\u0300-\u036f]/g, ""))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
+        if(ctx.client.config.generate.blacklist_regex && new RegExp(ctx.client.config.generate.blacklist_regex, "i").test(prompt.replace(/[\u0300-\u036f]/g, ""))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(ctx.client.config.generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(ctx.client.config.generate?.blacklisted_styles?.includes(style_raw.toLowerCase())) return ctx.error({error: "The chosen style or category is blacklisted"})
         if(ctx.client.config.generate?.blacklisted_styles?.includes(style.name)) return ctx.error({error: "The randomly chosen style from the category is blacklisted"})
