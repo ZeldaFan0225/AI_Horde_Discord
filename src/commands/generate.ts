@@ -221,7 +221,9 @@ export default class extends Command {
                 denoising_strength: denoise,
                 cfg_scale: style.cfg_scale,
                 loras: style.loras,
-                steps: style.steps
+                steps: style.steps,
+                tis: style.tis,
+                hires_fix: style.hires_fix
             },
             replacement_filter: ctx.client.config.generate.replacement_filter,
             nsfw: ctx.client.config.generate?.user_restrictions?.allow_nsfw,

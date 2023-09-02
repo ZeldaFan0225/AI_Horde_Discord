@@ -1,4 +1,4 @@
-import {ModelGenerationInputStableSamplers, AIHorde} from "@zeldafan0225/ai_horde";
+import {ModelGenerationInputStableSamplers, AIHorde, ModelPayloadTextInversionsStable} from "@zeldafan0225/ai_horde";
 import {
     AnySelectMenuInteraction,
     AutocompleteInteraction,
@@ -182,9 +182,15 @@ export interface HordeStyleData {
     width?: number,
     height?: number,
     steps?: number,
-    cfg_scale?: number
+    cfg_scale?: number,
+    hires_fix?: boolean,
     loras?: {
         name: string
+    }[],
+    tis?: {
+        name: string,
+        inject_ti?: (typeof ModelPayloadTextInversionsStable[keyof typeof ModelPayloadTextInversionsStable]),
+        stringth?: number
     }[]
 }
 
@@ -273,7 +279,9 @@ export interface Config {
             karras?: boolean,
             share?: boolean,
             keep_original_ratio: boolean
-            style?: string
+            style?: string,
+            hires_fix?: boolean,
+            tis?: string
         },
         source_image?: {
             require_login?: boolean,
@@ -330,7 +338,9 @@ export interface Config {
             allow_karras?: boolean,
             allow_sharing?: boolean,
             allow_rating?: boolean,
-            allow_lora?: boolean
+            allow_lora?: boolean,
+            allow_hires_fix?: boolean,
+            allow_tis?: boolean
         }
     },
     generate?: {

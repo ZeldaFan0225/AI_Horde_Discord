@@ -201,7 +201,26 @@ const command_data = new SlashCommandBuilder()
                 .setAutocomplete(true)
             )
         }
+        if(config.advanced_generate?.user_restrictions?.allow_tis) {
+            command_data
+            .addStringOption(
+                new SlashCommandStringOption()
+                .setName("textual_inversion")
+                .setDescription("The textual inversions IDs to apply separated with comma")
+            )
+        }
+        if(config.advanced_generate.user_restrictions?.allow_hires_fix) {
+            command_data
+            .addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("hires_fix")
+                .setDescription("Whether to apply hires_fix to the generation")
+            )
+        }
     }
+
+
+    // 21 out of 25 options used
 
 function generateButtons(id: string) {
     let i = 0
@@ -257,6 +276,8 @@ export default class extends Command {
         const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.advanced_generate?.default?.karras ?? false
         const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.advanced_generate?.default?.share
         const lora_id = ctx.interaction.options.getString("lora")
+        const ti_raw = ctx.interaction.options.getString("textual_inversion") ?? ctx.client.config.advanced_generate.default?.tis
+        const hires_fix = ctx.interaction.options.getBoolean("hires_fix") ?? ctx.client.config.advanced_generate.default?.hires_fix ?? false
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
@@ -308,6 +329,8 @@ export default class extends Command {
                 return `:${weight.toFixed(1)})`
             })
         }
+
+        const tis = ti_raw?.split(",").map(ti => ti.trim()).map(ti => ({name: ti, inject_ti: prompt.toLowerCase().indexOf("embedding:") === -1 ? "prompt" as const : undefined}))
         
         prompt = style.prompt.slice().replace("{p}", prompt)
         prompt = prompt.replace("{np}", !negative_prompt || prompt.includes("###") ? negative_prompt : `###${negative_prompt}`)
@@ -361,7 +384,9 @@ export default class extends Command {
                 n: amount,
                 denoising_strength: denoise,
                 karras,
-                loras: lora_id ? [{name: lora_id}] : undefined
+                loras: lora_id ? [{name: lora_id}] : undefined,
+                tis,
+                hires_fix
             },
             replacement_filter: ctx.client.config.advanced_generate.replacement_filter,
             nsfw: ctx.client.config.advanced_generate?.user_restrictions?.allow_nsfw,

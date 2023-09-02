@@ -90,7 +90,9 @@
             "karras": false,
             "share": false,
             "keep_original_ratio": true,
-            "style": "raw"
+            "style": "raw",
+            "hires_fix": false,
+            "tis": ""
         },
         "source_image": {
             "require_login": true,
@@ -147,7 +149,9 @@
             "allow_karras": true,
             "allow_sharing": true,
             "allow_rating": true,
-            "allow_lora": true
+            "allow_lora": true,
+            "allow_hires_fix": true,
+            "allow_tis": true
         }
     },
     "generate": {
