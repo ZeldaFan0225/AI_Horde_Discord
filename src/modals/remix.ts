@@ -130,7 +130,7 @@ export default class extends Modal {
             const embed = new EmbedBuilder({
                 color: Colors.Blue,
                 title: "Remixing finished",
-                description: `**Prompt**\n${prompt}\n**Target**\n${target_user?.tag}\n**Strength** ${strength}%${ctx.client.config.advanced?.dev ? `\n**Seed** ${generation.seed}` : ""}`,
+                description: `**Prompt**\n${prompt}\n**Target**\n${target_user?.displayName}\n**Strength** ${strength}%${ctx.client.config.advanced?.dev ? `\n**Seed** ${generation.seed}` : ""}`,
                 thumbnail: {url: target_user?.displayAvatarURL({extension: "webp", size: 2048})},
                 image: {url: `attachment://${generation.seed ?? `image${0}`}.webp`},
             })

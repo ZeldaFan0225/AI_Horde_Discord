@@ -22,7 +22,7 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
         await u.send({
             embeds: [{
                 title: "Gifting Kudos",
-                description: `You tried gifting kudos to ${target_user.tag ?? "somebody"} but you are not logged in.\nTo gift kudos use /login.`,
+                description: `You tried gifting kudos to ${target_user.displayName ?? "somebody"} but you are not logged in.\nTo gift kudos use /login.`,
                 color: Colors.Blue
             }]
         }).catch(console.error)
@@ -37,7 +37,7 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
                 await target_user.send({
                     embeds: [{
                         title: emoji.title ?? "Surprise",
-                        description: `**${u.tag}** tried to gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}\n\nSince you are not logged in you **did not** receive them. Log in with your [ai horde account](https://aihorde.net/register) within a week to claim your Kudos.`,
+                        description: `**${u.displayName}** tried to gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}\n\nSince you are not logged in you **did not** receive them. Log in with your [ai horde account](https://aihorde.net/register) within a week to claim your Kudos.`,
                         color: Colors.Red
                     }]
                 }).catch(console.error)
@@ -73,21 +73,21 @@ export async function handleMessageReact(reaction: PartialMessageReaction | Mess
     await u.send({
         embeds: [{
             title: "Gifting Kudos",
-            description: `Successfully gifted ${target_user?.tag ?? "somebody"} ${emoji.amount ?? 1} Kudos.`,
+            description: `Successfully gifted ${target_user?.displayName ?? "somebody"} ${emoji.amount ?? 1} Kudos.`,
             color: Colors.Green
         }]
     }).catch(console.error)
     const res = await target_user.send({
         embeds: [{
             title: emoji.title ?? "Surprise",
-            description: `**${u.tag}** gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}`,
+            description: `**${u.displayName}** gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}`,
             color: Colors.Yellow
         }]
     }).catch(console.error)
     if(!res?.id) await r.message.reply({
         embeds: [{
             title: emoji.title ?? "Surprise",
-            description: `**${u.tag}** gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}`,
+            description: `**${u.displayName}** gifted you **${emoji.amount ?? 1}** Kudos on [this message](${r.message.url}).${emoji.message ? `\n${emoji.message}` : ""}`,
             color: Colors.Yellow
         }]
     }).catch(console.error)
