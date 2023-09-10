@@ -190,7 +190,7 @@ export interface HordeStyleData {
     tis?: {
         name: string,
         inject_ti?: (typeof ModelPayloadTextInversionsStable[keyof typeof ModelPayloadTextInversionsStable]),
-        stringth?: number
+        strength?: number
     }[]
 }
 
