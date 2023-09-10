@@ -129,6 +129,7 @@
                 "min": 0,
                 "max": 100
             },
+            "enforce_negative_prompt": false,
             "allow_negative_prompt": true,
             "allow_style": true,
             "allow_sampler": true,
@@ -167,6 +168,7 @@
         "convert_a1111_weight_to_horde_weight": true,
         "improve_loading_time": false,
         "default": {
+            "negative_prompt": "loli, nsfw",
             "tiling": false,
             "amount": 1,
             "share": false,
@@ -193,6 +195,7 @@
                 "min": 0,
                 "max": 100
             },
+            "enforce_negative_prompt": false,
             "allow_negative_prompt": true,
             "allow_style": true,
             "allow_tiling": true,

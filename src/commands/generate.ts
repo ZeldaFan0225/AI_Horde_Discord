@@ -122,7 +122,7 @@ export default class extends Command {
         await ctx.interaction.deferReply({})
         const party = await ctx.client.getParty(ctx.interaction.channelId, ctx.database)
         let prompt = ctx.interaction.options.getString("prompt", true)
-        const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
+        const negative_prompt = (ctx.client.config.generate?.user_restrictions?.enforce_negative_prompt || !ctx.interaction.options.getString("negative_prompt") && ctx.client.config.generate?.defaults?.negative_prompt ? ctx.client.config.generate?.defaults?.negative_prompt : "") + (ctx.interaction.options.getString("negative_prompt") ?? "")
         const style_raw = ctx.interaction.options.getString("style") ?? party?.style ?? ctx.client.config.generate?.default?.style ?? "raw"
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.generate?.default?.denoise ?? 50)/100
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
