@@ -122,7 +122,15 @@ export default class extends Command {
         await ctx.interaction.deferReply({})
         const party = await ctx.client.getParty(ctx.interaction.channelId, ctx.database)
         let prompt = ctx.interaction.options.getString("prompt", true)
-        const negative_prompt = (ctx.client.config.generate?.user_restrictions?.enforce_negative_prompt || !ctx.interaction.options.getString("negative_prompt") && ctx.client.config.generate?.default?.negative_prompt ? ctx.client.config.generate?.default?.negative_prompt : "") + (ctx.interaction.options.getString("negative_prompt") ?? "")
+
+        // this can be expanded if wanted, but I have a hard enough time keeping it in my head without the logic being
+        // on multiple lines, so I added shortcuts for myself. 600+ characters per line is way too much
+        const enforcedneg = ctx.client.config.generate?.user_restrictions?.enforce_negative_prompt
+        const default_negative = ctx.client.config.advanced_generate?.default?.negative_prompt
+        const promptneg = ctx.interaction.options.getString("negative_prompt")
+        const negative_prefix = default_negative && (enforcedneg || !promptneg) ? default_negative : ""
+        const negative_prompt = [negative_prefix,promptneg].filter(Boolean).join(", ")
+
         const style_raw = ctx.interaction.options.getString("style") ?? party?.style ?? ctx.client.config.generate?.default?.style ?? "raw"
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.generate?.default?.denoise ?? 50)/100
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
