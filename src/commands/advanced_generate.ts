@@ -258,7 +258,7 @@ export default class extends Command {
         const style_raw = ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style
         const style = ctx.client.horde_styles[style_raw?.toLowerCase() ?? ""] || {prompt: "{p}{np}"}
 
-        const negative_prompt = (ctx.client.config.advanced_generate?.user_restrictions?.enforce_negative_prompt || !ctx.interaction.options.getString("negative_prompt") && ctx.client.config.advanced_generate?.defaults?.negative_prompt ? ctx.client.config.advanced_generate?.defaults?.negative_prompt : "") + (ctx.interaction.options.getString("negative_prompt") ?? "")
+        const negative_prompt = (ctx.client.config.advanced_generate?.user_restrictions?.enforce_negative_prompt || !ctx.interaction.options.getString("negative_prompt") && ctx.client.config.advanced_generate?.default?.negative_prompt ? ctx.client.config.advanced_generate?.default?.negative_prompt : "") + (ctx.interaction.options.getString("negative_prompt") ?? "")
         const sampler = (ctx.interaction.options.getString("sampler") ?? ctx.client.config.advanced_generate?.default?.sampler ?? ModelGenerationInputStableSamplers.k_euler) as any
         const cfg = ctx.interaction.options.getInteger("cfg") ?? style.cfg_scale ?? ctx.client.config.advanced_generate?.default?.cfg ?? 7.5
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.advanced_generate?.default?.denoise ?? 50)/100
