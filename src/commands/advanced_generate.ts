@@ -411,7 +411,7 @@ export default class extends Command {
             if(ctx.client.config.advanced?.dev) console.error(e)
             return e.rawError as any;
         })
-        if(!generation_start || !generation_start.id) return ctx.error({error: `Unable to start generation: ${generation_start.message}${Object.entries(generation_start.errors).map(([k, v]) => `\n${k}: ${v}`).join("")}`});
+        if(!generation_start || !generation_start.id) return ctx.error({error: `Unable to start generation: ${generation_start.message}${Object.entries(generation_start.errors || {}).map(([k, v]) => `\n${k}: ${v}`).join("")}`});
 
 
         if (ctx.client.config.logs?.enabled) {
