@@ -289,7 +289,7 @@ export default class extends Command {
             const lora = await ctx.client.fetchLORAByID(lora_id, ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
             if(ctx.client.config.advanced?.dev) console.log(lora)
             if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given", codeblock: false})
-            if(lora.type !== "LORA") return ctx.error({error: "The given ID is not a LORA"})
+            if(lora.type !== "LORA" && lora.type !== "LoCon") return ctx.error({error: "The given ID is not a LORA"})
         }
 
         if(party?.channel_id) return ctx.error({error: `You can only use ${await ctx.client.getSlashCommandTag("generate")} in parties`, codeblock: false})
