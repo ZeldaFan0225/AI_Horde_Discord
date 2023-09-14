@@ -20,6 +20,7 @@ export class AIHordeClient extends Client {
 	bot_version: string
 	horde_styles: Record<string, HordeStyleData>
 	horde_style_categories: Record<string, string[]>
+	horde_curated_loras: Array<number>
 
 	constructor(options: ClientOptions) {
 		super(options);
@@ -41,6 +42,7 @@ export class AIHordeClient extends Client {
 
 		this.horde_styles = {}
 		this.horde_style_categories = {}
+		this.horde_curated_loras = []
 	}
 
 	getNeededPermissions(guild_id: string) {
@@ -89,6 +91,14 @@ export class AIHordeClient extends Client {
 		if(!req.status?.toString().startsWith("2")) throw new Error("Unable to fetch style categories");
 		const res = await req.json()
 		this.horde_style_categories = res
+	}
+
+	async loadHordeCuratedLORAs() {
+		const source = this.config.data_sources?.curated_loras_source ?? `https://raw.githubusercontent.com/Haidra-Org/AI-Horde-image-model-reference/main/lora.json`
+		const req = await fetch(source)
+		if(!req.status?.toString().startsWith("2")) throw new Error("Unable to fetch curated LORAs");
+		const res = await req.json()
+		this.horde_curated_loras = res
 	}
 
 	getHordeStyle(input: string, search_order: ("style" | "category")[] = ["style", "category"]): HordeStyleData & {name: string, type: "style" | "category-style"} | null {
