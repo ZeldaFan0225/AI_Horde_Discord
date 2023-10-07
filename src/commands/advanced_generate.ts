@@ -661,7 +661,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 if(!isNaN(Number(option.value)) && option.value) {
                     const lora_by_id = await context.client.fetchLORAByID(option.value, context.client.config.advanced_generate?.user_restrictions?.allow_nsfw)
 
-                    if(lora_by_id?.name && ((lora_by_id?.modelVersions[0]?.files[0]?.sizeKB && lora_by_id?.modelVersions[0]?.files[0]?.sizeKB <= 220000) || context.client.horde_curated_loras?.includes(lora_by_id.id))) ret.push({
+                    if(lora_by_id?.name && (lora_by_id?.modelVersions[0]?.files[0]?.sizeKB && (lora_by_id?.modelVersions[0]?.files[0]?.sizeKB <= 220000 || context.client.horde_curated_loras?.includes(lora_by_id.id)))) ret.push({
                         name: lora_by_id.name,
                         value: lora_by_id.id.toString()
                     })
