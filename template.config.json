@@ -265,6 +265,6 @@
     },
     "data_sources": {
         "styles_source": "https://raw.githubusercontent.com/Haidra-Org/AI-Horde-Styles/main/styles.json",
-        "style_categories_source": "https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/categories.json"
+        "style_categories_source": "https://raw.githubusercontent.com/Haidra-Org/AI-Horde-Styles/main/categories.json"
     }
 }

@@ -77,7 +77,7 @@ client.on("ready", async () => {
     client.components.loadClasses().catch(console.error)
     client.contexts.loadClasses().catch(console.error)
     client.modals.loadClasses().catch(console.error)
-    client.user?.setPresence({activities: [{type: ActivityType.Listening, name: "to your generation requests | https://https://aihorde.net/"}], status: PresenceUpdateStatus.DoNotDisturb, })
+    client.user?.setPresence({activities: [{type: ActivityType.Listening, name: "your generation requests | https://aihorde.net/"}], status: PresenceUpdateStatus.DoNotDisturb, })
     if(client.config.generate?.enabled) {
         await client.loadHordeStyles()
         await client.loadHordeStyleCategories()
