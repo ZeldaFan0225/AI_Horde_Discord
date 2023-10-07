@@ -78,7 +78,7 @@ export class AIHordeClient extends Client {
 	}
 
 	async loadHordeStyles() {
-		const source = this.config.data_sources?.styles_source ?? `https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/styles.json`
+		const source = this.config.data_sources?.styles_source || `https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/styles.json`
 		const req = await fetch(source)
 		if(!req.status?.toString().startsWith("2")) throw new Error("Unable to fetch styles");
 		const res = await req.json()
@@ -86,7 +86,7 @@ export class AIHordeClient extends Client {
 	}
 
 	async loadHordeStyleCategories() {
-		const source = this.config.data_sources?.style_categories_source ?? `https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/categories.json`
+		const source = this.config.data_sources?.style_categories_source || `https://raw.githubusercontent.com/db0/Stable-Horde-Styles/main/categories.json`
 		const req = await fetch(source)
 		if(!req.status?.toString().startsWith("2")) throw new Error("Unable to fetch style categories");
 		const res = await req.json()
@@ -94,7 +94,7 @@ export class AIHordeClient extends Client {
 	}
 
 	async loadHordeCuratedLORAs() {
-		const source = this.config.data_sources?.curated_loras_source ?? `https://raw.githubusercontent.com/Haidra-Org/AI-Horde-image-model-reference/main/lora.json`
+		const source = this.config.data_sources?.curated_loras_source || `https://raw.githubusercontent.com/Haidra-Org/AI-Horde-image-model-reference/main/lora.json`
 		const req = await fetch(source)
 		if(!req.status?.toString().startsWith("2")) throw new Error("Unable to fetch curated LORAs");
 		const res = await req.json()
