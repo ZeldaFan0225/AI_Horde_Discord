@@ -237,6 +237,6 @@ Here you can see an explanation of what which option does
 `*7` EXPERIMENTAL OPTION, ENABLE AT YOUR OWN RISK  
 `*8` For example (((test))) will be automatically converted to (test:1.3)  
 `*9` Uses an encryption key only known to you to encrypt the users tokens. This is recommended to increase security. Enabling this option may have an impact on speed.  
-`*10` Must follow the scheme of https://github.com/db0/Stable-Horde-Styles/blob/main/styles.json  
-`*11` Must follow the scheme of https://github.com/db0/Stable-Horde-Styles/blob/main/categories.json  
+`*10` Must follow the scheme of https://github.com/Haidra-Org/Stable-Horde-Styles/blob/main/styles.json  
+`*11` Must follow the scheme of https://github.com/Haidra-Org/Stable-Horde-Styles/blob/main/categories.json  
 `*12` Must follow the scheme of https://github.com/Haidra-Org/AI-Horde-image-model-reference/blob/main/lora.json
