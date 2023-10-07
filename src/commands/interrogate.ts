@@ -39,6 +39,55 @@ const command_data = new SlashCommandBuilder()
                 .setDescription("Whether to create a detailed interrogation result")
             )
         }
+        if(config.interrogate.user_restrictions?.allow_gfpgan) {
+            command_data.addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("gfpgan")
+                .setDescription("Whether to use GFPGAN for the interrogation")
+            )
+        }
+        if(config.interrogate.user_restrictions?.allow_realesrgan_x4_plus) {
+            command_data.addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("realesrgan_x4_plus")
+                .setDescription("Whether to use RealESRGAN x4+ for the interrogation")
+            )
+        }
+        if(config.interrogate.user_restrictions?.allow_realesrgan_x4_plus_anime) {
+            command_data.addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("realesrgan_x4_plus_anime")
+                .setDescription("Whether to use RealESRGAN x4+ anime for the interrogation")
+            )
+        }
+        if(config.interrogate.user_restrictions?.allow_nmkd_siax) {
+            command_data.addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("nmkd_siax")
+                .setDescription("Whether to use NMKD_Siax for the interrogation")
+            )
+        }
+        if(config.interrogate.user_restrictions?.allow_animesharp_x4) {
+            command_data.addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("4x_animesharp")
+                .setDescription("Whether to use 4x_AnimeSharp for the interrogation")
+            )
+        }
+        if(config.interrogate.user_restrictions?.allow_codeformers) {
+            command_data.addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("codeformers")
+                .setDescription("Whether to use CodeFormers for the interrogation")
+            )
+        }
+        if(config.interrogate.user_restrictions?.allow_strip_background) {
+            command_data.addBooleanOption(
+                new SlashCommandBooleanOption()
+                .setName("strip_background")
+                .setDescription("Whether to strip the background from the image")
+            )
+        }
     }
 
 export default class extends Command {
@@ -58,8 +107,15 @@ export default class extends Command {
         const nsfw = ctx.interaction.options.getBoolean("nsfw") ?? ctx.client.config.interrogate?.default?.nsfw
         const caption = ctx.interaction.options.getBoolean("caption") ?? ctx.client.config.interrogate?.default?.caption
         const detailed = ctx.interaction.options.getBoolean("detailed_interrogation") ?? ctx.client.config.interrogate?.default?.interrogation
+        const gfpgan = ctx.interaction.options.getBoolean("gfpgan") ?? ctx.client.config.interrogate?.default?.gfpgan
+        const x4plus = ctx.interaction.options.getBoolean("realesrgan_x4_plus") ?? ctx.client.config.interrogate?.default?.realesrgan_x4_plus
+        const x4plus_anime = ctx.interaction.options.getBoolean("realesrgan_x4_plus_anime") ?? ctx.client.config.interrogate?.default?.realesrgan_x4_plus_anime
+        const nmkd_siax = ctx.interaction.options.getBoolean("nmkd_siax") ?? ctx.client.config.interrogate?.default?.nmkd_siax
+        const animesharp_4x = ctx.interaction.options.getBoolean("4x_animesharp") ?? ctx.client.config.interrogate?.default?.animesharp_x4
+        const codeformers = ctx.interaction.options.getBoolean("codeformers") ?? ctx.client.config.interrogate?.default?.codeformers
+        const strip_background = ctx.interaction.options.getBoolean("strip_background") ?? ctx.client.config.interrogate?.default?.strip_background
 
-        if(!nsfw && !caption && !detailed) return ctx.error({error: "One of the interrogation types must be selected"})
+        if(ctx.interaction.options.data.length <= 1) return ctx.error({error: "One of the interrogation types must be selected"})
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
 
@@ -73,6 +129,13 @@ export default class extends Command {
         if(nsfw) forms.push({name: ModelInterrogationFormTypes.nsfw})
         if(caption) forms.push({name: ModelInterrogationFormTypes.caption})
         if(detailed) forms.push({name: ModelInterrogationFormTypes.interrogation})
+        if(gfpgan) forms.push({name: ModelInterrogationFormTypes.GFPGAN})
+        if(x4plus) forms.push({name: ModelInterrogationFormTypes.RealESRGAN_x4plus})
+        if(x4plus_anime) forms.push({name: ModelInterrogationFormTypes.RealESRGAN_x4plus_anime_6B})
+        if(nmkd_siax) forms.push({name: ModelInterrogationFormTypes.NMKD_Siax})
+        if(animesharp_4x) forms.push({name: ModelInterrogationFormTypes["4x_AnimeSharp"]})
+        if(codeformers) forms.push({name: ModelInterrogationFormTypes.CodeFormers})
+        if(strip_background) forms.push({name: ModelInterrogationFormTypes.strip_background})
 
         const interrogation_data: ModelInterrogationInputStable = {
             source_image: attachment.url,
@@ -96,6 +159,20 @@ export default class extends Command {
             console.log(start_status)
         }
 
+        const text_status = []
+
+        if(nsfw) text_status.push(`**NSFW** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.nsfw)?.state}\``)
+        if(caption) text_status.push(`**Caption** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.caption)?.state}\``)
+        if(detailed) text_status.push(`**Detailed Interrogation** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.interrogation)?.state}\``)
+        if(gfpgan) text_status.push(`**GFPGAN** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.GFPGAN)?.state}\``)
+        if(x4plus) text_status.push(`**RealESRGAN x4+** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.RealESRGAN_x4plus)?.state}\``)
+        if(x4plus_anime) text_status.push(`**RealESRGAN x4+ anime** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.RealESRGAN_x4plus_anime_6B)?.state}\``)
+        if(nmkd_siax) text_status.push(`**NMKD_Siax** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.NMKD_Siax)?.state}\``)
+        if(animesharp_4x) text_status.push(`**4x_AnimeSharp** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes["4x_AnimeSharp"])?.state}\``)
+        if(codeformers) text_status.push(`**CodeFormers** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.CodeFormers)?.state}\``)
+        if(strip_background) text_status.push(`**Strip Background** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.strip_background)?.state}\``)
+
+
         const embed = new EmbedBuilder({
             color: Colors.Blue,
             title: "Interrogation started",
@@ -103,7 +180,8 @@ export default class extends Command {
 
 Interrogation workers: \`${start_horde_data.interrogator_count}\`
 Interrogations queued: \`${start_horde_data.queued_forms}\`
-${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.nsfw)?.state}\`` : ""}${caption ? `\n**Caption** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.caption)?.state}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${start_status?.forms?.find(f => f.form === ModelInterrogationFormTypes.interrogation)?.state}\`` : ""}`,
+
+${text_status.join("\n")}`,
             image: {
                 url: attachment.url
             }
@@ -152,14 +230,28 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === ModelInterrog
                 return;
             }
 
+            const text_status = []
+
+            if(nsfw) text_status.push(`**NSFW** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.nsfw)?.state}\``)
+            if(caption) text_status.push(`**Caption** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.caption)?.state}\``)
+            if(detailed) text_status.push(`**Detailed Interrogation** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.interrogation)?.state}\``)
+            if(gfpgan) text_status.push(`**GFPGAN** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.GFPGAN)?.state}\``)
+            if(x4plus) text_status.push(`**RealESRGAN x4+** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.RealESRGAN_x4plus)?.state}\``)
+            if(x4plus_anime) text_status.push(`**RealESRGAN x4+ anime** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.RealESRGAN_x4plus_anime_6B)?.state}\``)
+            if(nmkd_siax) text_status.push(`**NMKD_Siax** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.NMKD_Siax)?.state}\``)
+            if(animesharp_4x) text_status.push(`**4x_AnimeSharp** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes["4x_AnimeSharp"])?.state}\``)
+            if(codeformers) text_status.push(`**CodeFormers** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.CodeFormers)?.state}\``)
+            if(strip_background) text_status.push(`**Strip Background** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.strip_background)?.state}\``)
+
             const embed = new EmbedBuilder({
                 color: Colors.Blue,
                 title: "Interrogation started",
                 description: `Please wait...
 
-                Interrogation workers: \`${horde_data.interrogator_count}\`
-                Interrogations queued: \`${horde_data.queued_forms}\`
-                ${nsfw ? `\n**NSFW** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.nsfw)?.state}\`` : ""}${caption ? `\n**Caption** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.caption)?.state}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${status?.forms?.find(f => f.form === ModelInterrogationFormTypes.interrogation)?.state}\`` : ""}`,
+Interrogation workers: \`${horde_data.interrogator_count}\`
+Interrogations queued: \`${horde_data.queued_forms}\`
+
+${text_status.join("\n")}`,
                 image: {
                     url: attachment.url
                 }
@@ -188,6 +280,7 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === ModelInterrog
 
             if(ctx.client.config.advanced?.dev) {
                 console.log(status)
+                console.log(status.forms)
             }
 
             if(status.state !== HordeAsyncRequestStates.done && status.state !== HordeAsyncRequestStates.partial) return {status, horde_data}
@@ -197,11 +290,32 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === ModelInterrog
                 const nsfw_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes.nsfw)
                 const caption_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes.caption)
                 const detailed_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes.interrogation)
+                const gfpgan_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes.GFPGAN)
+                const x4plus_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes.RealESRGAN_x4plus)
+                const x4plus_anime_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes.RealESRGAN_x4plus_anime_6B)
+                const nmkd_siax_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes.NMKD_Siax)
+                const animesharp_4x_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes["4x_AnimeSharp"])
+                const codeformers_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes.CodeFormers)
+                const strip_background_res = status?.forms?.find(f => f.form === ModelInterrogationFormTypes.strip_background)
+
+                const text_status = []
+
+                if(nsfw) text_status.push(`**NSFW** \`${nsfw_res?.state !== HordeAsyncRequestStates.done ? nsfw_res?.state : nsfw_res?.result?.nsfw}\``)
+                if(caption) text_status.push(`**Caption** \`${caption_res?.state !== HordeAsyncRequestStates.done ? caption_res?.state : caption_res?.result?.caption}\``)
+                if(detailed) text_status.push(`**Detailed Interrogation** \`${detailed_res?.state !== HordeAsyncRequestStates.done ? detailed_res?.state : "Result attached"}\``)
+                if(gfpgan) text_status.push(`**GFPGAN** \`${gfpgan_res?.state !== HordeAsyncRequestStates.done ? gfpgan_res?.state : "GFPGAN.webp"}\``)
+                if(x4plus) text_status.push(`**RealESRGAN x4+** \`${x4plus_res?.state !== HordeAsyncRequestStates.done ? x4plus_res?.state : "RealESRGAN_x4plus.webp"}\``)
+                if(x4plus_anime) text_status.push(`**RealESRGAN x4+ anime** \`${x4plus_anime_res?.state !== HordeAsyncRequestStates.done ? x4plus_anime_res?.state : "RealESRGAN_x4plus_anime_6B.webp"}\``)
+                if(nmkd_siax) text_status.push(`**NMKD_Siax** \`${nmkd_siax_res?.state !== HordeAsyncRequestStates.done ? nmkd_siax_res?.state : "NMKD_Siax.webp"}\``)
+                if(animesharp_4x) text_status.push(`**4x_AnimeSharp** \`${animesharp_4x_res?.state !== HordeAsyncRequestStates.done ? animesharp_4x_res?.state : "4x_AnimeSharp.webp"}\``)
+                if(codeformers) text_status.push(`**CodeFormers** \`${codeformers_res?.state !== HordeAsyncRequestStates.done ? codeformers_res?.state : "CodeFormers.webp"}\``)
+                if(strip_background) text_status.push(`**Strip Background** \`${strip_background_res?.state !== HordeAsyncRequestStates.done ? strip_background_res?.state : "strip_background.webp"}\``)
+
                 
                 const embed = new EmbedBuilder({
                     color: Colors.Blue,
                     title: "Interrogation finished",
-                    description: `${nsfw ? `**NSFW** \`${nsfw_res?.state !== HordeAsyncRequestStates.done ? nsfw_res?.state : nsfw_res?.result?.nsfw}\`` : ""}${detailed ? `\n**Detailed Interrogation** \`${detailed_res?.state !== HordeAsyncRequestStates.done ? detailed_res?.state : "Result attached"}\`` : ""}${caption ? `\n**Caption**\n${caption_res?.state !== HordeAsyncRequestStates.done ? caption_res?.state : caption_res?.result?.caption}` : ""}`,
+                    description: `${text_status.join("\n")}`,
                     image: {
                         url: attachment.url
                     }
@@ -211,6 +325,14 @@ ${nsfw ? `\n**NSFW** \`${start_status?.forms?.find(f => f.form === ModelInterrog
 
                 const files = []
                 if(detailed && detailed_res?.state === HordeAsyncRequestStates.done) files.push(new AttachmentBuilder(Buffer.from(JSON.stringify((status?.forms?.find(f => f.form === ModelInterrogationFormTypes.interrogation)?.result?.interrogation || {}), null, 2)), {name: "detailed.json"}))
+        
+                const images = (status.forms?.filter(f => f.result?.[f.form as typeof ModelInterrogationFormTypes[keyof typeof ModelInterrogationFormTypes]]?.["startsWith"]("https://")).map(f => ({url: f.result?.[f.form as typeof ModelInterrogationFormTypes[keyof typeof ModelInterrogationFormTypes]], filename: `${f.form}.webp`})) || []) as unknown as ({url: string, filename: string})[]
+                
+                for(const image of images) {
+                    const data = await fetch(image.url)
+                    files.push(new AttachmentBuilder(Buffer.from(await data.arrayBuffer()), {name: image.filename}))
+                }
+
                 await message.edit({components: [{type: 1, components: [delete_btn.toJSON()]}], embeds: [embed], files});
                 return null
             } 

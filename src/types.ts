@@ -241,12 +241,26 @@ export interface Config {
         default?: {
             nsfw?: boolean,
             caption?: boolean,
-            interrogation?: boolean
+            interrogation?: boolean,
+            gfpgan?: boolean,
+            realesrgan_x4_plus?: boolean,
+            realesrgan_x4_plus_anime?: boolean,
+            nmkd_siax?: boolean,
+            animesharp_x4?: boolean,
+            codeformers?: boolean,
+            strip_background?: boolean
         },
         user_restrictions?: {
             allow_nsfw?: boolean,
             allow_caption?: boolean,
-            allow_interrogation?: boolean
+            allow_interrogation?: boolean,
+            allow_gfpgan?: boolean,
+            allow_realesrgan_x4_plus?: boolean,
+            allow_realesrgan_x4_plus_anime?: boolean,
+            allow_nmkd_siax?: boolean,
+            allow_animesharp_x4?: boolean,
+            allow_codeformers?: boolean,
+            allow_strip_background?: boolean
         }
     },
     advanced_generate?: {
