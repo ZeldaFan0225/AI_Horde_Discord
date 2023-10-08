@@ -142,7 +142,7 @@ export interface LORAData {
         files: {
             name: string,
             id: number,
-            sikeKB: number,
+            sizeKB: number,
             type: string,
             metadata: {
                 fp: null,
@@ -454,6 +454,7 @@ export interface Config {
         }
     },
     data_sources?: {
+        curated_loras_source?: string
         styles_source?: string
         style_categories_source?: string,
     }

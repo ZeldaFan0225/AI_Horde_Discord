@@ -81,9 +81,11 @@ client.on("ready", async () => {
     if(client.config.generate?.enabled) {
         await client.loadHordeStyles()
         await client.loadHordeStyleCategories()
+        await client.loadHordeCuratedLORAs()
         setInterval(async () => {
             await client.loadHordeStyles()
             await client.loadHordeStyleCategories()
+            await client.loadHordeCuratedLORAs()
         }, 1000 * 60 * 60 * 24)
     }
     console.log(`Ready`)
