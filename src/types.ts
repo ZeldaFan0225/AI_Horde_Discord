@@ -185,7 +185,8 @@ export interface HordeStyleData {
     cfg_scale?: number,
     hires_fix?: boolean,
     loras?: {
-        name: string
+        name: string,
+        inject_trigger?: string
     }[],
     tis?: {
         name: string,

@@ -13,7 +13,7 @@
     "advanced": {
         "dev": false,
         "encrypt_token": true,
-        "result_structure_v2_enabled": false
+        "result_structure_v2_enabled": true
     },
     "filter_actions": {
         "mode": "whitelist",

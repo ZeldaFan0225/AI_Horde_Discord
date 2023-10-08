@@ -410,7 +410,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const images = await ctx.ai_horde_manager.getImageGenerationStatus(generation_start!.id!)
 
 
-                if(ctx.client.config.advanced?.result_structure_v2_enabled) {
+                if(ctx.client.config.advanced?.result_structure_v2_enabled ?? true) {
                     const image_map_r = images.generations?.map(async g => {
                         const req = await Centra(g.img!, "GET").send();
                         if(g.censored) return {attachment: null, generation: g}
@@ -467,7 +467,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 if(ctx.client.config.generate?.user_restrictions?.allow_rating && (generation_data.shared ?? true) && files.length === 1) {
                     components = [...generateButtons(generation_start!.id!), ...components]
                 }
-                await message.edit({content: `Image generation finished`, components, embeds, files});
+                await message.edit({content: `Image generation finished\n\n**A new view is available, check it out by enabling \`result_structure_v2_enabled\` in the bots config**`, components, embeds, files});
                 if(party) await handlePartySubmit()
                 return null
             } 
