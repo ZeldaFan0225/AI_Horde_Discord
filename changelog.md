@@ -1,5 +1,10 @@
 # Changelog
 
+## V3.3.0
+- add support for upscaling and similar interrogation forms
+- add support for adding roles when somebody logs in via the bot
+- add support for LoCons and similar in /advanced_generate
+
 ## V3.2.3
 
 - fix a1111 weight conversion

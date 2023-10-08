@@ -199,6 +199,7 @@ export interface Config {
     default_token?: string,
     apply_roles_to_worker_owners?: string[],
     apply_roles_to_trusted_users?: string[],
+    apply_roles_to_logged_in_users?: string[],
     advanced?: {
         dev?: boolean,
         encrypt_token?: boolean,
@@ -210,7 +211,8 @@ export interface Config {
         apply_filter_to?: {
             react_to_transfer?: boolean,
             apply_roles_to_worker_owners?: boolean,
-            apply_roles_to_trusted_users?: boolean
+            apply_roles_to_trusted_users?: boolean,
+            apply_roles_to_logged_in_users?: boolean
         }
     },
     react_to_transfer?: {

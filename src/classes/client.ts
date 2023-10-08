@@ -147,7 +147,7 @@ export class AIHordeClient extends Client {
 		return encrypted.toString('hex') + ":" + iv.toString('hex');
 	};
 
-	checkGuildPermissions(id: string | null | undefined, action: "apply_roles_to_trusted_users" | "apply_roles_to_worker_owners" | "react_to_transfer"): boolean {
+	checkGuildPermissions(id: string | null | undefined, action: "apply_roles_to_trusted_users" | "apply_roles_to_worker_owners" | "react_to_transfer" | "apply_roles_to_logged_in_users"): boolean {
 		if(!id) return false;
 		if(!this.config.filter_actions?.mode) return false
 		if(this.config.filter_actions.mode === "blacklist") {
