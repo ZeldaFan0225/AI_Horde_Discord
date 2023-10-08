@@ -268,7 +268,7 @@ export default class extends Command {
         const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
         const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.advanced_generate?.default?.tiling)
         const steps = ctx.interaction.options.getInteger("steps") ?? style.steps ?? ctx.client.config.advanced_generate?.default?.steps ?? 30
-        const amount = ctx.interaction.options.getInteger("amount") ?? ctx.client.config.advanced_generate?.default?.amount ?? 1
+        const amount = ctx.interaction.options.getInteger("amount") ?? ctx.client.config.advanced_generate?.default?.amount ?? undefined
         let height = ctx.interaction.options.getInteger("height") ?? style?.height ?? ctx.client.config.advanced_generate?.default?.resolution?.height ?? 512
         let width = ctx.interaction.options.getInteger("width") ?? style?.width ?? ctx.client.config.advanced_generate?.default?.resolution?.width ?? 512
         const model = ctx.interaction.options.getString("model") ?? style?.model ?? ctx.client.config.advanced_generate?.default?.model
