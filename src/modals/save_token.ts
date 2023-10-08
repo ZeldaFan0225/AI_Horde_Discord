@@ -23,19 +23,20 @@ export default class extends Modal {
             })
         }
         const user_data = await ctx.ai_horde_manager.findUser({token: raw_token}).catch(() => null)
-        if(ctx.interaction.inCachedGuild()) {
-            const member = ctx.interaction.member
-            let apply_roles = []
-            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_worker_owners") && user_data?.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length) apply_roles.push(...ctx.client.config.apply_roles_to_worker_owners)
-            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_trusted_users") && user_data?.trusted && ctx.client.config.apply_roles_to_trusted_users?.length) apply_roles.push(...ctx.client.config.apply_roles_to_trusted_users)
-    
-            apply_roles = apply_roles.filter(r => !member?.roles.cache.has(r))
-            if(apply_roles.length) await member?.roles.add(apply_roles).catch(console.error)
-        }
         if(!user_data) return ctx.error({error: "Unable to find user with this token!"})
         const token = ctx.client.config.advanced?.encrypt_token ? ctx.client.encryptString(raw_token) : raw_token
         const res = await ctx.database.query("INSERT INTO user_tokens VALUES (DEFAULT, $1, $2, $3) ON CONFLICT (id) DO UPDATE SET token=$2, horde_id=$3 RETURNING *", [ctx.interaction.user.id, token, user_data.id])
         if(!res.rowCount) return ctx.error({error: "Unable to save token"})
+        if(ctx.interaction.inCachedGuild()) {
+            const member = ctx.interaction.member
+            let apply_roles = []
+            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_worker_owners") && user_data.worker_ids?.length && ctx.client.config.apply_roles_to_worker_owners?.length) apply_roles.push(...ctx.client.config.apply_roles_to_worker_owners)
+            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_trusted_users") && user_data.trusted && ctx.client.config.apply_roles_to_trusted_users?.length) apply_roles.push(...ctx.client.config.apply_roles_to_trusted_users)
+            if (ctx.client.checkGuildPermissions(ctx.interaction.guildId, "apply_roles_to_logged_in_users") && ctx.client.config.apply_roles_to_logged_in_users?.length) apply_roles.push(...ctx.client.config.apply_roles_to_logged_in_users)
+    
+            apply_roles = apply_roles.filter(r => !member?.roles.cache.has(r))
+            if(apply_roles.length) await member?.roles.add(apply_roles).catch(console.error)
+        }
         await ctx.interaction.reply({
             content: `S${ctx.client.config.advanced?.encrypt_token ? "ecurely s" : ""}aved your token in the database.`,
             ephemeral: true

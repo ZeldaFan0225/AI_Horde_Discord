@@ -7,10 +7,13 @@
     "apply_roles_to_trusted_users": [
 
     ],
+    "apply_roles_to_logged_in_users": [
+
+    ],
     "advanced": {
         "dev": false,
         "encrypt_token": true,
-        "result_structure_v2_enabled": false
+        "result_structure_v2_enabled": true
     },
     "filter_actions": {
         "mode": "whitelist",
@@ -20,7 +23,8 @@
         "apply_filter_to": {
             "react_to_transfer": true,
             "apply_roles_to_worker_owners": true,
-            "apply_roles_to_trusted_users": true
+            "apply_roles_to_trusted_users": true,
+            "apply_roles_to_logged_in_users": true
         }
     },
     "react_to_transfer": {
@@ -53,12 +57,26 @@
         "default": {
             "nsfw": false,
             "caption": false,
-            "interrogation": false
+            "interrogation": false,
+            "gfpgan": false,
+            "realesrgan_x4_plus": false,
+            "realesrgan_x4_plus_anime": false,
+            "nmkd_siax": false,
+            "animesharp_x4": false,
+            "codeformers": false,
+            "strip_background": false
         },
         "user_restrictions": {
             "allow_nsfw": true,
             "allow_caption": true,
-            "allow_interrogation": true
+            "allow_interrogation": true,
+            "allow_gfpgan": true,
+            "allow_realesrgan_x4_plus": true,
+            "allow_realesrgan_x4_plus_anime": true,
+            "allow_nmkd_siax": true,
+            "allow_animesharp_x4": true,
+            "allow_codeformers": true,
+            "allow_strip_background": true
         }
     },
     "advanced_generate": {

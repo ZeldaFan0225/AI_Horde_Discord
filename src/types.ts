@@ -185,7 +185,8 @@ export interface HordeStyleData {
     cfg_scale?: number,
     hires_fix?: boolean,
     loras?: {
-        name: string
+        name: string,
+        inject_trigger?: string
     }[],
     tis?: {
         name: string,
@@ -199,6 +200,7 @@ export interface Config {
     default_token?: string,
     apply_roles_to_worker_owners?: string[],
     apply_roles_to_trusted_users?: string[],
+    apply_roles_to_logged_in_users?: string[],
     advanced?: {
         dev?: boolean,
         encrypt_token?: boolean,
@@ -210,7 +212,8 @@ export interface Config {
         apply_filter_to?: {
             react_to_transfer?: boolean,
             apply_roles_to_worker_owners?: boolean,
-            apply_roles_to_trusted_users?: boolean
+            apply_roles_to_trusted_users?: boolean,
+            apply_roles_to_logged_in_users?: boolean
         }
     },
     react_to_transfer?: {
@@ -241,12 +244,26 @@ export interface Config {
         default?: {
             nsfw?: boolean,
             caption?: boolean,
-            interrogation?: boolean
+            interrogation?: boolean,
+            gfpgan?: boolean,
+            realesrgan_x4_plus?: boolean,
+            realesrgan_x4_plus_anime?: boolean,
+            nmkd_siax?: boolean,
+            animesharp_x4?: boolean,
+            codeformers?: boolean,
+            strip_background?: boolean
         },
         user_restrictions?: {
             allow_nsfw?: boolean,
             allow_caption?: boolean,
-            allow_interrogation?: boolean
+            allow_interrogation?: boolean,
+            allow_gfpgan?: boolean,
+            allow_realesrgan_x4_plus?: boolean,
+            allow_realesrgan_x4_plus_anime?: boolean,
+            allow_nmkd_siax?: boolean,
+            allow_animesharp_x4?: boolean,
+            allow_codeformers?: boolean,
+            allow_strip_background?: boolean
         }
     },
     advanced_generate?: {

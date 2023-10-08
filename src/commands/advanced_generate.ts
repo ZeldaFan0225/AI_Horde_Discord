@@ -197,7 +197,7 @@ const command_data = new SlashCommandBuilder()
             .addStringOption(
                 new SlashCommandStringOption()
                 .setName("lora")
-                .setDescription("The LORA to use for this request")
+                .setDescription("The LORA, LoCon or LyCORIS to use for this request")
                 .setAutocomplete(true)
             )
         }
@@ -288,9 +288,9 @@ export default class extends Command {
         if(lora_id) {
             const lora = await ctx.client.fetchLORAByID(lora_id, ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
             if(ctx.client.config.advanced?.dev) console.log(lora)
-            if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given", codeblock: false})
-            if(lora.type !== "LORA") return ctx.error({error: "The given ID is not a LORA"})
-            if(lora.modelVersions[0]?.files[0]?.sizeKB && lora.modelVersions[0]?.files[0]?.sizeKB > 220000 && !ctx.client.horde_curated_loras?.includes(lora.id)) return ctx.error({error: "The given LORA is larger than 220mb"})
+            if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given. LoCon and LyCORIS are also acceptable.", codeblock: false})
+            if(lora.type !== "LORA" && lora.type !== "LoCon") return ctx.error({error: "The given ID is not a LORA, LoCon or LyCORIS"})
+            if(lora.modelVersions[0]?.files[0]?.sizeKB && lora.modelVersions[0]?.files[0]?.sizeKB > 220000 && !ctx.client.horde_curated_loras?.includes(lora.id)) return ctx.error({error: "The given LORA, LoCon or LyCORIS is larger than 220mb"})
         }
 
         if(party?.channel_id) return ctx.error({error: `You can only use ${await ctx.client.getSlashCommandTag("generate")} in parties`, codeblock: false})
@@ -574,7 +574,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 done = true
                 const images = await ctx.ai_horde_manager.getImageGenerationStatus(generation_start!.id!)
 
-                if(ctx.client.config.advanced?.result_structure_v2_enabled) {
+                if(ctx.client.config.advanced?.result_structure_v2_enabled ?? true) {
                     const image_map_r = images.generations?.map(async g => {
                         const req = await Centra(g.img!, "GET").send();
                         if(g.censored) return {attachment: null, generation: g}
@@ -628,7 +628,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 if(ctx.client.config.advanced_generate?.user_restrictions?.allow_rating && (generation_data.shared ?? true) && files.length === 1) {
                     components = [...generateButtons(generation_start!.id!), ...components]
                 }
-                await message.edit({content: `Image generation finished`, components, embeds, files}).catch(console.error);
+                await message.edit({content: `Image generation finished\n\n**A new view is available, check it out by enabling \`result_structure_v2_enabled\` in the bots config**`, components, embeds, files}).catch(console.error);
                 return null
             } 
         }
