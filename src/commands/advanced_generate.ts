@@ -265,7 +265,7 @@ export default class extends Command {
         const seed = ctx.interaction.options.getString("seed")
         const gfpgan = !!(ctx.interaction.options.getBoolean("use_gfpgan") ?? ctx.client.config.advanced_generate?.default?.gfpgan)
         const real_esrgan = !!(ctx.interaction.options.getBoolean("use_real_esrgan") ?? ctx.client.config.advanced_generate?.default?.real_esrgan)
-        const seed_variation = ctx.interaction.options.getInteger("seed_variation") ?? 1
+        const seed_variation = ctx.interaction.options.getInteger("seed_variation")
         const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.advanced_generate?.default?.tiling)
         const steps = ctx.interaction.options.getInteger("steps") ?? style.steps ?? ctx.client.config.advanced_generate?.default?.steps ?? 30
         const amount = ctx.interaction.options.getInteger("amount") ?? ctx.client.config.advanced_generate?.default?.amount ?? 1
