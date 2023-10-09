@@ -378,7 +378,7 @@ export default class extends Command {
                 seed: seed ?? undefined,
                 height,
                 width,
-                seed_variation,
+                seed_variation ?? undefined,
                 post_processing,
                 tiling,
                 steps,
