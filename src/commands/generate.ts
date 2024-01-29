@@ -220,6 +220,7 @@ export default class extends Command {
                 tiling,
                 denoising_strength: denoise,
                 cfg_scale: style.cfg_scale,
+                clip_skip: style.clip_skip,
                 loras: style.loras,
                 steps: style.steps,
                 tis: style.tis,
