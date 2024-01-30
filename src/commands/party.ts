@@ -159,7 +159,7 @@ export default class extends Command {
                 const styles = Object.keys(context.client.horde_styles)
                 const categories = Object.keys(context.client.horde_style_categories)
                 const available = [...styles.map(s => ({name: `Style: ${s}`, value: s})), ...categories.map(s => ({name: `Category: ${s}`, value: s}))]
-                const ret = option.value ? available.filter(s => s.value.toLowerCase().includes(option.value.toLowerCase())) : available
+                const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase().replace("style: ","").replace("category: ","").trim())) : available
                 return await context.interaction.respond(ret.slice(0,25))
             }
         }

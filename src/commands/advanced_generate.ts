@@ -670,7 +670,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             case "style": {
                 const styles = Object.keys(context.client.horde_styles)
                 const available = styles.map(s => ({name: s, value: s}))
-                const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase())) : available
+                const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase().replace("style: ","").replace("category: ","").trim())) : available
                 return await context.interaction.respond(ret.slice(0,25))
             }
             case "lora": {
