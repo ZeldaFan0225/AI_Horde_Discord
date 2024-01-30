@@ -265,7 +265,7 @@ export default class extends Command {
         await ctx.interaction.deferReply({})
         let prompt = ctx.interaction.options.getString("prompt", true)
         
-        const style_raw = (ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style).replace("Style: ","").replace("Category: ","")
+        const style_raw = (ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style ?? "").replace("Style: ","").replace("Category: ","")
         const style = ctx.client.horde_styles[style_raw?.toLowerCase() ?? ""] || {prompt: "{p}{np}"}
 
         const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
@@ -659,7 +659,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const models = await context.ai_horde_manager.getModels()
                 if(context.client.config.advanced?.dev) console.log(models)
                 const available = [{name: "Any Model", value: "YOLO"}, ...models.sort((a, b) => b.performance!-a.performance!).map(m => ({name: `${m.name} | Workers: ${m.count} | Performance: ${m.performance} | Queued: ${m.queued}`, value: m.name!}))].filter(v => !context.client.config.advanced_generate?.blacklisted_models?.includes(v.value)).filter(v => !option.value || v.name.toLowerCase().includes(option.value.toLowerCase()))
-                return await context.interaction.respond(available.filter(o => o.name?.toLowerCase().includes(option.value.toLowerCase())).slice(0,25))
+                return await context.interaction.respond(available.filter(o => o.name?.toLowerCase().includes(option.value.toLowerCase().trim())).slice(0,25))
             }
             case "width":
             case "height": {
