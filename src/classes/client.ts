@@ -2,7 +2,7 @@ import SuperMap from "@thunder04/supermap";
 import { ChannelType, Client, ClientOptions, PermissionFlagsBits, PermissionsBitField } from "discord.js";
 import { readFileSync } from "fs";
 import { Store } from "../stores/store";
-import { Config, HordeStyleData, LORAData, LORAFetchResponse, Party, StoreTypes } from "../types";
+import { Config, HordeStyleData, LORAData, LORAVersionData, LORAFetchResponse, Party, StoreTypes } from "../types";
 import {existsSync, mkdirSync, writeFileSync} from "fs"
 import { Pool } from "pg";
 import crypto from "crypto"
@@ -222,6 +222,23 @@ export class AIHordeClient extends Client {
 		const data: LORAData = await res.json()
 
 		if(!nsfw && data.nsfw) return null
+
+		if(this.config.advanced?.dev) console.log(data)
+
+		return data
+	}
+	async fetchLORAByVersionID(id: string, nsfw: boolean = false) {
+		const res = await fetch(`https://civitai.com/api/v1/model-versions/${id}`, {
+			method: "GET",
+			headers: {
+				"User-Agent": `ZeldaFan-Discord-Bot:${this.bot_version}:https://github.com/ZeldaFan0225/AI_Horde_Discord`
+			}
+		})
+		
+		if(res.status === 404) return null
+		const data: LORAVersionData = await res.json()
+
+		if(!nsfw && data.model?.nsfw) return null
 
 		if(this.config.advanced?.dev) console.log(data)
 

@@ -175,6 +175,63 @@ export interface LORAData {
     }[]
 }
 
+export interface LORAVersionData {
+    id: number,
+    modelId: number,
+    name: string,
+    createdAt: string,
+    updatedAt: string,
+    trainedWords: string[],
+    baseModel: string,
+    earlyAccessTimeFrame: number,
+    description: string,
+    stats: {
+        downloadCount: number,
+        ratingCount: number,
+        rating: number
+    },
+    model: {
+        name: string,
+        type: string,
+        poi: boolean,
+        nsfw: boolean,
+        mode?: string
+    },
+    files: {
+        name: string,
+        id: number,
+        sizeKB: number,
+        type: string,
+        metadata: {
+            fp: null,
+            size: null,
+            format: string
+        },
+        pickleScanResult: string,
+        pickleScanMessage: string,
+        virusScanResult: string,
+        scannedAt: string,
+        hashes: {
+            AutoV1: string,
+            AutoV2: string,
+            SHA256: string,
+            CRC32: string,
+            BLAKE3: string
+        },
+        downloadURL: string,
+        primary: true
+    }[],
+    images: {
+        url: string,
+        nsfw: string,
+        width: number,
+        height: number,
+        hash: string,
+        meta: Record<string, any>
+    }[],
+    downloadUrl: string
+}
+
 export interface HordeStyleData {
     prompt: string,
     model?: string,

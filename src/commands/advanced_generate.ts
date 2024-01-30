@@ -197,7 +197,7 @@ const command_data = new SlashCommandBuilder()
             .addStringOption(
                 new SlashCommandStringOption()
                 .setName("lora")
-                .setDescription("The LORA, LoCon or LyCORIS to use for this request")
+                .setDescription("The LORA, LoCon or LyCORIS to use for this request. begin with 'v' for a specific version.")
                 .setAutocomplete(true)
             )
         }
@@ -296,10 +296,16 @@ export default class extends Command {
         const can_bypass = ctx.client.config.advanced_generate?.source_image?.whitelist?.bypass_checks && ctx.client.config.advanced_generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
         const party = await ctx.client.getParty(ctx.interaction.channelId, ctx.database)
 
-        if(lora_id) {
+        if(lora_id && lora_id[0] =="v") {
+            const lora = await ctx.client.fetchLORAByVersionID(lora_id.replace("v",""), ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
+            if(ctx.client.config.advanced?.dev) console.log(lora)
+            if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given. LoCon and LyCORIS are also acceptable. To use a specific version, prefix it with a v.", codeblock: false})
+            if(lora.model.type !== "LORA" && lora.model.type !== "LoCon") return ctx.error({error: "The given ID is not a LORA, LoCon or LyCORIS"})
+            if(lora.files[0]?.sizeKB && lora.files[0]?.sizeKB > 225280) return ctx.error({error: "The given LORA, LoCon or LyCORIS is larger than 220mb"})
+        } else if(lora_id) {
             const lora = await ctx.client.fetchLORAByID(lora_id, ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
             if(ctx.client.config.advanced?.dev) console.log(lora)
-            if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given. LoCon and LyCORIS are also acceptable.", codeblock: false})
+            if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given. LoCon and LyCORIS are also acceptable. To use a specific version, prefix it with a v.", codeblock: false})
             if(lora.type !== "LORA" && lora.type !== "LoCon") return ctx.error({error: "The given ID is not a LORA, LoCon or LyCORIS"})
             if(lora.modelVersions[0]?.files[0]?.sizeKB && lora.modelVersions[0]?.files[0]?.sizeKB > 225280 && !ctx.client.horde_curated_loras?.includes(lora.id)) return ctx.error({error: "The given LORA, LoCon or LyCORIS is larger than 220mb"})
         }
@@ -670,7 +676,14 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             case "lora": {
                 const ret = []
 
-                if(!isNaN(Number(option.value)) && option.value) {
+                if(option.value && option.value.length > 1 && option.value[0] == "v" && !isNaN(Number(option.value.slice(1)))) {
+                    const lora_by_id = await context.client.fetchLORAByVersionID(option.value, context.client.config.advanced_generate?.user_restrictions?.allow_nsfw)
+
+                    if(lora_by_id?.name && (lora_by_id?.files[0]?.sizeKB && (lora_by_id?.files[0]?.sizeKB <= 225280))) ret.push({
+                        name: lora_by_id.model.name + ": " + lora_by_id.name,
+                        value: "v"+lora_by_id.id.toString()
+                    })
+                } else if(!isNaN(Number(option.value)) && option.value) {
                     const lora_by_id = await context.client.fetchLORAByID(option.value, context.client.config.advanced_generate?.user_restrictions?.allow_nsfw)
 
                     if(lora_by_id?.name && (lora_by_id?.modelVersions[0]?.files[0]?.sizeKB && (lora_by_id?.modelVersions[0]?.files[0]?.sizeKB <= 225280 || context.client.horde_curated_loras?.includes(lora_by_id.id)))) ret.push({
