@@ -81,7 +81,7 @@ export default class extends Command {
         const recurring = !!(ctx.interaction.options.getBoolean("recurring") ?? ctx.client.config.party?.default?.recurring)
         const pay = !!(ctx.interaction.options.getBoolean("pay_for_generations") ?? ctx.client.config.party?.default?.pay_for_generations)
         const wordlist = (ctx.interaction.options.getString("wordlist") ?? "").split(",").map(w => w.trim().toLowerCase()).filter(w => w)
-        const style_raw = ctx.interaction.options.getString("style") ?? ctx.client.config.generate?.default?.style ?? "raw"
+        const style_raw = (ctx.interaction.options.getString("style") ?? ctx.client.config.generate?.default?.style ?? "raw").replace("Style: ","").replace("Category: ","")
         const style = ctx.client.horde_styles[style_raw.toLowerCase()] || ctx.client.horde_style_categories[style_raw.toLowerCase()]
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)

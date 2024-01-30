@@ -265,7 +265,7 @@ export default class extends Command {
         await ctx.interaction.deferReply({})
         let prompt = ctx.interaction.options.getString("prompt", true)
         
-        const style_raw = ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style
+        const style_raw = (ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style).replace("Style: ","").replace("Category: ","")
         const style = ctx.client.horde_styles[style_raw?.toLowerCase() ?? ""] || {prompt: "{p}{np}"}
 
         const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
