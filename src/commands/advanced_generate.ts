@@ -230,7 +230,7 @@ const command_data = new SlashCommandBuilder()
     }
 
 
-    // 21 out of 25 options used
+    // 24 out of 25 options used
 
 function generateButtons(id: string) {
     let i = 0
