@@ -197,7 +197,7 @@ const command_data = new SlashCommandBuilder()
             .addStringOption(
                 new SlashCommandStringOption()
                 .setName("lora")
-                .setDescription("The LORA, LoCon or LyCORIS to use for this request. Optionally, begin with 'v' for a specific version, add a colon to set a model weight, and another colon to set a clip weight (eg. v12345:1.5:2).")
+                .setDescription("The LORA LoCon or LyCORIS to use for this request. Use v12345:1.4:5 for versionid 12345 with weights")
                 .setAutocomplete(true)
             )
         }
