@@ -123,7 +123,7 @@ export default class extends Command {
         const party = await ctx.client.getParty(ctx.interaction.channelId, ctx.database)
         let prompt = ctx.interaction.options.getString("prompt", true)
         const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
-        const style_raw = ctx.interaction.options.getString("style") ?? party?.style ?? ctx.client.config.generate?.default?.style ?? "raw"
+        const style_raw = (ctx.interaction.options.getString("style") ?? party?.style ?? ctx.client.config.generate?.default?.style ?? "raw").replace("Style: ","").replace("Category: ","")
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.generate?.default?.denoise ?? 50)/100
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.generate?.default?.tiling)
@@ -220,6 +220,7 @@ export default class extends Command {
                 tiling,
                 denoising_strength: denoise,
                 cfg_scale: style.cfg_scale,
+                clip_skip: style.clip_skip,
                 loras: style.loras,
                 steps: style.steps,
                 tis: style.tis,
@@ -504,7 +505,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const styles = Object.keys(context.client.horde_styles)
                 const categories = Object.keys(context.client.horde_style_categories)
                 const available = [...styles.map(s => ({name: `Style: ${s}`, value: s})), ...categories.map(s => ({name: `Category: ${s}`, value: s}))]
-                const ret = option.value ? available.filter(s => s.value.toLowerCase().includes(option.value.toLowerCase())) : available
+                const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase().replace("style: ","").replace("category: ","").trim())) : available
                 return await context.interaction.respond(ret.slice(0,25))
             }
         }

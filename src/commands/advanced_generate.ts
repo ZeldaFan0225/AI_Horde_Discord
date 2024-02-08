@@ -197,7 +197,7 @@ const command_data = new SlashCommandBuilder()
             .addStringOption(
                 new SlashCommandStringOption()
                 .setName("lora")
-                .setDescription("The LORA, LoCon or LyCORIS to use for this request")
+                .setDescription("The LORA LoCon or LyCORIS to use for this request. Use v12345:1.4:5 for versionid 12345 with weights")
                 .setAutocomplete(true)
             )
         }
@@ -217,10 +217,20 @@ const command_data = new SlashCommandBuilder()
                 .setDescription("Whether to apply hires_fix to the generation")
             )
         }
+        if(config.advanced_generate.user_restrictions?.allow_clip_skip) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("clip_skip")
+                .setDescription("The number of CLIP language processor layers to skip")
+                .setMinValue(1) //1 is off/default
+                .setMaxValue(12)
+            )
+        }
     }
 
 
-    // 21 out of 25 options used
+    // 24 out of 25 options used
 
 function generateButtons(id: string) {
     let i = 0
@@ -255,7 +265,7 @@ export default class extends Command {
         await ctx.interaction.deferReply({})
         let prompt = ctx.interaction.options.getString("prompt", true)
         
-        const style_raw = ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style
+        const style_raw = (ctx.interaction.options.getString("style") ?? ctx.client.config.advanced_generate?.default?.style ?? "").replace("Style: ","").replace("Category: ","")
         const style = ctx.client.horde_styles[style_raw?.toLowerCase() ?? ""] || {prompt: "{p}{np}"}
 
         const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
@@ -275,9 +285,10 @@ export default class extends Command {
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? ctx.client.config.advanced_generate?.default?.keep_original_ratio ?? true
         const karras = ctx.interaction.options.getBoolean("karras") ?? ctx.client.config.advanced_generate?.default?.karras ?? false
         const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.advanced_generate?.default?.share
-        const lora_id = ctx.interaction.options.getString("lora")
+        const lora_raw = ctx.interaction.options.getString("lora")
         const ti_raw = ctx.interaction.options.getString("textual_inversion") ?? ctx.client.config.advanced_generate.default?.tis
         const hires_fix = ctx.interaction.options.getBoolean("hires_fix") ?? ctx.client.config.advanced_generate.default?.hires_fix ?? false
+        const clip_skip = ctx.interaction.options.getInteger("clip_skip") ?? style.clip_skip ?? ctx.client.config.advanced_generate?.default?.clip_skip ?? 1
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
@@ -285,12 +296,25 @@ export default class extends Command {
         const can_bypass = ctx.client.config.advanced_generate?.source_image?.whitelist?.bypass_checks && ctx.client.config.advanced_generate?.source_image?.whitelist?.user_ids?.includes(ctx.interaction.user.id)
         const party = await ctx.client.getParty(ctx.interaction.channelId, ctx.database)
 
-        if(lora_id) {
-            const lora = await ctx.client.fetchLORAByID(lora_id, ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
-            if(ctx.client.config.advanced?.dev) console.log(lora)
-            if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given. LoCon and LyCORIS are also acceptable.", codeblock: false})
-            if(lora.type !== "LORA" && lora.type !== "LoCon") return ctx.error({error: "The given ID is not a LORA, LoCon or LyCORIS"})
-            if(lora.modelVersions[0]?.files[0]?.sizeKB && lora.modelVersions[0]?.files[0]?.sizeKB > 225280 && !ctx.client.horde_curated_loras?.includes(lora.id)) return ctx.error({error: "The given LORA, LoCon or LyCORIS is larger than 220mb"})
+        let lora_clip_weight, lora_model_weight, lora_id
+        if(lora_raw) {
+            const lora_in = lora_raw.split(':')
+            lora_id = lora_in[0]
+            lora_model_weight = lora_in.length > 1 && lora_in[1] ? parseFloat(lora_in[1]) : 1
+            lora_clip_weight = lora_in.length > 2  && lora_in[2] ? parseFloat(lora_in[2]) : 1
+            if(lora_id && lora_id[0] =="v") {
+                const lora = await ctx.client.fetchLORAByVersionID(parseInt(lora_id.replace("v","")), ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
+                if(ctx.client.config.advanced?.dev) console.log(lora)
+                if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given. LoCon and LyCORIS are also acceptable.\nFor advanced usage, do not use autocomplete results, use numberic modelid or modelversionid instead:\n- To use a specific version, prefix the modelversionid with a v. eg. v12345\n- To add weights, split them with colons: 12345:1.5 for 1.5 model weight, v12345:1.5:2 for clip weight of 2.", codeblock: false})
+                if(lora.model.type !== "LORA" && lora.model.type !== "LoCon") return ctx.error({error: "The given ID is not a LORA, LoCon or LyCORIS"})
+                if(lora.files[0]?.sizeKB && lora.files[0]?.sizeKB > 225280) return ctx.error({error: "The given LORA, LoCon or LyCORIS is larger than 220mb"})
+            } else if(lora_id) {
+                const lora = await ctx.client.fetchLORAByID(lora_id, ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
+                if(ctx.client.config.advanced?.dev) console.log(lora)
+                if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given. LoCon and LyCORIS are also acceptable.\nFor advanced usage, do not use autocomplete results, use numberic modelid or modelversionid instead:\n- To use a specific version, prefix the modelversionid with a v. eg. v12345\n- To add weights, split them with colons: 12345:1.5 for 1.5 model weight, v12345:1.5:2 for clip weight of 2.", codeblock: false})
+                if(lora.type !== "LORA" && lora.type !== "LoCon") return ctx.error({error: "The given ID is not a LORA, LoCon or LyCORIS"})
+                if(lora.modelVersions[0]?.files[0]?.sizeKB && lora.modelVersions[0]?.files[0]?.sizeKB > 225280 && !ctx.client.horde_curated_loras?.includes(lora.id)) return ctx.error({error: "The given LORA, LoCon or LyCORIS is larger than 220mb"})
+            }
         }
 
         if(party?.channel_id) return ctx.error({error: `You can only use ${await ctx.client.getSlashCommandTag("generate")} in parties`, codeblock: false})
@@ -375,6 +399,7 @@ export default class extends Command {
             params: {
                 sampler_name: sampler,
                 cfg_scale: cfg,
+                clip_skip: clip_skip,
                 seed: seed ?? undefined,
                 height,
                 width,
@@ -385,7 +410,7 @@ export default class extends Command {
                 n: amount,
                 denoising_strength: denoise,
                 karras,
-                loras: lora_id ? [{name: lora_id}] : undefined,
+                loras: lora_id && lora_clip_weight && lora_model_weight ? [{name: lora_id, clip: lora_clip_weight ?? 1, model: lora_model_weight ?? 1}] : undefined,
                 tis,
                 hires_fix
             },
@@ -641,7 +666,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
                 const models = await context.ai_horde_manager.getModels()
                 if(context.client.config.advanced?.dev) console.log(models)
                 const available = [{name: "Any Model", value: "YOLO"}, ...models.sort((a, b) => b.performance!-a.performance!).map(m => ({name: `${m.name} | Workers: ${m.count} | Performance: ${m.performance} | Queued: ${m.queued}`, value: m.name!}))].filter(v => !context.client.config.advanced_generate?.blacklisted_models?.includes(v.value)).filter(v => !option.value || v.name.toLowerCase().includes(option.value.toLowerCase()))
-                return await context.interaction.respond(available.filter(o => o.name?.toLowerCase().includes(option.value.toLowerCase())).slice(0,25))
+                return await context.interaction.respond(available.filter(o => o.name?.toLowerCase().includes(option.value.toLowerCase().trim())).slice(0,25))
             }
             case "width":
             case "height": {
@@ -652,13 +677,20 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             case "style": {
                 const styles = Object.keys(context.client.horde_styles)
                 const available = styles.map(s => ({name: s, value: s}))
-                const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase())) : available
+                const ret = option.value ? available.filter(s => s.name.toLowerCase().includes(option.value.toLowerCase().replace("style: ","").replace("category: ","").trim())) : available
                 return await context.interaction.respond(ret.slice(0,25))
             }
             case "lora": {
                 const ret = []
 
-                if(!isNaN(Number(option.value)) && option.value) {
+                if(option.value && option.value.length > 1 && option.value[0] == "v" && !isNaN(Number(option.value.slice(1).split(":")[0]))) {
+                    const lora_by_id = await context.client.fetchLORAByVersionID(parseInt(option.value.replace("v","")), context.client.config.advanced_generate?.user_restrictions?.allow_nsfw)
+
+                    if(lora_by_id?.name && (lora_by_id?.files[0]?.sizeKB && (lora_by_id?.files[0]?.sizeKB <= 225280))) ret.push({
+                        name: lora_by_id.model.name + ": " + lora_by_id.name,
+                        value: "v"+lora_by_id.id.toString()
+                    })
+                } else if(!isNaN(Number(option.value)) && option.value) {
                     const lora_by_id = await context.client.fetchLORAByID(option.value, context.client.config.advanced_generate?.user_restrictions?.allow_nsfw)
 
                     if(lora_by_id?.name && (lora_by_id?.modelVersions[0]?.files[0]?.sizeKB && (lora_by_id?.modelVersions[0]?.files[0]?.sizeKB <= 225280 || context.client.horde_curated_loras?.includes(lora_by_id.id)))) ret.push({
