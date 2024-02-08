@@ -303,7 +303,7 @@ export default class extends Command {
             lora_model_weight = lora_in.length > 1 && lora_in[1] ? parseFloat(lora_in[1]) : 1
             lora_clip_weight = lora_in.length > 2  && lora_in[2] ? parseFloat(lora_in[2]) : 1
             if(lora_id && lora_id[0] =="v") {
-                const lora = await ctx.client.fetchLORAByVersionID(lora_id.replace("v",""), ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
+                const lora = await ctx.client.fetchLORAByVersionID(parseInt(lora_id.replace("v","")), ctx.client.config.advanced_generate.user_restrictions?.allow_nsfw)
                 if(ctx.client.config.advanced?.dev) console.log(lora)
                 if(!lora) return ctx.error({error: "A LORA ID from https://civitai.com/ has to be given. LoCon and LyCORIS are also acceptable.\nFor advanced usage, do not use autocomplete results, use numberic modelid or modelversionid instead:\n- To use a specific version, prefix the modelversionid with a v. eg. v12345\n- To add weights, split them with colons: 12345:1.5 for 1.5 model weight, v12345:1.5:2 for clip weight of 2.", codeblock: false})
                 if(lora.model.type !== "LORA" && lora.model.type !== "LoCon") return ctx.error({error: "The given ID is not a LORA, LoCon or LyCORIS"})
@@ -683,8 +683,8 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             case "lora": {
                 const ret = []
 
-                if(option.value && option.value.length > 1 && option.value[0] == "v" && !isNaN(Number(option.value.slice(1)))) {
-                    const lora_by_id = await context.client.fetchLORAByVersionID(option.value, context.client.config.advanced_generate?.user_restrictions?.allow_nsfw)
+                if(option.value && option.value.length > 1 && option.value[0] == "v" && !isNaN(Number(option.value.slice(1).split(":")[0]))) {
+                    const lora_by_id = await context.client.fetchLORAByVersionID(parseInt(option.value.replace("v","")), context.client.config.advanced_generate?.user_restrictions?.allow_nsfw)
 
                     if(lora_by_id?.name && (lora_by_id?.files[0]?.sizeKB && (lora_by_id?.files[0]?.sizeKB <= 225280))) ret.push({
                         name: lora_by_id.model.name + ": " + lora_by_id.name,

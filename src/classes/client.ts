@@ -227,7 +227,7 @@ export class AIHordeClient extends Client {
 
 		return data
 	}
-	async fetchLORAByVersionID(id: string, nsfw: boolean = false) {
+	async fetchLORAByVersionID(id: number, nsfw: boolean = false) {
 		const res = await fetch(`https://civitai.com/api/v1/model-versions/${id}`, {
 			method: "GET",
 			headers: {
