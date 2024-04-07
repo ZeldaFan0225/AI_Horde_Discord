@@ -22,7 +22,7 @@
     "@thunder04/supermap": "^3.0.2",
     "@zeldafan0225/ai_horde": "^5.0.7",
     "centra": "^2.5.0",
-    "discord.js": "^14.13.0",
+    "discord.js": "^14.14.1",
     "pg": "^8.8.0",
     "webp-converter": "^2.3.3"
   },
