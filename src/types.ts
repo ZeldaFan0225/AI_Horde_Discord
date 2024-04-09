@@ -187,6 +187,9 @@ export interface HordeStyleData {
     hires_fix?: boolean,
     loras?: {
         name: string,
+        model?: number,
+        clip?: number,
+        is_version?: boolean,
         inject_trigger?: string
     }[],
     tis?: {
