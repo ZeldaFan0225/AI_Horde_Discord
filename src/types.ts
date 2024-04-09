@@ -180,6 +180,7 @@ export interface HordeStyleData {
     model?: string,
     sampler_name?: string,
     width?: number,
+    clip_skip?: number,
     height?: number,
     steps?: number,
     cfg_scale?: number,

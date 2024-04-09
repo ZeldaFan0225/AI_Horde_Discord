@@ -287,6 +287,7 @@ export default class extends Command {
         const ti_raw = ctx.interaction.options.getString("textual_inversion") ?? ctx.client.config.advanced_generate.default?.tis
         const hires_fix = ctx.interaction.options.getBoolean("hires_fix") ?? ctx.client.config.advanced_generate.default?.hires_fix ?? false
         const qr_code_url = ctx.interaction.options.getString("qr_code_url")
+        const clipskip = style?.clip_skip ?? 1
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
@@ -384,6 +385,7 @@ export default class extends Command {
             params: {
                 sampler_name: sampler,
                 cfg_scale: cfg,
+                clip_skip: clipskip,
                 seed: seed ?? undefined,
                 height,
                 width,
