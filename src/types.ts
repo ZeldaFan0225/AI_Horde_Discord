@@ -288,6 +288,7 @@ export interface Config {
                 height?: number
             },
             cfg?: number,
+            clip_skip?: number,
             amount?: number,
             sampler?: typeof ModelGenerationInputStableSamplers,
             model?: string,
@@ -340,6 +341,7 @@ export interface Config {
             allow_style: boolean,
             allow_sampler?: boolean,
             allow_cfg?: boolean,
+            allow_clip_skip?: boolean,
             allow_seed?: boolean,
             allow_height?: boolean,
             allow_width?: boolean,

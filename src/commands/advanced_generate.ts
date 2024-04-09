@@ -225,10 +225,20 @@ const command_data = new SlashCommandBuilder()
                 .setDescription("The url to use for the qr code")
             )
         }
+        if(config.advanced_generate.user_restrictions?.allow_clip_skip) {
+            command_data
+            .addIntegerOption(
+                new SlashCommandIntegerOption()
+                .setName("clip_skip")
+                .setDescription("The number of CLIP language processor layers to skip")
+                .setMinValue(1) //1 is off/default
+                .setMaxValue(12)
+            )
+        }
     }
 
 
-    // 24 out of 25 options used
+    // 25 out of 25 options used(!)
 
 function generateButtons(id: string) {
     let i = 0
@@ -287,7 +297,7 @@ export default class extends Command {
         const ti_raw = ctx.interaction.options.getString("textual_inversion") ?? ctx.client.config.advanced_generate.default?.tis
         const hires_fix = ctx.interaction.options.getBoolean("hires_fix") ?? ctx.client.config.advanced_generate.default?.hires_fix ?? false
         const qr_code_url = ctx.interaction.options.getString("qr_code_url")
-        const clipskip = style?.clip_skip ?? 1
+        const clipskip = ctx.interaction.options.getInteger("clip_skip") ?? style?.clip_skip ?? ctx.client.config.advanced_generate?.default?.clip_skip ?? 1
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)

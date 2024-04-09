@@ -82,6 +82,7 @@ Here you can see an explanation of what which option does
             },
             "amount": The default amount of images to generate (INTEGER) *1,
             "cfg": The cfg value to use for generation (INTEGER) *1,
+            "clip_skip": The clip_skip value to use for generation (INTEGER) *1,
             "sampler": The default sampler to use (STRING) *1 *2,
             "model": The default model to use for generation (STRING) *1 *3,
             "denoise": The default denoise strength to use in % (NUMBER; 0-100) *1,
@@ -127,6 +128,7 @@ Here you can see an explanation of what which option does
             },
             "allow_sampler": (BOOLEAN) *5
             "allow_cfg": (BOOLEAN) *5,
+            "allow_clip_skip": (BOOLEAN) *5,
             "allow_seed": (BOOLEAN) *5,
             "allow_height": (BOOLEAN) *5,
             "allow_width": (BOOLEAN) *5,
