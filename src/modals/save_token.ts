@@ -23,8 +23,9 @@ export default class extends Modal {
             })
         }
         const user_data = await ctx.ai_horde_manager.findUser({token: raw_token}).catch(() => null)
-        if(!user_data) return ctx.error({error: "Unable to find user with this token!"})
+        if(!user_data || !user_data?.id) return ctx.error({error: "Unable to find user with this token!"})
         const token = ctx.client.config.advanced?.encrypt_token ? ctx.client.encryptString(raw_token) : raw_token
+        if(!token) return ctx.error({error: "Unable to encrypt token"})
         const res = await ctx.database.query("INSERT INTO user_tokens VALUES (DEFAULT, $1, $2, $3) ON CONFLICT (id) DO UPDATE SET token=$2, horde_id=$3 RETURNING *", [ctx.interaction.user.id, token, user_data.id])
         if(!res.rowCount) return ctx.error({error: "Unable to save token"})
         if(ctx.interaction.inCachedGuild()) {

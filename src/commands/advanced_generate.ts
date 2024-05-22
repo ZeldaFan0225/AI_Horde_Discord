@@ -217,10 +217,18 @@ const command_data = new SlashCommandBuilder()
                 .setDescription("Whether to apply hires_fix to the generation")
             )
         }
+        if(config.advanced_generate.user_restrictions?.allow_qr_codes) {
+            command_data
+            .addStringOption(
+                new SlashCommandStringOption()
+                .setName("qr_code_url")
+                .setDescription("The url to use for the qr code")
+            )
+        }
     }
 
 
-    // 21 out of 25 options used
+    // 24 out of 25 options used
 
 function generateButtons(id: string) {
     let i = 0
@@ -278,6 +286,7 @@ export default class extends Command {
         const lora_id = ctx.interaction.options.getString("lora")
         const ti_raw = ctx.interaction.options.getString("textual_inversion") ?? ctx.client.config.advanced_generate.default?.tis
         const hires_fix = ctx.interaction.options.getBoolean("hires_fix") ?? ctx.client.config.advanced_generate.default?.hires_fix ?? false
+        const qr_code_url = ctx.interaction.options.getString("qr_code_url")
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
@@ -387,7 +396,9 @@ export default class extends Command {
                 karras,
                 loras: lora_id ? [{name: lora_id}] : undefined,
                 tis,
-                hires_fix
+                hires_fix,
+                workflow: qr_code_url ? "qr_code" : undefined,
+                extra_texts: qr_code_url ? [{text: qr_code_url, reference: "qr_code"}] : undefined
             },
             replacement_filter: ctx.client.config.advanced_generate.replacement_filter,
             nsfw: ctx.client.config.advanced_generate?.user_restrictions?.allow_nsfw,

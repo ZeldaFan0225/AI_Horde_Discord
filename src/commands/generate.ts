@@ -87,6 +87,14 @@ const command_data = new SlashCommandBuilder()
                 .setDescription("Whether to share your generation result for research")
             )
         }
+        if(config.generate.user_restrictions?.allow_qr_codes) {
+            command_data
+            .addStringOption(
+                new SlashCommandStringOption()
+                .setName("qr_code_url")
+                .setDescription("The url to use for the qr code")
+            )
+        }
     }
 
 function generateButtons(id: string) {
@@ -129,6 +137,7 @@ export default class extends Command {
         const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.generate?.default?.tiling)
         const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.generate?.default?.share
         const keep_ratio = ctx.interaction.options.getBoolean("keep_original_ratio") ?? ctx.client.config.generate?.default?.keep_original_ratio ?? true
+        const qr_code_url = ctx.interaction.options.getString("qr_code_url")
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const style = ctx.client.getHordeStyle(style_raw)
@@ -223,7 +232,9 @@ export default class extends Command {
                 loras: style.loras,
                 steps: style.steps,
                 tis: style.tis,
-                hires_fix: style.hires_fix
+                hires_fix: style.hires_fix,
+                workflow: qr_code_url ? "qr_code" : undefined,
+                extra_texts: qr_code_url ? [{text: qr_code_url, reference: "qr_code"}] : undefined
             },
             replacement_filter: ctx.client.config.generate.replacement_filter,
             nsfw: ctx.client.config.generate?.user_restrictions?.allow_nsfw,

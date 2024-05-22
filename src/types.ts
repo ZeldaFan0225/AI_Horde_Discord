@@ -357,7 +357,8 @@ export interface Config {
             allow_rating?: boolean,
             allow_lora?: boolean,
             allow_hires_fix?: boolean,
-            allow_tis?: boolean
+            allow_tis?: boolean,
+            allow_qr_codes?: boolean
         }
     },
     generate?: {
@@ -407,7 +408,8 @@ export interface Config {
             allow_sharing?: boolean,
             allow_rating?: boolean,
             allow_source_image?: boolean,
-            allow_denoise?: boolean
+            allow_denoise?: boolean,
+            allow_qr_codes?: boolean
         }
     },
     remix?: {
