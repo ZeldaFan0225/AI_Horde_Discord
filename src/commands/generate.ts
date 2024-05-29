@@ -141,8 +141,8 @@ export default class extends Command {
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const style = ctx.client.getHordeStyle(style_raw)
+        const clipskip = style?.clip_skip ?? undefined
 
-        const clipskip = style?.clip_skip ?? 1
         let height = style?.height
         let width = style?.width
 
