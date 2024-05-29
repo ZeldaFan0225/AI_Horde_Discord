@@ -189,6 +189,7 @@
         "default": {
             "tiling": false,
             "amount": 1,
+            "clip_skip": 1,
             "share": false,
             "style": "raw",
             "keep_original_ratio": true,

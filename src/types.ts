@@ -381,6 +381,7 @@ export interface Config {
         convert_a1111_weight_to_horde_weight?: boolean,
         default?: {
             tiling?: boolean,
+            clip_skip?: number,
             amount?: number,
             share?: boolean,
             style?: string,

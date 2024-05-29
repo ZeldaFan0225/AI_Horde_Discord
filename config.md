@@ -161,6 +161,7 @@ Here you can see an explanation of what which option does
         "improve_loading_time": Try to improve the displaying time between generation finished and generation displayed in discord (BOOLEAN) *7
         "default": {
             "tiling": Whether the result should be tileable if nothing is specified (BOOLEAN) *1,
+            "clip_skip": The clip_skip value to use for generation (INTEGER) *1,
             "share:" The default for sharing the result (BOOLEAN) *1,
             "amount": The default amount of images to generate (INTEGER) *1,
             "style": The name of the style to use as a default (STRING)
