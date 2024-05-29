@@ -295,9 +295,9 @@ export default class extends Command {
         const share_result = ctx.interaction.options.getBoolean("share_result") ?? ctx.client.config.advanced_generate?.default?.share
         const lora_id = ctx.interaction.options.getString("lora")
         const ti_raw = ctx.interaction.options.getString("textual_inversion") ?? ctx.client.config.advanced_generate.default?.tis
-        const hires_fix = ctx.interaction.options.getBoolean("hires_fix") ?? ctx.client.config.advanced_generate.default?.hires_fix ?? undefined
+        const hires_fix = ctx.interaction.options.getBoolean("hires_fix") ?? ctx.client.config.advanced_generate.default?.hires_fix
         const qr_code_url = ctx.interaction.options.getString("qr_code_url")
-        const clipskip = ctx.interaction.options.getInteger("clip_skip") ?? style?.clip_skip ?? ctx.client.config.advanced_generate?.default?.clip_skip ?? undefined
+        const clipskip = ctx.interaction.options.getInteger("clip_skip") ?? style?.clip_skip ?? ctx.client.config.advanced_generate?.default?.clip_skip
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const user_token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
@@ -315,7 +315,7 @@ export default class extends Command {
         const lora_obj = lora_id ? [{
                 "name": lora_id,
                 "inject_trigger": "all"
-            }] : style?.loras ?? undefined;
+            }] : style?.loras;
 
         if(party?.channel_id) return ctx.error({error: `You can only use ${await ctx.client.getSlashCommandTag("generate")} in parties`, codeblock: false})
         if(ctx.client.config.advanced_generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("advanced_generate")}`, codeblock: false})
