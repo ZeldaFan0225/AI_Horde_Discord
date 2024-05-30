@@ -180,12 +180,16 @@ export interface HordeStyleData {
     model?: string,
     sampler_name?: string,
     width?: number,
+    clip_skip?: number,
     height?: number,
     steps?: number,
     cfg_scale?: number,
     hires_fix?: boolean,
     loras?: {
         name: string,
+        model?: number,
+        clip?: number,
+        is_version?: boolean,
         inject_trigger?: string
     }[],
     tis?: {
@@ -287,6 +291,7 @@ export interface Config {
                 height?: number
             },
             cfg?: number,
+            clip_skip?: number,
             amount?: number,
             sampler?: typeof ModelGenerationInputStableSamplers,
             model?: string,
@@ -339,6 +344,7 @@ export interface Config {
             allow_style: boolean,
             allow_sampler?: boolean,
             allow_cfg?: boolean,
+            allow_clip_skip?: boolean,
             allow_seed?: boolean,
             allow_height?: boolean,
             allow_width?: boolean,
@@ -375,6 +381,7 @@ export interface Config {
         convert_a1111_weight_to_horde_weight?: boolean,
         default?: {
             tiling?: boolean,
+            clip_skip?: number,
             amount?: number,
             share?: boolean,
             style?: string,

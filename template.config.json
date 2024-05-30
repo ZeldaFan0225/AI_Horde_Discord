@@ -99,6 +99,7 @@
                 "height": 512
             },
             "cfg": 7.5,
+            "clip_skip": 1,
             "amount": 1,
             "sampler": "k_euler",
             "model": "stable_diffusion",
@@ -151,6 +152,7 @@
             "allow_style": true,
             "allow_sampler": true,
             "allow_cfg": true,
+            "allow_clip_skip": true,
             "allow_seed": true,
             "allow_height": true,
             "allow_width": true,
@@ -187,6 +189,7 @@
         "default": {
             "tiling": false,
             "amount": 1,
+            "clip_skip": 1,
             "share": false,
             "style": "raw",
             "keep_original_ratio": true,

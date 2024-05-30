@@ -141,6 +141,7 @@ export default class extends Command {
         let img = ctx.interaction.options.getAttachment("source_image")
 
         const style = ctx.client.getHordeStyle(style_raw)
+        const clipskip = style?.clip_skip ?? ctx.client.config.generate?.default?.clip_skip
 
         let height = style?.height
         let width = style?.width
@@ -224,6 +225,7 @@ export default class extends Command {
             params: {
                 sampler_name: style.sampler_name as typeof ModelGenerationInputStableSamplers[keyof typeof ModelGenerationInputStableSamplers],
                 height: height,
+                clip_skip: clipskip,
                 width: width,
                 n: amount,
                 tiling,
