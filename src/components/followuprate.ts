@@ -19,7 +19,7 @@ export default class extends Component {
         const generation = await ctx.ai_horde_manager.getImageGenerationStatus(id!).catch(console.error)
         if(!generation?.generations?.length) return ctx.error({error: "Unable to find generation"})
 
-        const res = await ctx.ai_horde_manager.postRating(id!, {
+        const res = await ctx.ai_horde_manager.postImageRating(id!, {
             ratings: generation.generations.map(g => ({
                 id: g.id!,
                 rating: Number(rate)
