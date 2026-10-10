@@ -1,4 +1,4 @@
-import { TextInputModalData } from "discord.js";
+import { ActionRowModalData, TextInputModalData } from "discord.js";
 import { Modal } from "../classes/modal";
 import { ModalContext } from "../classes/modalContext";
 
@@ -14,8 +14,8 @@ export default class extends Modal {
 
     override async run(ctx: ModalContext): Promise<any> {
         if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
-        const username = (ctx.interaction.components[0]?.components[0] as TextInputModalData).value
-        const amount = parseInt((ctx.interaction.components[1]?.components[0] as TextInputModalData).value)
+        const username = ((ctx.interaction.components[0] as ActionRowModalData | undefined)?.components[0] as TextInputModalData).value
+        const amount = parseInt(((ctx.interaction.components[1] as ActionRowModalData | undefined)?.components[0] as TextInputModalData).value)
         const token = await ctx.client.getUserToken(ctx.interaction.user.id, ctx.database)
         if(isNaN(amount) || amount <= 0) return ctx.error({
             error: "You can only send one or mode kudos"

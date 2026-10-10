@@ -1,4 +1,4 @@
-import { Colors, TextInputModalData } from "discord.js";
+import { ActionRowModalData, Colors, TextInputModalData } from "discord.js";
 import { Modal } from "../classes/modal";
 import { ModalContext } from "../classes/modalContext";
 
@@ -14,7 +14,7 @@ export default class extends Modal {
 
     override async run(ctx: ModalContext): Promise<any> {
         if(!ctx.database) return ctx.error({error: "The database is disabled. This action requires a database."})
-        const raw_token = (ctx.interaction.components[0]?.components[0] as TextInputModalData).value
+        const raw_token = ((ctx.interaction.components[0] as ActionRowModalData | undefined)?.components[0] as TextInputModalData).value
         if(!raw_token?.length || raw_token ===  (ctx.client.config.default_token || "0000000000")) {
             await ctx.database.query("DELETE FROM user_tokens WHERE id=$1", [ctx.interaction.user.id])
             return ctx.interaction.reply({

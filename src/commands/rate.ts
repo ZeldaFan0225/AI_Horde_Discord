@@ -1,4 +1,4 @@
-import { ActionRowData, ButtonBuilder, Colors, EmbedBuilder, InteractionButtonComponentData, SlashCommandBuilder } from "discord.js";
+import { ButtonBuilder, Colors, EmbedBuilder, InteractionButtonComponentData, SlashCommandBuilder } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 
@@ -10,7 +10,7 @@ const command_data = new SlashCommandBuilder()
 function generateButtons(id: string) {
     let i = 0
     const getId = () => `rate_${i+1}_${id}`
-    const components: ActionRowData<InteractionButtonComponentData>[] = []
+    const components: {type: 1, components: InteractionButtonComponentData[]}[] = []
     while(i < 10) {
         const btn = {
             type: 2,

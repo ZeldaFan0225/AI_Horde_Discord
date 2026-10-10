@@ -1,11 +1,11 @@
-import { ActionRowData, Colors, ComponentType, EmbedBuilder, InteractionButtonComponentData } from "discord.js";
+import { Colors, ComponentType, EmbedBuilder, InteractionButtonComponentData } from "discord.js";
 import { Component } from "../classes/component";
 import { ComponentContext } from "../classes/componentContext";
 
 function generateButtons(id: string) {
     let i = 0
     const getId = () => `rate_${i+1}_${id}`
-    const components: ActionRowData<InteractionButtonComponentData>[] = []
+    const components: {type: 1, components: InteractionButtonComponentData[]}[] = []
     while(i < 10) {
         const btn = {
             type: 2,

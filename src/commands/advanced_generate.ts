@@ -1,4 +1,4 @@
-import { ActionRowData, AttachmentBuilder, ButtonBuilder, ChannelType, Colors, EmbedBuilder, InteractionButtonComponentData, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
+import { AttachmentBuilder, ButtonBuilder, ChannelType, Colors, EmbedBuilder, InteractionButtonComponentData, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "discord.js";
 import { Command } from "../classes/command";
 import { CommandContext } from "../classes/commandContext";
 import { Config } from "../types";
@@ -243,7 +243,7 @@ const command_data = new SlashCommandBuilder()
 function generateButtons(id: string) {
     let i = 0
     const getId = () => `followuprate_${i+1}_${id}`
-    const components: ActionRowData<InteractionButtonComponentData>[] = []
+    const components: {type: 1, components: InteractionButtonComponentData[]}[] = []
     while(i < 10) {
         const btn = {
             type: 2,
