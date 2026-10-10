@@ -114,7 +114,8 @@ client.on("interactionCreate", async (interaction) => {
                     return await handleContexts(interaction, client, connection, ai_horde_manager).catch(console.error);
                 }
             }
-        };
+            break;
+        }
         case InteractionType.MessageComponent: {
 			return await handleComponents(interaction, client, connection, ai_horde_manager).catch(console.error);
         };
