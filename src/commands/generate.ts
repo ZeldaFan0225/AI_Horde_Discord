@@ -5,8 +5,11 @@ import { AutocompleteContext } from "../classes/autocompleteContext";
 import { readFileSync, appendFileSync } from "fs";
 import { Config } from "../types";
 import {ModelGenerationInputStableSamplers, ImageGenerationInput} from "@zeldafan0225/ai_horde";
-import Centra from "centra";
+import { applyForcedNegativePrompt, downloadImage, parseAutocompleteValue, resolveNSFW } from "../utils/generation";
 const {buffer2webpbuffer} = require("webp-converter")
+
+/** The default failure timeout. The API sometimes reports jobs as stuck that still finish, so this is generous. */
+const DEFAULT_FAILURE_TIMEOUT_SECONDS = 60 * 10
 
 const config = JSON.parse(readFileSync("./config.json").toString()) as Config
 
@@ -130,8 +133,8 @@ export default class extends Command {
         await ctx.interaction.deferReply({})
         const party = await ctx.client.getParty(ctx.interaction.channelId, ctx.database)
         let prompt = ctx.interaction.options.getString("prompt", true)
-        const negative_prompt = ctx.interaction.options.getString("negative_prompt") ?? ""
-        const style_raw = ctx.interaction.options.getString("style") ?? party?.style ?? ctx.client.config.generate?.default?.style ?? "raw"
+        const negative_prompt = applyForcedNegativePrompt(ctx.interaction.options.getString("negative_prompt") ?? "", ctx.client.config.generate?.forced_negative_prompt)
+        const style_raw = parseAutocompleteValue(ctx.interaction.options.getString("style")) ?? party?.style ?? ctx.client.config.generate?.default?.style ?? "raw"
         const denoise = (ctx.interaction.options.getInteger("denoise") ?? ctx.client.config.generate?.default?.denoise ?? 50)/100
         const amount = ctx.interaction.options.getInteger("amount") ?? 1
         const tiling = !!(ctx.interaction.options.getBoolean("tiling") ?? ctx.client.config.generate?.default?.tiling)
@@ -159,8 +162,9 @@ export default class extends Command {
         if(ctx.client.config.generate?.require_login && !user_token) return ctx.error({error: `You are required to ${await ctx.client.getSlashCommandTag("login")} to use ${await ctx.client.getSlashCommandTag("generate")}`, codeblock: false})
         if(ctx.client.config.generate.blacklist_regex && new RegExp(ctx.client.config.generate.blacklist_regex, "i").test(prompt.replace(/[\u0300-\u036f]/g, ""))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
         if(ctx.client.config.generate?.blacklisted_words?.some(w => prompt.toLowerCase().includes(w.toLowerCase()))) return ctx.error({error: "Your prompt included one or more blacklisted words"})
-        if(ctx.client.config.generate?.blacklisted_styles?.includes(style_raw.toLowerCase())) return ctx.error({error: "The chosen style or category is blacklisted"})
-        if(ctx.client.config.generate?.blacklisted_styles?.includes(style.name)) return ctx.error({error: "The randomly chosen style from the category is blacklisted"})
+        const blacklisted_styles = ctx.client.config.generate?.blacklisted_styles?.map(s => s.toLowerCase())
+        if(blacklisted_styles?.includes(style_raw.toLowerCase())) return ctx.error({error: "The chosen style or category is blacklisted"})
+        if(blacklisted_styles?.includes(style.name)) return ctx.error({error: "The randomly chosen style from the category is blacklisted"})
         if(img && !can_bypass && !user_token) return ctx.error({error: `You need to ${await ctx.client.getSlashCommandTag("login")} and agree to our ${await ctx.client.getSlashCommandTag("terms")} first before being able to use a source image`, codeblock: false})
         if(img && ctx.client.config.generate?.source_image?.require_ai_horde_account_oauth_connection && (!ai_horde_user || ai_horde_user.pseudonymous)) return ctx.error({error: "Your ai horde account needs to be created with a oauth connection"})
         if(img && !can_bypass && ctx.client.config.generate?.source_image?.require_nsfw_channel && (ctx.interaction.channel?.type !== ChannelType.GuildText || !ctx.interaction.channel.nsfw)) return ctx.error({error: "This channel needs to be marked as age restricted to use a source image"})
@@ -207,12 +211,12 @@ export default class extends Command {
         const token = party?.shared_key || user_token || ctx.client.config.default_token || "0000000000"
         let img_data: Buffer | undefined
         if(img) {
-            let img_data_res = await Centra(img.url, "GET")
-                .send()
-            
-            if(img.contentType === "image/webp") img_data = img_data_res.body
+            const img_data_raw = await downloadImage(img.url)
+            if(!img_data_raw) return ctx.error({error: "Unable to download the source image"})
+
+            if(img.contentType === "image/webp") img_data = img_data_raw
             else {
-                img_data = await buffer2webpbuffer(img_data_res.body, img.contentType?.replace("image/",""),"-q 80").catch((e: Error) => ctx.client.config.advanced?.dev ? console.error(e) : null)
+                img_data = await buffer2webpbuffer(img_data_raw, img.contentType?.replace("image/",""),"-q 80").catch((e: Error) => ctx.client.config.advanced?.dev ? console.error(e) : null)
                 if(!img_data) return ctx.error({
                     error: "Image format conversion to webp failed"
                 })
@@ -239,8 +243,12 @@ export default class extends Command {
                 extra_texts: qr_code_url ? [{text: qr_code_url, reference: "qr_code"}] : undefined
             },
             replacement_filter: ctx.client.config.generate.replacement_filter,
-            nsfw: ctx.client.config.generate?.user_restrictions?.allow_nsfw,
-            censor_nsfw: ctx.client.config.generate?.censor_nsfw,
+            ...resolveNSFW({
+                channel: ctx.interaction.channel,
+                allow_nsfw: ctx.client.config.generate?.user_restrictions?.allow_nsfw,
+                censor_nsfw: ctx.client.config.generate?.censor_nsfw,
+                channel_based_nsfw: ctx.client.config.generate?.channel_based_nsfw
+            }),
             trusted_workers: ctx.client.config.generate?.trusted_workers,
             models: style.model ? [style.model] : undefined,
             source_image: img_data?.toString("base64"),
@@ -332,6 +340,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
 
         const message = await ctx.interaction.fetchReply()
 
+        const failure_timeout = 1000 * (ctx.client.config.generate?.generation_failure_timeout_seconds ?? DEFAULT_FAILURE_TIMEOUT_SECONDS)
         let error_timeout = Date.now()*2
         let prev_left = 1
 
@@ -355,7 +364,7 @@ ETA: <t:${Math.floor(Date.now()/1000)+(start_status?.wait_time ?? 0)}:R>`
             if(status?.wait_time === 0 && prev_left !== 0) error_timeout = Date.now()
             prev_left = status?.wait_time ?? 1
 
-            if(error_timeout < (Date.now()-1000*60*2) || start_status?.faulted) {
+            if(error_timeout < (Date.now()-failure_timeout) || start_status?.faulted) {
                 if(!done) {
                     await ctx.ai_horde_manager.deleteImageGenerationRequest(generation_start.id!)
                     message.edit({
@@ -421,27 +430,31 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
             else {
                 done = true
                 const images = await ctx.ai_horde_manager.getImageGenerationStatus(generation_start!.id!)
+                const seeds = images.generations?.map(g => g.seed).filter(s => s) ?? []
+                const footer_text = `Generation ID ${generation_start!.id}${seeds.length ? ` | Seed${seeds.length > 1 ? "s" : ""} ${seeds.join(", ")}` : ""}`
 
 
                 if(ctx.client.config.advanced?.result_structure_v2_enabled ?? true) {
                     const image_map_r = images.generations?.map(async g => {
-                        const req = await Centra(g.img!, "GET").send();
-                        if(g.censored) return {attachment: null, generation: g}
-                        const attachment = new AttachmentBuilder(req.body, {name: `${g.id}.webp`})
-                        return {attachment, generation: g}
+                        if(g.censored) return {attachment: null, generation: g, failed: false}
+                        const body = await downloadImage(g.img!)
+                        if(!body) return {attachment: null, generation: g, failed: true}
+                        const attachment = new AttachmentBuilder(body, {name: `${g.id}.webp`})
+                        return {attachment, generation: g, failed: false}
                     }) || []
                     if(!precheck) clearInterval(inter)
 
                     const image_map = await Promise.all(image_map_r)
                     const files = image_map.filter(i => i.attachment).map(i => i.attachment) as  AttachmentBuilder[]
+                    const failed_downloads = image_map.map((i, n) => i.failed ? `[Image ${n+1}](${i.generation.img})` : null).filter(l => l)
                     if(img_data && image_map.length < 10) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
                     let components = [{type: 1, components: [delete_btn]}]
                     const embeds = [
                         new EmbedBuilder({
                             title: "Generation Finished",
-                            description: `**Prompt** ${ctx.interaction.options.getString("prompt", true)}\n**Style** \`${style?.name ?? style_raw}\`${style?.type === "category-style" ? ` from category \`${style_raw}\`` : ""}\n**Kudos Consumed** \`${images.kudos}\`${image_map.length !== amount ? "\nCensored Images are not displayed" : ""}`,
+                            description: `**Prompt** ${ctx.interaction.options.getString("prompt", true)}\n**Style** \`${style?.name ?? style_raw}\`${style?.type === "category-style" ? ` from category \`${style_raw}\`` : ""}\n**Kudos Consumed** \`${images.kudos}\`${image_map.some(i => i.generation.censored) ? "\nCensored Images are not displayed" : ""}${failed_downloads.length ? `\nSome images could not be downloaded, open them here: ${failed_downloads.join(", ")}` : ""}`,
                             color: Colors.Blue,
-                            footer: {text: `Generation ID ${generation_start!.id}`},
+                            footer: {text: footer_text},
                             thumbnail: img_data && image_map.length < 10 ? {url: "attachment://original.webp"} : img_data ? {url: img!.url} : undefined
                         })
                     ]
@@ -457,24 +470,23 @@ ETA: <t:${Math.floor(Date.now()/1000)+(status?.wait_time ?? 0)}:R>`
 
 
                 const image_map_r = images.generations?.map(async (g, i) => {
-                    const req = await Centra(g.img!, "get").send();
-                    if(ctx.client.config.advanced?.dev) console.log(req)
-                    const attachment = new AttachmentBuilder(req.body, {name: `${g.seed ?? `image${i}`}.webp`})
+                    const body = await downloadImage(g.img!)
                     const embed = new EmbedBuilder({
                         title: `Image ${i+1}`,
-                        image: {url: `attachment://${g.seed ?? `image${i}`}.webp`},
                         color: Colors.Blue,
-                        description: `${!i ? `**Raw Prompt:** ${ctx.interaction.options.getString("prompt", true)}\n**Processed Prompt:** ${prompt}\n**Style:** \`${style?.name ?? style_raw}\`${style?.type === "category-style" ? ` from category \`${style_raw}\`` : ""}\n**Total Kudos Cost:** \`${images.kudos}\`` : ""}${ctx.client.config.advanced?.dev ? `\n\n**Image ID** ${g.id}` : ""}` || undefined,
+                        description: `${!i ? `**Raw Prompt:** ${ctx.interaction.options.getString("prompt", true)}\n**Processed Prompt:** ${prompt}\n**Style:** \`${style?.name ?? style_raw}\`${style?.type === "category-style" ? ` from category \`${style_raw}\`` : ""}\n**Total Kudos Cost:** \`${images.kudos}\`` : ""}${!body ? `\n**Unable to download this image, open it [here](${g.img})**` : ""}${ctx.client.config.advanced?.dev ? `\n\n**Image ID** ${g.id}` : ""}` || undefined,
                     })
+                    if(!body) return {attachment: null, embed}
+                    embed.setImage(`attachment://${g.seed ?? `image${i}`}.webp`)
                     if(img_data) embed.setThumbnail(`attachment://original.webp`)
-                    return {attachment, embed}
+                    return {attachment: new AttachmentBuilder(body, {name: `${g.seed ?? `image${i}`}.webp`}), embed}
                 }) || []
                 if(!precheck) clearInterval(inter)
 
                 const image_map = await Promise.all(image_map_r)
                 const embeds = image_map.map(i => i.embed)
-                if(ctx.client.config.advanced?.dev) embeds.at(-1)?.setFooter({text: `Generation ID ${generation_start!.id}`})
-                const files = image_map.map(i => i.attachment)
+                embeds.at(-1)?.setFooter({text: footer_text})
+                const files = image_map.filter(i => i.attachment).map(i => i.attachment) as AttachmentBuilder[]
                 if(img_data) files.push(new AttachmentBuilder(img_data, {name: "original.webp"}))
                 let components = [{type: 1, components: [delete_btn]}]
                 if(ctx.client.config.generate?.user_restrictions?.allow_rating && (generation_data.shared ?? true) && files.length === 1) {

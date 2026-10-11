@@ -71,8 +71,14 @@ Here you can see an explanation of what which option does
         "blacklisted_words": A list of blacklisted words which users are not allowed to use (ARRAY OF STRING),
         "blacklist_regex": A regex version of blacklisted_words, allows blacklisting negative and positive prompt (check for ###) and multiple words together (STRING),
         "update_generation_status_interval_seconds": The interval at which the embed in Discord gets updated (INTEGER),
+        "generation_failure_timeout_seconds": How long to wait after the estimated time ran out before cancelling the generation as failed (INTEGER; default: 600) *13,
         "convert_a1111_weight_to_horde_weight": Whether to convert a1111 to weighted prompt required by the api (BOOLEAN) *7 *8,
         "improve_loading_time": Try to improve the displaying time between generation finished and generation displayed in discord (BOOLEAN) *7
+        "channel_based_nsfw": Decide NSFW by the channels age restriction: NSFW is only possible in age restricted channels, everywhere else results are censored. Overrides censor_nsfw (BOOLEAN),
+        "forced_negative_prompt": {
+            "prompt": A negative prompt applied to every generation (STRING),
+            "mode": 'force' adds it in front of the users negative prompt, 'replaceable' only uses it when the user gave no negative prompt (STRING; default: 'force')
+        },
         "default": {
             "tiling": Whether the result should be tileable if nothing is specified (BOOLEAN) *1,
             "steps": How many steps to go through by default if nothing is specified (INTEGER) *1,
@@ -86,10 +92,12 @@ Here you can see an explanation of what which option does
             "sampler": The default sampler to use (STRING) *1 *2,
             "model": The default model to use for generation (STRING) *1 *3,
             "denoise": The default denoise strength to use in % (NUMBER; 0-100) *1,
-            "gfpgan": The default for gfpgan (BOOLEAN) *1,
-            "real_esrgan:" The default for real_esrgan (BOOLEAN) *1,
-            "karras:" The default for karras (BOOLEAN) *1,
+            "face_fixer": The default face fixer, 'none' or one of GFPGAN, GFPGANv1.3, CodeFormers, RestoreFormer (STRING) *1,
+            "upscaler": The default upscaler, 'none' or one of the upscalers offered in the command (STRING) *1,
+            "scheduler": The default scheduler, leave empty to use the workers default (STRING) *1 *14,
+            "nsfw": The default for the nsfw option when the user does not choose (BOOLEAN; default: true),
             "share:" The default for sharing the result (BOOLEAN) *1,
+            "gfpgan", "real_esrgan", "karras": DEPRECATED, still read when face_fixer, upscaler or scheduler are not set
         },
         "source_image": {
             "require_login": Whether the user has to be logged in to use image to image (BOOLEAN),
@@ -132,19 +140,28 @@ Here you can see an explanation of what which option does
             "allow_seed": (BOOLEAN) *5,
             "allow_height": (BOOLEAN) *5,
             "allow_width": (BOOLEAN) *5,
-            "allow_gfpgan": (BOOLEAN) *1 *5,
-            "allow_real_esrgan": (BOOLEAN) *1 *5,
-            "allow_seed_variation": (BOOLEAN) *5,
+            "allow_face_fixer": (BOOLEAN) *1 *5,
+            "allow_upscaler": (BOOLEAN) *1 *5,
             "allow_tiling": (BOOLEAN) *5,
             "allow_steps": (BOOLEAN) *5,
             "allow_amount": (BOOLEAN) *5,
             "allow_models": (BOOLEAN) *5,
-            "allow_source_image": (BOOLEAN) *5,
+            "allow_source_image": Allow uploading a source image in /img2img (BOOLEAN) *5,
             "allow_denoise": (BOOLEAN) *5,
-            "allow_karras": (BOOLEAN) * 5,
-            "allow_nsfw": Set to true if you want to allow NSFW image generation for your users (BOOLEAN),
+            "allow_scheduler": (BOOLEAN) *5,
+            "allow_nsfw": Set to true if you want to allow NSFW image generation for your users, also adds the nsfw option (BOOLEAN),
             "allow_sharing": (BOOLEAN) *5,
-            "allow_rating": Allow the user to rate their generated images (BOOLEAN)
+            "allow_rating": Allow the user to rate their generated images (BOOLEAN),
+            "allow_qr_codes": Allow generating QR codes in /img2img (BOOLEAN) *5,
+            "allow_gfpgan", "allow_real_esrgan", "allow_karras": DEPRECATED, still read when allow_face_fixer, allow_upscaler or allow_scheduler are not set,
+            "allow_seed_variation": REMOVED, seed variation is obsolete
+        }
+    },
+    "img2img": {
+        "enabled": Whether the /img2img command is enabled, all other settings are taken from advanced_generate (BOOLEAN),
+        "user_restrictions": {
+            "allow_source_url": Allow giving a link to the source image instead of uploading it (BOOLEAN) *5 *15,
+            "allow_controlnet": Allow guiding the generation with ControlNet (BOOLEAN) *5
         }
     },
     "generate": {
@@ -157,8 +174,11 @@ Here you can see an explanation of what which option does
         "blacklisted_words": A list of blacklisted words which users are not allowed to use (ARRAY OF STRING),
         "blacklist_regex": A regex version of blacklisted_words, allows blacklisting negative and positive prompt (check for ###) and multiple words together (STRING),
         "update_generation_status_interval_seconds": The interval at which the embed in Discord gets updated (INTEGER),
+        "generation_failure_timeout_seconds": How long to wait after the estimated time ran out before cancelling the generation as failed (INTEGER; default: 600) *13,
         "convert_a1111_weight_to_horde_weight": Whether to convert a1111 to weighted prompt required by the api (BOOLEAN) *7 *8,
         "improve_loading_time": Try to improve the displaying time between generation finished and generation displayed in discord (BOOLEAN) *7
+        "channel_based_nsfw": See advanced_generate (BOOLEAN),
+        "forced_negative_prompt": See advanced_generate,
         "default": {
             "tiling": Whether the result should be tileable if nothing is specified (BOOLEAN) *1,
             "clip_skip": The clip_skip value to use for generation (INTEGER) *1,
@@ -232,7 +252,7 @@ Here you can see an explanation of what which option does
 ```
 
 `*1` See API Documentation for reference (https://aihorde.net/api)  
-`*2` Available Samplers: k_lms, k_heun, k_euler, k_euler_a, k_dpm_2, k_dpm_2_a, DDIM, PLMS, k_dpm_fast, k_dpm_adaptive, k_dpmpp_2s_a, k_dpmpp_2m, dpmsolver  
+`*2` Available Samplers: see https://aihorde.net/api/v2/status/sampler_constraints, users pick them from an autocomplete list  
 `*3` Not all models are available at all times *1  
 `*4` Developer mode will enable logging and will also show the generations ID in the embed in Discord  
 `*5` This option changes how the command is created. If set to false the user will not have the option to modify this value when generating or the input they can give is limited.  
@@ -242,4 +262,7 @@ Here you can see an explanation of what which option does
 `*9` Uses an encryption key only known to you to encrypt the users tokens. This is recommended to increase security. Enabling this option may have an impact on speed.  
 `*10` Must follow the scheme of https://github.com/Haidra-Org/Stable-Horde-Styles/blob/main/styles.json  
 `*11` Must follow the scheme of https://github.com/Haidra-Org/Stable-Horde-Styles/blob/main/categories.json  
-`*12` Must follow the scheme of https://github.com/Haidra-Org/AI-Horde-image-model-reference/blob/main/lora.json
+`*12` Must follow the scheme of https://github.com/Haidra-Org/AI-Horde-image-model-reference/blob/main/lora.json  
+`*13` The AI Horde sometimes reports generations as stuck that still finish, so this should not be too short  
+`*14` Available Schedulers: normal, karras, exponential, sgm_uniform, simple, ddim_uniform, beta, linear_quadratic, kl_optimal, align_your_steps, gits  
+`*15` The bot downloads the image from the given URL. Only http(s) links to images up to 20MB are accepted, all other source image restrictions apply as well

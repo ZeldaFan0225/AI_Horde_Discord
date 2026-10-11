@@ -81,16 +81,17 @@ export class AIHordeClient extends Client {
 		const source = this.config.data_sources?.styles_source || `https://raw.githubusercontent.com/Haidra-Org/AI-Horde-Styles/main/styles.json`
 		const req = await fetch(source)
 		if(!req.status?.toString().startsWith("2")) throw new Error("Unable to fetch styles");
-		const res = await req.json()
-		this.horde_styles = res
+		const res: Record<string, HordeStyleData> = await req.json()
+		// lookups are case insensitive, so styles containing capital letters have to be indexed in lowercase
+		this.horde_styles = Object.fromEntries(Object.entries(res).map(([name, style]) => [name.toLowerCase(), style]))
 	}
 
 	async loadHordeStyleCategories() {
 		const source = this.config.data_sources?.style_categories_source || `https://raw.githubusercontent.com/Haidra-Org/AI-Horde-Styles/main/categories.json`
 		const req = await fetch(source)
 		if(!req.status?.toString().startsWith("2")) throw new Error("Unable to fetch style categories");
-		const res = await req.json()
-		this.horde_style_categories = res
+		const res: Record<string, string[]> = await req.json()
+		this.horde_style_categories = Object.fromEntries(Object.entries(res).map(([name, styles]) => [name.toLowerCase(), styles]))
 	}
 
 	async loadHordeCuratedLORAs() {

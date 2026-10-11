@@ -1,5 +1,25 @@
 # Changelog
 
+## V3.5.0
+- update to ai_horde 6.1.0: all current samplers, schedulers, face fixers, upscalers and ControlNet types
+- fix: /advanced_generate failed to register with more than 25 samplers, samplers are now picked via autocomplete
+- new /img2img command: use an uploaded image or an image URL as the source, guide the generation with ControlNet and generate QR codes
+- /advanced_generate: `scheduler` replaces `karras`, `face_fixer` and `upscaler` selections replace `use_gfpgan` and `use_real_esrgan`, new `nsfw` option
+- copied autocomplete labels like `Style: anime` or `model | Workers: 3 | ...` are understood as the plain value
+- styles and style categories with capital letters can now be used
+- generations are no longer cancelled as failed after 2 minutes, the timeout is configurable and defaults to 10 minutes
+- downloading generated images is retried, if it still fails a link to the image is shown
+- the seeds of the generated images are shown in the footer next to the generation ID
+- optional: decide NSFW and censoring by the channels age restriction (`channel_based_nsfw`)
+- optional: a forced or replaceable negative prompt (`forced_negative_prompt`)
+
+**Migrating**
+
+- `source_image`, `keep_original_ratio` and `qr_code_url` moved from /advanced_generate to /img2img, enable it with `img2img.enabled`
+- `seed_variation` was removed from /advanced_generate as it is obsolete
+- the config keys `allow_karras`, `allow_gfpgan`, `allow_real_esrgan` and `default.karras`, `default.gfpgan`, `default.real_esrgan` still work, but should be replaced with `allow_scheduler`, `allow_face_fixer`, `allow_upscaler` and `default.scheduler`, `default.face_fixer`, `default.upscaler`
+- see `template.config.json` and `config.md` for all new options
+
 ## V3.3.0
 - add support for upscaling and similar interrogation forms
 - add support for adding roles when somebody logs in via the bot

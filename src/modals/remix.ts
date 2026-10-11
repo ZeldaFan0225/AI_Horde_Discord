@@ -5,6 +5,7 @@ import { appendFileSync } from "fs";
 import {SourceImageProcessingTypes, ImageGenerationInput, ModelGenerationInputStableSamplers} from "@zeldafan0225/ai_horde";
 import { EmbedBuilder } from "@discordjs/builders";
 import { AttachmentBuilder, ButtonBuilder, Colors } from "discord.js";
+import { downloadImage } from "../utils/generation";
 
 
 export default class extends Modal {
@@ -125,7 +126,8 @@ export default class extends Modal {
             const generation = result.generations?.[0]
             if(!generation?.id) return displayError();
             if(ctx.client.config.advanced?.dev) console.log(generation)
-            const req = await Centra(generation.img!, "get").send().then(res => res.body)
+            const req = await downloadImage(generation.img!)
+            if(!req) return displayError();
             const attachment = new AttachmentBuilder(req, {name: `${generation.seed ?? `image${0}`}.webp`})
             const embed = new EmbedBuilder({
                 color: Colors.Blue,

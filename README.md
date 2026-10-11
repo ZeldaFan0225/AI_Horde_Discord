@@ -14,6 +14,7 @@ This package includes the code for a discord bot which interacts with the ai hor
 The bot has the following features:
 
 - /generate command with all options the api supports at the time of creating this file
+- /img2img to generate from an uploaded image or an image URL, with ControlNet and QR code support
 - /login, /logout and /updatetoken for users to add and manage their account which they can create at https://aihorde.net/register
 - /userinfo (Userinfo context command) which shows your ai horde user information and the user information of anybody else who is logged in
 - /terms which shows how the bot currently handles the api token and further information

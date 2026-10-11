@@ -199,6 +199,13 @@ export interface HordeStyleData {
     }[]
 }
 
+export interface ForcedNegativePrompt {
+    /** The negative prompt to apply */
+    prompt: string,
+    /** 'force' prepends it to every negative prompt, 'replaceable' only uses it if the user gave none */
+    mode?: "force" | "replaceable"
+}
+
 export interface Config {
     use_database?: boolean,
     default_token?: string,
@@ -281,8 +288,11 @@ export interface Config {
         blacklisted_models?: string[],
         blacklist_regex?: string,
         update_generation_status_interval_seconds?: number,
+        generation_failure_timeout_seconds?: number,
         improve_loading_time?: boolean,
         convert_a1111_weight_to_horde_weight?: boolean,
+        channel_based_nsfw?: boolean,
+        forced_negative_prompt?: ForcedNegativePrompt,
         default?: {
             tiling?: boolean,
             steps?: number,
@@ -296,9 +306,16 @@ export interface Config {
             sampler?: typeof ModelGenerationInputStableSamplers,
             model?: string,
             denoise?: number,
+            face_fixer?: string,
+            upscaler?: string,
+            /** @deprecated use face_fixer */
             gfpgan?: boolean,
+            /** @deprecated use upscaler */
             real_esrgan?: boolean,
+            scheduler?: string,
+            /** @deprecated use scheduler */
             karras?: boolean,
+            nsfw?: boolean,
             share?: boolean,
             keep_original_ratio: boolean
             style?: string,
@@ -348,8 +365,13 @@ export interface Config {
             allow_seed?: boolean,
             allow_height?: boolean,
             allow_width?: boolean,
+            allow_face_fixer?: boolean,
+            allow_upscaler?: boolean,
+            /** @deprecated use allow_face_fixer */
             allow_gfpgan?: boolean,
+            /** @deprecated use allow_upscaler */
             allow_real_esrgan?: boolean,
+            /** @deprecated seed variation is obsolete, the option was removed */
             allow_seed_variation?: boolean,
             allow_tiling?: boolean,
             allow_steps?: boolean,
@@ -358,6 +380,8 @@ export interface Config {
             allow_nsfw?: boolean,
             allow_source_image?: boolean,
             allow_denoise?: boolean,
+            allow_scheduler?: boolean,
+            /** @deprecated use allow_scheduler */
             allow_karras?: boolean,
             allow_sharing?: boolean,
             allow_rating?: boolean,
@@ -365,6 +389,14 @@ export interface Config {
             allow_hires_fix?: boolean,
             allow_tis?: boolean,
             allow_qr_codes?: boolean
+        }
+    },
+    /** Image to image generation. Uses the advanced_generate settings for everything not configured here */
+    img2img?: {
+        enabled?: boolean,
+        user_restrictions?: {
+            allow_source_url?: boolean,
+            allow_controlnet?: boolean
         }
     },
     generate?: {
@@ -377,8 +409,11 @@ export interface Config {
         blacklisted_styles?: string[],
         blacklist_regex?: string,
         update_generation_status_interval_seconds?: number,
+        generation_failure_timeout_seconds?: number,
         improve_loading_time?: boolean,
         convert_a1111_weight_to_horde_weight?: boolean,
+        channel_based_nsfw?: boolean,
+        forced_negative_prompt?: ForcedNegativePrompt,
         default?: {
             tiling?: boolean,
             clip_skip?: number,
