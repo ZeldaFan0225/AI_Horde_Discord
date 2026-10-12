@@ -8,6 +8,9 @@ import { Pool } from "pg";
 import crypto from "crypto"
 import { AIHorde, SharedKeyDetails } from "@zeldafan0225/ai_horde";
 
+/** How long a party is cached after it was looked up */
+export const PARTY_CACHE_TTL = 1000 * 60 * 20
+
 export class AIHordeClient extends Client {
 	commands: Store<StoreTypes.COMMANDS>;
 	components: Store<StoreTypes.COMPONENTS>;
@@ -176,14 +179,16 @@ export class AIHordeClient extends Client {
 		if(this.cache.has(`party-${id}`)) return this.cache.get(`party-${id}`)
 		const p = await database?.query("SELECT * FROM parties WHERE channel_id=$1", [id])
 		if(!p?.rowCount) return undefined
-		this.cache.set(`party-${id}`, 1000 * 60 * 20)
-		return p.rows[0]!
+		const party: Party = p.rows[0]!
+		this.cache.set(`party-${id}`, party, PARTY_CACHE_TTL)
+		return party
 	}
 
 	async cleanUpParties(ai_horde_manager: AIHorde, database?: Pool) {
 		const expired_parties = await database?.query("DELETE FROM parties WHERE ends_at <= CURRENT_TIMESTAMP RETURNING *").catch(console.error)
 		if(!expired_parties?.rowCount) return;
 		for(let party of expired_parties.rows) {
+			this.cache.delete(`party-${party.channel_id}`)
 			const channel = await this.channels.fetch(party.channel_id).catch(console.error)
 			if(!channel?.id || channel?.type !== ChannelType.PublicThread) continue;
 			let usagestats: SharedKeyDetails = {}
